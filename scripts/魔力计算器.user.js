@@ -161,11 +161,6 @@
   }
   var index_A, index_B;
   if(document.URL.includes("m-team.cc/torrents.php") || document.URL.includes("m-team.cc/adult.php")) {
-    var seeding = parseFloat(/gif"\>(\d+)/.exec(document.getElementById("info_block").innerHTML)[1]);
-    if(seeding > GM_getValue("MT").Umax) {
-      seeding = GM_getValue("MT").Umax;
-    }
-    var A0 = GM_getValue("MT").L * Math.tan((GM_getValue("MT").sum - seeding * GM_getValue("MT").d) * Math.PI / (2 * GM_getValue("MT").B0));
     table = document.getElementsByClassName("torrents")[0];
     index_A = table.rows[0].cells.length - 2;
     index_B = table.rows[0].cells.length - 1;
@@ -177,6 +172,11 @@
     table.rows[0].cells[index_B].noWrap = true;
     table.rows[0].cells[index_B].align = "center";
     table.rows[0].cells[index_B].innerHTML = 'B值增量<br><u><a href="mybonus.php">更新参数</a></u>';
+    var seeding = parseFloat(/gif"\>(\d+)/.exec(document.getElementById("info_block").innerHTML)[1]);
+    if(seeding > GM_getValue("MT").Umax) {
+      seeding = GM_getValue("MT").Umax;
+    }
+    var A0 = GM_getValue("MT").L * Math.tan((GM_getValue("MT").sum - seeding * GM_getValue("MT").d) * Math.PI / (2 * GM_getValue("MT").B0));
     for(i = 1; i < table.rows.length; i++) {
       T = (new Date().getTime() - new Date(/title="(.+)"/.exec(table.rows[i].cells[3].innerHTML)[1]).getTime()) / 604800;
       S = size_G(table.rows[i].cells[4].innerText);
