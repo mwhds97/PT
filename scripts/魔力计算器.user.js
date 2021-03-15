@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         魔力计算器
-// @version      1.4
+// @version      1.5
 // @author       mwhds97
 // @match        *.u2.dmhy.org/mpseed.php*
 // @match        *.m-team.cc/mybonus.php*
@@ -113,8 +113,8 @@
   var i, L, S, T, N, SD, U, D, A, table, index_A, index_B;
   if(document.URL.includes("u2.dmhy.org/torrents.php")) {
     table = document.getElementsByClassName("torrents")[0];
-    index_A = table.rows[0].cells.length - 1;
-    index_B = table.rows[0].cells.length;
+    index_A = table.rows[0].cells.length;
+    index_B = table.rows[0].cells.length + 1;
     table.rows[0].insertCell(index_A);
     table.rows[0].cells[index_A].noWrap = true;
     table.rows[0].cells[index_A].align = "center";
