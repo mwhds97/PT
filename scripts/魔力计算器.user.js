@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         魔力计算器
-// @version      1.5
+// @version      1.6
 // @author       mwhds97
 // @match        *.u2.dmhy.org/mpseed.php*
 // @match        *.m-team.cc/mybonus.php*
@@ -39,7 +39,7 @@
   }
   function calcA(S, T, N, site) {
     var params = GM_getValue(site);
-    return (1 - Math.pow(10, -T / params.T0)) * S * (1 + Math.sqrt(2) * Math.pow(10, -(N - 1)/(params.N0 - 1)));
+    return (1 - Math.pow(10, -T / params.T0)) * S * (1 + Math.sqrt(2) * Math.pow(10, -(N - 1) / (params.N0 - 1)));
   }
   function calcA_HDC(S, T, N, official) {
     var params = GM_getValue("HDC");
@@ -47,15 +47,15 @@
       return 0;
     }
     if(official) {
-      return (1 - Math.pow(10, -T / params.T0)) * S * (1 + Math.sqrt(2) * Math.pow(10, -(N - 1)/(params.N0 - 1))) * (params.M / (params.M + N - 1)) * params.Ra;
+      return (1 - Math.pow(10, -T / params.T0)) * S * (1 + Math.sqrt(2) * Math.pow(10, -(N - 1) / (params.N0 - 1))) * (params.M / (params.M + N - 1)) * params.Ra;
     }
     else {
-      return (1 - Math.pow(10, -T / params.T0)) * (400 / Math.PI * Math.atan(S / 100)) * (1 + Math.sqrt(2) * Math.pow(10, -(N - 1)/(params.N0 - 1))) * (params.M / (params.M + N - 1)) * params.Rb;
+      return (1 - Math.pow(10, -T / params.T0)) * (400 / Math.PI * Math.atan(S / 100)) * (1 + Math.sqrt(2) * Math.pow(10, -(N - 1) / (params.N0 - 1))) * (params.M / (params.M + N - 1)) * params.Rb;
     }
   }
   function calcA_HDS(S, T, N, official) {
     var params = GM_getValue("HDS");
-    return (1 - Math.pow(10, -T / params.T0)) * S * (official ? params.Ka : params.Kb) * (1 + Math.sqrt(2) * Math.pow(10, -(N - 1)/(params.N0 - 1))) * (params.M / (N + 1));
+    return (1 - Math.pow(10, -T / params.T0)) * S * (official ? params.Ka : params.Kb) * (1 + Math.sqrt(2) * Math.pow(10, -(N - 1) / (params.N0 - 1))) * (params.M / (N + 1));
   }
   function calcB(A, site) {
     var params = GM_getValue(site);
