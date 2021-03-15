@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         魔力计算器
-// @version      1.2
+// @version      1.4
 // @author       mwhds97
 // @match        *.u2.dmhy.org/mpseed.php*
 // @match        *.m-team.cc/mybonus.php*
@@ -110,13 +110,19 @@
     GM_setValue("OCD", {"T0": parseFloat(params[1]), "N0": parseFloat(params[2]), "B0": parseFloat(params[3]), "L": parseFloat(params[4]), "A0": parseFloat(params[5])});
   }
 
-  var i, L, S, T, N, SD, U, D, A, table;
+  var i, L, S, T, N, SD, U, D, A, table, index_A, index_B;
   if(document.URL.includes("u2.dmhy.org/torrents.php")) {
     table = document.getElementsByClassName("torrents")[0];
-    table.rows[0].insertCell();
-    table.rows[0].lastChild.noWrap = true;
-    table.rows[0].lastChild.align = "center";
-    table.rows[0].lastChild.innerHTML = 'UCoin<br><u><a href="mpseed.php">更新参数</a></u>';
+    index_A = table.rows[0].cells.length - 1;
+    index_B = table.rows[0].cells.length;
+    table.rows[0].insertCell(index_A);
+    table.rows[0].cells[index_A].noWrap = true;
+    table.rows[0].cells[index_A].align = "center";
+    table.rows[0].cells[index_A].innerHTML = 'UCoin<br><u><a href="mpseed.php">更新参数</a></u>';
+    table.rows[0].insertCell(index_B);
+    table.rows[0].cells[index_B].noWrap = true;
+    table.rows[0].cells[index_B].align = "center";
+    table.rows[0].cells[index_B].innerHTML = '麻瓜<br><u><a href="mpseed.php">更新参数</a></u>';
     for(i = 1; i < table.rows.length; i++) {
       var type = table.rows[i].cells[0].innerText;
       var pro = /pro.*alt="([\w\s%]+)"/.exec(table.rows[i].cells[1].innerHTML);
@@ -156,11 +162,12 @@
         U = parseFloat(factors[1]);
         D = parseFloat(factors[2]);
       }
-      table.rows[i].insertCell();
-      table.rows[i].lastChild.innerText = calcU(S, L ,SD + 1, U, D, type).toFixed(3);
+      table.rows[i].insertCell(index_A);
+      table.rows[i].insertCell(index_B);
+      table.rows[i].cells[index_A].innerText = calcU(S, L ,SD + 1, U, D, type).toFixed(3);
+      table.rows[i].cells[index_B].innerText = calcU(S, L ,SD + 1, 1.0, 1.0, type).toFixed(3);
     }
   }
-  var index_A, index_B;
   if(document.URL.includes("m-team.cc/torrents.php") || document.URL.includes("m-team.cc/adult.php") || document.URL.includes("m-team.cc/movie.php")) {
     table = document.getElementsByClassName("torrents")[0];
     index_A = table.rows[0].cells.length - 2;
