@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         魔力计算器
-// @version      1.1
+// @version      1.2
 // @author       mwhds97
 // @match        *.u2.dmhy.org/mpseed.php*
 // @match        *.m-team.cc/mybonus.php*
@@ -12,6 +12,7 @@
 // @match        *.u2.dmhy.org/torrents.php*
 // @match        *.m-team.cc/torrents.php*
 // @match        *.m-team.cc/adult.php*
+// @match        *.m-team.cc/movie.php*
 // @match        *.hdchina.org/torrents.php*
 // @match        *.chdbits.co/torrents.php*
 // @match        *.hdsky.me/torrents.php*
@@ -160,7 +161,7 @@
     }
   }
   var index_A, index_B;
-  if(document.URL.includes("m-team.cc/torrents.php") || document.URL.includes("m-team.cc/adult.php")) {
+  if(document.URL.includes("m-team.cc/torrents.php") || document.URL.includes("m-team.cc/adult.php") || document.URL.includes("m-team.cc/movie.php")) {
     table = document.getElementsByClassName("torrents")[0];
     index_A = table.rows[0].cells.length - 2;
     index_B = table.rows[0].cells.length - 1;
