@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         魔力计算器
-// @version      1.0
+// @version      1.1
 // @author       mwhds97
 // @match        *.u2.dmhy.org/mpseed.php*
 // @match        *.m-team.cc/mybonus.php*
@@ -85,7 +85,7 @@
     GM_setValue("U2", {"S0": parseFloat(params[1]), "b": parseFloat(params[2]), "d": parseFloat(params[3]), "Lmin": parseFloat(params[4]), "Lmax": parseFloat(params[5]), "SD0": parseFloat(params[6]), "e": parseFloat(params[7]), "Pa": parseFloat(params[8]), "Pb": parseFloat(params[9])});
   }
   if(document.URL.includes("m-team.cc/mybonus.php")) {
-    params = /(\d+(?:\.\d+)?)\D*(\d+(?:\.\d+)?)[\s\S]*T0 = (\d+(?:\.\d+)?)[\s\S]*N0 = (\d+(?:\.\d+)?)[\s\S]*B0 = (\d+(?:\.\d+)?)[\s\S]*L = (\d+(?:\.\d+)?)[\s\S]*-\s*(\d+(?:\.\d+)?)/.exec(document.getElementsByClassName("text")[2].innerText);
+    params = /(\d+(?:\.\d+)?)\D*(\d+(?:\.\d+)?)[\s\S]*T0 = (\d+(?:\.\d+)?)[\s\S]*N0 = (\d+(?:\.\d+)?)[\s\S]*B0 = (\d+(?:\.\d+)?)[\s\S]*L = (\d+(?:\.\d+)?)[\s\S]*-\s*(\d+(?:\.\d+)?).*(?:\d+(?:\.\d+)?)/.exec(document.getElementsByClassName("text")[2].innerText);
     GM_setValue("MT", {"d": parseFloat(params[1]), "Umax": parseFloat(params[2]), "T0": parseFloat(params[3]), "N0": parseFloat(params[4]), "B0": parseFloat(params[5]), "L": parseFloat(params[6]), "sum": parseFloat(params[7])});
   }
   if(document.URL.includes("hdchina.org/mybonus.php")) {
