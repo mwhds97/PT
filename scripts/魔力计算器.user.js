@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         魔力计算器
-// @version      1.7
+// @version      1.8
 // @author       mwhds97
 // @match        *.u2.dmhy.org/mpseed.php*
 // @match        *.m-team.cc/mybonus.php*
@@ -127,7 +127,7 @@
     for(i = 1; i < table.rows.length; i++) {
       var type = table.rows[i].cells[0].innerText;
       var pro = /pro.*alt="([\w\s%]+)"/.exec(table.rows[i].cells[1].innerHTML);
-      L = (new Date().getTime() - new Date(/title="(.+)"/.exec(table.rows[i].cells[3].innerHTML)[1]).getTime()) / 86400;
+      L = (new Date().getTime() - new Date(/title="(.+)"/.exec(table.rows[i].cells[3].innerHTML)[1]).getTime()) / 86400000;
       S = size_G(table.rows[i].cells[4].innerText);
       SD = parseFloat(table.rows[i].cells[5].innerText);
       if(pro === null) {
@@ -185,7 +185,7 @@
     }
     var A0 = GM_getValue("MT").L * Math.tan((GM_getValue("MT").sum - seeding * GM_getValue("MT").d) * Math.PI / (2 * GM_getValue("MT").B0));
     for(i = 1; i < table.rows.length; i++) {
-      T = (new Date().getTime() - new Date(/title="(.+)"/.exec(table.rows[i].cells[3].innerHTML)[1]).getTime()) / 604800;
+      T = (new Date().getTime() - new Date(/title="(.+)"/.exec(table.rows[i].cells[3].innerHTML)[1]).getTime()) / 604800000;
       S = size_G(table.rows[i].cells[4].innerText);
       N = parseFloat(table.rows[i].cells[5].innerText);
       A = calcA(S, T, N + 1, "MT");
@@ -206,7 +206,7 @@
     table.rows[0].cells[index_A].outerHTML = '<th style="text-decoration: underline;"><a href="mybonus.php">A值</a></th>';
     table.rows[0].cells[index_B].outerHTML = '<th style="text-decoration: underline;"><a href="mybonus.php">B值增量</a></th>';
     for(i = 1; i < table.rows.length; i++) {
-      T = (new Date().getTime() - new Date(/title="(.+)"/.exec(table.rows[i].cells[3].innerHTML)[1]).getTime()) / 604800;
+      T = (new Date().getTime() - new Date(/title="(.+)"/.exec(table.rows[i].cells[3].innerHTML)[1]).getTime()) / 604800000;
       S = size_G(table.rows[i].cells[4].innerText);
       N = parseFloat(table.rows[i].cells[5].innerText);
       A = calcA_HDC(S, T, N + 1, /HDChina|HDCTV|HDWinG|HDWTV|HDC/.test(table.rows[i].cells[1].innerText));
@@ -227,7 +227,7 @@
     table.rows[0].cells[index_A].outerHTML = '<td class="colhead" style="text-decoration: underline;"><a href="mybonus.php">A值</a></td>';
     table.rows[0].cells[index_B].outerHTML = '<td class="colhead" style="text-decoration: underline;"><a href="mybonus.php">B值增量</a></td>';
     for(i = 1; i < table.rows.length; i++) {
-      T = (new Date().getTime() - new Date(/title="(.+)"/.exec(table.rows[i].cells[3].innerHTML)[1]).getTime()) / 604800;
+      T = (new Date().getTime() - new Date(/title="(.+)"/.exec(table.rows[i].cells[3].innerHTML)[1]).getTime()) / 604800000;
       S = size_G(table.rows[i].cells[4].innerText);
       N = parseFloat(table.rows[i].cells[5].innerText);
       A = calcA(S, T, N + 1, "CHD");
@@ -248,7 +248,7 @@
     table.rows[0].cells[index_A].outerHTML = '<td class="colhead" style="text-decoration: underline;"><a href="mybonus.php">A值</a></td>';
     table.rows[0].cells[index_B].outerHTML = '<td class="colhead" style="text-decoration: underline;"><a href="mybonus.php">B值增量</a></td>';
     for(i = 1; i < table.rows.length; i++) {
-      T = (new Date().getTime() - new Date(/title="(.+)"/.exec(table.rows[i].cells[3].innerHTML)[1]).getTime()) / 604800;
+      T = (new Date().getTime() - new Date(/title="(.+)"/.exec(table.rows[i].cells[3].innerHTML)[1]).getTime()) / 604800000;
       S = size_G(table.rows[i].cells[4].innerText);
       N = parseFloat(table.rows[i].cells[5].innerText);
       A = calcA_HDS(S, T, N + 1, /HDSky|HDS|HDS3D|HDSTV|HDSWEB|HDSPad|HDSCD|HDSpecial|HDSAB/.test(table.rows[i].cells[1].innerText));
@@ -269,7 +269,7 @@
     table.rows[0].cells[index_A].outerHTML = '<td class="colhead" style="text-decoration: underline;"><a href="mybonus.php">A值</a></td>';
     table.rows[0].cells[index_B].outerHTML = '<td class="colhead" style="text-decoration: underline;"><a href="mybonus.php">B值增量</a></td>';
     for(i = 1; i < table.rows.length; i++) {
-      T = (new Date().getTime() - new Date(/title="(.+)"/.exec(table.rows[i].cells[3].innerHTML)[1]).getTime()) / 604800;
+      T = (new Date().getTime() - new Date(/title="(.+)"/.exec(table.rows[i].cells[3].innerHTML)[1]).getTime()) / 604800000;
       S = size_G(table.rows[i].cells[4].innerText);
       N = parseFloat(table.rows[i].cells[5].innerText);
       A = calcA(S, T, N + 1, "OB");
@@ -290,7 +290,7 @@
     table.rows[0].cells[index_A].outerHTML = '<td class="colhead" style="text-decoration: underline;"><a href="mybonus.php">A值</a></td>';
     table.rows[0].cells[index_B].outerHTML = '<td class="colhead" style="text-decoration: underline;"><a href="mybonus.php">B值增量</a></td>';
     for(i = 1; i < table.rows.length; i++) {
-      T = (new Date().getTime() - new Date(/title="(.+)"/.exec(table.rows[i].cells[5].innerHTML)[1]).getTime()) / 604800;
+      T = (new Date().getTime() - new Date(/title="(.+)"/.exec(table.rows[i].cells[5].innerHTML)[1]).getTime()) / 604800000;
       S = size_G(table.rows[i].cells[6].innerText);
       N = parseFloat(table.rows[i].cells[7].innerText);
       A = calcA(S, T, N + 1, "OCD");
