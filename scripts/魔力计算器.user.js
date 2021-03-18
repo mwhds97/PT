@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         魔力计算器
-// @version      1.6
+// @version      1.7
 // @author       mwhds97
 // @match        *.u2.dmhy.org/mpseed.php*
 // @match        *.m-team.cc/mybonus.php*
@@ -25,6 +25,11 @@
 
 (function() {
   'use strict';
+
+  if(typeof(GM_getValue("first")) == "undefined" && (document.URL.includes("torrents.php") || document.URL.includes("adult.php") || document.URL.includes("movie.php") || document.URL.includes("rescue.php"))) {
+    alert("请点击列表标题以获取或更新必要参数");
+    GM_setValue("first", "blood");
+  }
 
   function calcU(S, L, SD, U, D, type) {
     var params = GM_getValue("U2");
@@ -116,13 +121,9 @@
     index_A = table.rows[0].cells.length;
     index_B = table.rows[0].cells.length + 1;
     table.rows[0].insertCell(index_A);
-    table.rows[0].cells[index_A].noWrap = true;
-    table.rows[0].cells[index_A].align = "center";
-    table.rows[0].cells[index_A].innerHTML = 'UCoin<br><u><a href="mpseed.php">更新参数</a></u>';
     table.rows[0].insertCell(index_B);
-    table.rows[0].cells[index_B].noWrap = true;
-    table.rows[0].cells[index_B].align = "center";
-    table.rows[0].cells[index_B].innerHTML = '麻瓜<br><u><a href="mpseed.php">更新参数</a></u>';
+    table.rows[0].cells[index_A].outerHTML = '<td class="colhead" style="text-decoration: underline;"><a href="mpseed.php">UCoin</a></td>';
+    table.rows[0].cells[index_B].outerHTML = '<td class="colhead" style="text-decoration: underline;"><a href="mpseed.php">麻瓜</a></td>';
     for(i = 1; i < table.rows.length; i++) {
       var type = table.rows[i].cells[0].innerText;
       var pro = /pro.*alt="([\w\s%]+)"/.exec(table.rows[i].cells[1].innerHTML);
@@ -164,6 +165,8 @@
       }
       table.rows[i].insertCell(index_A);
       table.rows[i].insertCell(index_B);
+      table.rows[i].cells[index_A].outerHTML = '<td class="rowfollow nowrap"></td>';
+      table.rows[i].cells[index_B].outerHTML = '<td class="rowfollow nowrap"></td>';
       table.rows[i].cells[index_A].innerText = calcU(S, L ,SD + 1, U, D, type).toFixed(3);
       table.rows[i].cells[index_B].innerText = calcU(S, L ,SD + 1, 1.0, 1.0, type).toFixed(3);
     }
@@ -173,13 +176,9 @@
     index_A = table.rows[0].cells.length - 2;
     index_B = table.rows[0].cells.length - 1;
     table.rows[0].insertCell(index_A);
-    table.rows[0].cells[index_A].noWrap = true;
-    table.rows[0].cells[index_A].align = "center";
-    table.rows[0].cells[index_A].innerHTML = 'A值<br><u><a href="mybonus.php">更新参数</a></u>';
     table.rows[0].insertCell(index_B);
-    table.rows[0].cells[index_B].noWrap = true;
-    table.rows[0].cells[index_B].align = "center";
-    table.rows[0].cells[index_B].innerHTML = 'B值增量<br><u><a href="mybonus.php">更新参数</a></u>';
+    table.rows[0].cells[index_A].outerHTML = '<td class="colhead" style="text-decoration: underline;"><a href="mybonus.php">A值</a></td>';
+    table.rows[0].cells[index_B].outerHTML = '<td class="colhead" style="text-decoration: underline;"><a href="mybonus.php">B值增量</a></td>';
     var seeding = parseFloat(/gif"\>(\d+)/.exec(document.getElementById("info_block").innerHTML)[1]);
     if(seeding > GM_getValue("MT").Umax) {
       seeding = GM_getValue("MT").Umax;
@@ -192,6 +191,8 @@
       A = calcA(S, T, N + 1, "MT");
       table.rows[i].insertCell(index_A);
       table.rows[i].insertCell(index_B);
+      table.rows[i].cells[index_A].outerHTML = '<td class="rowfollow nowrap"></td>';
+      table.rows[i].cells[index_B].outerHTML = '<td class="rowfollow nowrap"></td>';
       table.rows[i].cells[index_A].innerText = A.toFixed(3);
       table.rows[i].cells[index_B].innerText = (calcB(A0 + A, "MT") - calcB(A0, "MT")).toFixed(3);
     }
@@ -201,13 +202,9 @@
     index_A = table.rows[0].cells.length - 1;
     index_B = table.rows[0].cells.length;
     table.rows[0].insertCell(index_A);
-    table.rows[0].cells[index_A].noWrap = true;
-    table.rows[0].cells[index_A].align = "center";
-    table.rows[0].cells[index_A].innerHTML = 'A值<br><u><a href="mybonus.php">更新参数</a></u>';
     table.rows[0].insertCell(index_B);
-    table.rows[0].cells[index_B].noWrap = true;
-    table.rows[0].cells[index_B].align = "center";
-    table.rows[0].cells[index_B].innerHTML = 'B值增量<br><u><a href="mybonus.php">更新参数</a></u>';
+    table.rows[0].cells[index_A].outerHTML = '<th style="text-decoration: underline;"><a href="mybonus.php">A值</a></th>';
+    table.rows[0].cells[index_B].outerHTML = '<th style="text-decoration: underline;"><a href="mybonus.php">B值增量</a></th>';
     for(i = 1; i < table.rows.length; i++) {
       T = (new Date().getTime() - new Date(/title="(.+)"/.exec(table.rows[i].cells[3].innerHTML)[1]).getTime()) / 604800;
       S = size_G(table.rows[i].cells[4].innerText);
@@ -215,6 +212,8 @@
       A = calcA_HDC(S, T, N + 1, /HDChina|HDCTV|HDWinG|HDWTV|HDC/.test(table.rows[i].cells[1].innerText));
       table.rows[i].insertCell(index_A);
       table.rows[i].insertCell(index_B);
+      table.rows[i].cells[index_A].outerHTML = '<td class="t_size" style="font-size: 12px;"></td>';
+      table.rows[i].cells[index_B].outerHTML = '<td class="t_time" style="font-size: 12px;"></td>';
       table.rows[i].cells[index_A].innerText = A.toFixed(3);
       table.rows[i].cells[index_B].innerText = (calcB(GM_getValue("HDC").A0 + A, "HDC") - calcB(GM_getValue("HDC").A0, "HDC")).toFixed(3);
     }
@@ -224,13 +223,9 @@
     index_A = table.rows[0].cells.length - 2;
     index_B = table.rows[0].cells.length - 1;
     table.rows[0].insertCell(index_A);
-    table.rows[0].cells[index_A].noWrap = true;
-    table.rows[0].cells[index_A].align = "center";
-    table.rows[0].cells[index_A].innerHTML = 'A值<br><u><a href="mybonus.php">更新参数</a></u>';
     table.rows[0].insertCell(index_B);
-    table.rows[0].cells[index_B].noWrap = true;
-    table.rows[0].cells[index_B].align = "center";
-    table.rows[0].cells[index_B].innerHTML = 'B值增量<br><u><a href="mybonus.php">更新参数</a></u>';
+    table.rows[0].cells[index_A].outerHTML = '<td class="colhead" style="text-decoration: underline;"><a href="mybonus.php">A值</a></td>';
+    table.rows[0].cells[index_B].outerHTML = '<td class="colhead" style="text-decoration: underline;"><a href="mybonus.php">B值增量</a></td>';
     for(i = 1; i < table.rows.length; i++) {
       T = (new Date().getTime() - new Date(/title="(.+)"/.exec(table.rows[i].cells[3].innerHTML)[1]).getTime()) / 604800;
       S = size_G(table.rows[i].cells[4].innerText);
@@ -238,6 +233,8 @@
       A = calcA(S, T, N + 1, "CHD");
       table.rows[i].insertCell(index_A);
       table.rows[i].insertCell(index_B);
+      table.rows[i].cells[index_A].outerHTML = '<td class="rowfollow nowrap"></td>';
+      table.rows[i].cells[index_B].outerHTML = '<td class="rowfollow nowrap"></td>';
       table.rows[i].cells[index_A].innerText = A.toFixed(3);
       table.rows[i].cells[index_B].innerText = (calcB(GM_getValue("CHD").A0 + A, "CHD") - calcB(GM_getValue("CHD").A0, "CHD")).toFixed(3);
     }
@@ -247,13 +244,9 @@
     index_A = table.rows[0].cells.length - 2;
     index_B = table.rows[0].cells.length - 1;
     table.rows[0].insertCell(index_A);
-    table.rows[0].cells[index_A].noWrap = true;
-    table.rows[0].cells[index_A].align = "center";
-    table.rows[0].cells[index_A].innerHTML = 'A值<br><u><a href="mybonus.php">更新参数</a></u>';
     table.rows[0].insertCell(index_B);
-    table.rows[0].cells[index_B].noWrap = true;
-    table.rows[0].cells[index_B].align = "center";
-    table.rows[0].cells[index_B].innerHTML = 'B值增量<br><u><a href="mybonus.php">更新参数</a></u>';
+    table.rows[0].cells[index_A].outerHTML = '<td class="colhead" style="text-decoration: underline;"><a href="mybonus.php">A值</a></td>';
+    table.rows[0].cells[index_B].outerHTML = '<td class="colhead" style="text-decoration: underline;"><a href="mybonus.php">B值增量</a></td>';
     for(i = 1; i < table.rows.length; i++) {
       T = (new Date().getTime() - new Date(/title="(.+)"/.exec(table.rows[i].cells[3].innerHTML)[1]).getTime()) / 604800;
       S = size_G(table.rows[i].cells[4].innerText);
@@ -261,6 +254,8 @@
       A = calcA_HDS(S, T, N + 1, /HDSky|HDS|HDS3D|HDSTV|HDSWEB|HDSPad|HDSCD|HDSpecial|HDSAB/.test(table.rows[i].cells[1].innerText));
       table.rows[i].insertCell(index_A);
       table.rows[i].insertCell(index_B);
+      table.rows[i].cells[index_A].outerHTML = '<td class="rowfollow nowrap"></td>';
+      table.rows[i].cells[index_B].outerHTML = '<td class="rowfollow nowrap"></td>';
       table.rows[i].cells[index_A].innerText = A.toFixed(3);
       table.rows[i].cells[index_B].innerText = (calcB(GM_getValue("HDS").A0 + A, "HDS") - calcB(GM_getValue("HDS").A0, "HDS")).toFixed(3);
     }
@@ -270,13 +265,9 @@
     index_A = table.rows[0].cells.length - 2;
     index_B = table.rows[0].cells.length - 1;
     table.rows[0].insertCell(index_A);
-    table.rows[0].cells[index_A].noWrap = true;
-    table.rows[0].cells[index_A].align = "center";
-    table.rows[0].cells[index_A].innerHTML = 'A值<br><u><a href="mybonus.php">更新参数</a></u>';
     table.rows[0].insertCell(index_B);
-    table.rows[0].cells[index_B].noWrap = true;
-    table.rows[0].cells[index_B].align = "center";
-    table.rows[0].cells[index_B].innerHTML = 'B值增量<br><u><a href="mybonus.php">更新参数</a></u>';
+    table.rows[0].cells[index_A].outerHTML = '<td class="colhead" style="text-decoration: underline;"><a href="mybonus.php">A值</a></td>';
+    table.rows[0].cells[index_B].outerHTML = '<td class="colhead" style="text-decoration: underline;"><a href="mybonus.php">B值增量</a></td>';
     for(i = 1; i < table.rows.length; i++) {
       T = (new Date().getTime() - new Date(/title="(.+)"/.exec(table.rows[i].cells[3].innerHTML)[1]).getTime()) / 604800;
       S = size_G(table.rows[i].cells[4].innerText);
@@ -284,6 +275,8 @@
       A = calcA(S, T, N + 1, "OB");
       table.rows[i].insertCell(index_A);
       table.rows[i].insertCell(index_B);
+      table.rows[i].cells[index_A].outerHTML = '<td class="rowfollow nowrap"></td>';
+      table.rows[i].cells[index_B].outerHTML = '<td class="rowfollow nowrap"></td>';
       table.rows[i].cells[index_A].innerText = A.toFixed(3);
       table.rows[i].cells[index_B].innerText = (calcB(GM_getValue("OB").A0 + A, "OB") - calcB(GM_getValue("OB").A0, "OB")).toFixed(3);
     }
@@ -293,13 +286,9 @@
     index_A = table.rows[0].cells.length - 1;
     index_B = table.rows[0].cells.length;
     table.rows[0].insertCell(index_A);
-    table.rows[0].cells[index_A].noWrap = true;
-    table.rows[0].cells[index_A].align = "center";
-    table.rows[0].cells[index_A].innerHTML = 'A值<br><u><a href="mybonus.php">更新参数</a></u>';
     table.rows[0].insertCell(index_B);
-    table.rows[0].cells[index_B].noWrap = true;
-    table.rows[0].cells[index_B].align = "center";
-    table.rows[0].cells[index_B].innerHTML = 'B值增量<br><u><a href="mybonus.php">更新参数</a></u>';
+    table.rows[0].cells[index_A].outerHTML = '<td class="colhead" style="text-decoration: underline;"><a href="mybonus.php">A值</a></td>';
+    table.rows[0].cells[index_B].outerHTML = '<td class="colhead" style="text-decoration: underline;"><a href="mybonus.php">B值增量</a></td>';
     for(i = 1; i < table.rows.length; i++) {
       T = (new Date().getTime() - new Date(/title="(.+)"/.exec(table.rows[i].cells[5].innerHTML)[1]).getTime()) / 604800;
       S = size_G(table.rows[i].cells[6].innerText);
@@ -307,6 +296,8 @@
       A = calcA(S, T, N + 1, "OCD");
       table.rows[i].insertCell(index_A);
       table.rows[i].insertCell(index_B);
+      table.rows[i].cells[index_A].outerHTML = '<td class="rowfollow nowrap"></td>';
+      table.rows[i].cells[index_B].outerHTML = '<td class="rowfollow nowrap"></td>';
       table.rows[i].cells[index_A].innerText = A.toFixed(3);
       table.rows[i].cells[index_B].innerText = (calcB(GM_getValue("OCD").A0 + A, "OCD") - calcB(GM_getValue("OCD").A0, "OCD")).toFixed(3);
     }
