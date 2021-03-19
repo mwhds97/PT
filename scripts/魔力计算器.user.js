@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         魔力计算器
-// @version      1.9
+// @version      1.10
 // @author       mwhds97
 // @match        *.u2.dmhy.org/mpseed.php*
 // @match        *.m-team.cc/mybonus.php*
@@ -13,6 +13,7 @@
 // @match        *.m-team.cc/torrents.php*
 // @match        *.m-team.cc/adult.php*
 // @match        *.m-team.cc/movie.php*
+// @match        *.m-team.cc/music.php*
 // @match        *.hdchina.org/torrents.php*
 // @match        *.chdbits.co/torrents.php*
 // @match        *.hdsky.me/torrents.php*
@@ -26,7 +27,7 @@
 (function() {
   'use strict';
 
-  if(typeof(GM_getValue("first")) == "undefined" && (document.URL.includes("torrents.php") || document.URL.includes("adult.php") || document.URL.includes("movie.php") || document.URL.includes("rescue.php"))) {
+  if(typeof(GM_getValue("first")) == "undefined" && (document.URL.includes("torrents.php") || document.URL.includes("adult.php") || document.URL.includes("movie.php") || document.URL.includes("music.php") || document.URL.includes("rescue.php"))) {
     alert("请点击列表标题以获取或更新必要参数");
     GM_setValue("first", "blood");
   }
@@ -171,7 +172,7 @@
       table.rows[i].cells[index_B].innerText = calcU(S, L ,SD + 1, 1.0, 1.0, type).toFixed(3);
     }
   }
-  if(document.URL.includes("m-team.cc/torrents.php") || document.URL.includes("m-team.cc/adult.php") || document.URL.includes("m-team.cc/movie.php")) {
+  if(document.URL.includes("m-team.cc/torrents.php") || document.URL.includes("m-team.cc/adult.php") || document.URL.includes("m-team.cc/movie.php") || document.URL.includes("m-team.cc/music.php")) {
     table = document.getElementsByClassName("torrents")[0];
     index_A = table.rows[0].cells.length - 2;
     index_B = table.rows[0].cells.length - 1;
