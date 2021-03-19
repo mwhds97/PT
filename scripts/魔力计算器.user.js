@@ -129,7 +129,7 @@
       var pro = /pro.*alt="([\w\s%]+)"/.exec(table.rows[i].cells[1].innerHTML);
       L = (new Date().getTime() - new Date(/title="(.+)"/.exec(table.rows[i].cells[3].innerHTML)[1]).getTime()) / 86400000;
       S = size_G(table.rows[i].cells[4].innerText);
-      SD = parseFloat(table.rows[i].cells[5].innerText);
+      SD = parseFloat(table.rows[i].cells[5].innerText.replace(/\D/g, ""));
       if(pro === null) {
         U = 1.0;
         D = 1.0;
@@ -187,7 +187,7 @@
     for(i = 1; i < table.rows.length; i++) {
       T = (new Date().getTime() - new Date(/title="(.+)"/.exec(table.rows[i].cells[3].innerHTML)[1]).getTime()) / 604800000;
       S = size_G(table.rows[i].cells[4].innerText);
-      N = parseFloat(table.rows[i].cells[5].innerText);
+      N = parseFloat(table.rows[i].cells[5].innerText.replace(/\D/g, ""));
       A = calcA(S, T, N + 1, "MT");
       table.rows[i].insertCell(index_A);
       table.rows[i].insertCell(index_B);
@@ -208,7 +208,7 @@
     for(i = 1; i < table.rows.length; i++) {
       T = (new Date().getTime() - new Date(/title="(.+)"/.exec(table.rows[i].cells[3].innerHTML)[1]).getTime()) / 604800000;
       S = size_G(table.rows[i].cells[4].innerText);
-      N = parseFloat(table.rows[i].cells[5].innerText);
+      N = parseFloat(table.rows[i].cells[5].innerText.replace(/\D/g, ""));
       A = calcA_HDC(S, T, N + 1, /HDChina|HDCTV|HDWinG|HDWTV|HDC/.test(table.rows[i].cells[1].innerText));
       table.rows[i].insertCell(index_A);
       table.rows[i].insertCell(index_B);
@@ -229,7 +229,7 @@
     for(i = 1; i < table.rows.length; i++) {
       T = (new Date().getTime() - new Date(/title="(.+)"/.exec(table.rows[i].cells[3].innerHTML)[1]).getTime()) / 604800000;
       S = size_G(table.rows[i].cells[4].innerText);
-      N = parseFloat(table.rows[i].cells[5].innerText);
+      N = parseFloat(table.rows[i].cells[5].innerText.replace(/\D/g, ""));
       A = calcA(S, T, N + 1, "CHD");
       table.rows[i].insertCell(index_A);
       table.rows[i].insertCell(index_B);
@@ -250,7 +250,7 @@
     for(i = 1; i < table.rows.length; i++) {
       T = (new Date().getTime() - new Date(/title="(.+)"/.exec(table.rows[i].cells[3].innerHTML)[1]).getTime()) / 604800000;
       S = size_G(table.rows[i].cells[4].innerText);
-      N = parseFloat(table.rows[i].cells[5].innerText);
+      N = parseFloat(table.rows[i].cells[5].innerText.replace(/\D/g, ""));
       A = calcA_HDS(S, T, N + 1, /HDSky|HDS|HDS3D|HDSTV|HDSWEB|HDSPad|HDSCD|HDSpecial|HDSAB/.test(table.rows[i].cells[1].innerText));
       table.rows[i].insertCell(index_A);
       table.rows[i].insertCell(index_B);
@@ -271,7 +271,7 @@
     for(i = 1; i < table.rows.length; i++) {
       T = (new Date().getTime() - new Date(/title="(.+)"/.exec(table.rows[i].cells[3].innerHTML)[1]).getTime()) / 604800000;
       S = size_G(table.rows[i].cells[4].innerText);
-      N = parseFloat(table.rows[i].cells[5].innerText);
+      N = parseFloat(table.rows[i].cells[5].innerText.replace(/\D/g, ""));
       A = calcA(S, T, N + 1, "OB");
       table.rows[i].insertCell(index_A);
       table.rows[i].insertCell(index_B);
@@ -292,7 +292,7 @@
     for(i = 1; i < table.rows.length; i++) {
       T = (new Date().getTime() - new Date(/title="(.+)"/.exec(table.rows[i].cells[5].innerHTML)[1]).getTime()) / 604800000;
       S = size_G(table.rows[i].cells[6].innerText);
-      N = parseFloat(table.rows[i].cells[7].innerText);
+      N = parseFloat(table.rows[i].cells[7].innerText.replace(/\D/g, ""));
       A = calcA(S, T, N + 1, "OCD");
       table.rows[i].insertCell(index_A);
       table.rows[i].insertCell(index_B);
