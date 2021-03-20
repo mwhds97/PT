@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         魔力计算器
-// @version      1.10
+// @version      1.11
 // @author       mwhds97
 // @match        *.u2.dmhy.org/mpseed.php*
 // @match        *.m-team.cc/mybonus.php*
@@ -27,7 +27,7 @@
 (function() {
   'use strict';
 
-  if(typeof(GM_getValue("first")) == "undefined" && (document.URL.includes("torrents.php") || document.URL.includes("adult.php") || document.URL.includes("movie.php") || document.URL.includes("music.php") || document.URL.includes("rescue.php"))) {
+  if(typeof(GM_getValue("first")) == "undefined" && /(torrents|adult|movie|music|rescue)\.php/.test(document.URL)) {
     alert("请点击列表标题以获取或更新必要参数");
     GM_setValue("first", "blood");
   }
@@ -117,7 +117,7 @@
   }
 
   var i, L, S, T, N, SD, U, D, A, table, index_A, index_B;
-  if(document.URL.includes("u2.dmhy.org/torrents.php")) {
+  if(/u2.*torrents\.php/.test(document.URL)) {
     table = document.getElementsByClassName("torrents")[0];
     index_A = table.rows[0].cells.length;
     index_B = table.rows[0].cells.length + 1;
@@ -172,7 +172,7 @@
       table.rows[i].cells[index_B].innerText = calcU(S, L ,SD + 1, 1.0, 1.0, type).toFixed(3);
     }
   }
-  if(document.URL.includes("m-team.cc/torrents.php") || document.URL.includes("m-team.cc/adult.php") || document.URL.includes("m-team.cc/movie.php") || document.URL.includes("m-team.cc/music.php")) {
+  if(/m-team.*(torrents|adult|movie|music)\.php/.test(document.URL)) {
     table = document.getElementsByClassName("torrents")[0];
     index_A = table.rows[0].cells.length - 2;
     index_B = table.rows[0].cells.length - 1;
@@ -198,7 +198,7 @@
       table.rows[i].cells[index_B].innerText = (calcB(A0 + A, "MT") - calcB(A0, "MT")).toFixed(3);
     }
   }
-  if(document.URL.includes("hdchina.org/torrents.php")) {
+  if(/hdchina.*torrents\.php/.test(document.URL)) {
     table = document.getElementsByClassName("torrent_list")[0];
     index_A = table.rows[0].cells.length - 1;
     index_B = table.rows[0].cells.length;
@@ -219,7 +219,7 @@
       table.rows[i].cells[index_B].innerText = (calcB(GM_getValue("HDC").A0 + A, "HDC") - calcB(GM_getValue("HDC").A0, "HDC")).toFixed(3);
     }
   }
-  if(document.URL.includes("chdbits.co/torrents.php")){
+  if(/chdbits.*torrents\.php/.test(document.URL)) {
     table = document.getElementsByClassName("torrents")[0];
     index_A = table.rows[0].cells.length - 2;
     index_B = table.rows[0].cells.length - 1;
@@ -240,7 +240,7 @@
       table.rows[i].cells[index_B].innerText = (calcB(GM_getValue("CHD").A0 + A, "CHD") - calcB(GM_getValue("CHD").A0, "CHD")).toFixed(3);
     }
   }
-  if(document.URL.includes("hdsky.me/torrents.php")){
+  if(/hdsky.*torrents\.php/.test(document.URL)) {
     table = document.getElementsByClassName("torrents progresstable")[0];
     index_A = table.rows[0].cells.length - 2;
     index_B = table.rows[0].cells.length - 1;
@@ -261,7 +261,7 @@
       table.rows[i].cells[index_B].innerText = (calcB(GM_getValue("HDS").A0 + A, "HDS") - calcB(GM_getValue("HDS").A0, "HDS")).toFixed(3);
     }
   }
-  if(document.URL.includes("ourbits.club/torrents.php") || document.URL.includes("ourbits.club/rescue.php")){
+  if(/ourbits.*(torrents|rescue)\.php/.test(document.URL)) {
     table = document.getElementsByClassName("torrents")[0];
     index_A = table.rows[0].cells.length - 2;
     index_B = table.rows[0].cells.length - 1;
@@ -282,7 +282,7 @@
       table.rows[i].cells[index_B].innerText = (calcB(GM_getValue("OB").A0 + A, "OB") - calcB(GM_getValue("OB").A0, "OB")).toFixed(3);
     }
   }
-  if(document.URL.includes("open.cd/torrents.php")){
+  if(/open.*cd.*torrents\.php/.test(document.URL)) {
     table = document.getElementsByClassName("torrents")[0];
     index_A = table.rows[0].cells.length - 1;
     index_B = table.rows[0].cells.length;
