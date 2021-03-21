@@ -42,5 +42,7 @@
   CreateButton(shbox, i + 12, "fall", "平地摔", "平地摔");
   CreateButton(shbox, i + 13, "choc", "巧克力", "巧克力");
   CreateButton(shbox, i + 14, "creed", "教义", "教义");
-  CreateButton(shbox, i + 15, "eternal", "+1s", "+1s");
+  CreateButton(shbox, i + 15, "ohayo", "早安", "早安");
+  CreateButton(shbox, i + 16, "oyasumi", "晚安", "晚安");
+  CreateButton(shbox, i + 17, "eternal", "+1s", "+1s");
 })();
