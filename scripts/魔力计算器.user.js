@@ -131,7 +131,7 @@
     GM_setValue("SSD", {"N0": parseFloat(params[1]), "E": parseFloat(params[2]), "D": parseFloat(params[3]), "A0": parseFloat(params[4]), "ratio": parseFloat(params[5])});
   }
 
-  var i, L, S, T, N, SD, U, D, A, dB, table, index_A, index_B, index_BR;
+  var i, L, S, T, N, SD, U, D, A, dB, table, index_A, index_B;
   if(/u2.*torrents\.php/.test(document.URL)) {
     table = document.getElementsByClassName("torrents")[0];
     index_A = table.rows[0].cells.length;
@@ -341,31 +341,17 @@
   if(/springsunday.*(torrents|rescue)\.php/.test(document.URL)) {
     table = document.getElementsByClassName("torrents")[0];
     index_A = table.rows[0].cells.length - 1;
-    index_B = table.rows[0].cells.length;
-    index_BR = table.rows[0].cells.length + 1;
     table.rows[0].insertCell(index_A);
-    table.rows[0].insertCell(index_B);
-    table.rows[0].insertCell(index_BR);
-    table.rows[0].cells[index_A].outerHTML = '<td class="colhead" style="text-decoration: underline;"><a href="mybonus.php">A值</a></td>';
-    table.rows[0].cells[index_B].outerHTML = '<td class="colhead" style="text-decoration: underline;"><a href="mybonus.php">积分增量</a></td>';
-    table.rows[0].cells[index_BR].outerHTML = '<td class="colhead" style="text-decoration: underline;"><a href="mybonus.php">魔力增量</a></td>';
+    table.rows[0].cells[index_A].outerHTML = '<td class="colhead" style="text-decoration: underline;"><a href="mybonus.php">初始A值</a></td>';
     for(i = 1; i < table.rows.length; i++) {
       table.rows[i].insertCell(index_A);
-      table.rows[i].insertCell(index_B);
-      table.rows[i].insertCell(index_BR);
       table.rows[i].cells[index_A].outerHTML = '<td class="rowfollow nowrap"></td>';
-      table.rows[i].cells[index_B].outerHTML = '<td class="rowfollow nowrap"></td>';
-      table.rows[i].cells[index_BR].outerHTML = '<td class="rowfollow nowrap"></td>';
     }
     for(i = 1; i < table.rows.length; i++) {
-      T = (new Date().getTime() - new Date(/title="(.+)"/.exec(table.rows[i].cells[4].innerHTML)[1]).getTime()) / 604800000;
       S = size_G(table.rows[i].cells[5].innerText);
       N = parseFloat(table.rows[i].cells[6].innerText.replace(/\D/g, ""));
-      A = calcA_SSD(S, T, N + 1);
-      dB = calcB_SSD(GM_getValue("SSD").A0 + A) - calcB_SSD(GM_getValue("SSD").A0);
+      A = calcA_SSD(S, 0, N + 1);
       table.rows[i].cells[index_A].innerText = A.toFixed(3);
-      table.rows[i].cells[index_B].innerText = dB.toFixed(3);
-      table.rows[i].cells[index_BR].innerText = (dB * GM_getValue("SSD").ratio).toFixed(3);
     }
   }
 })();
