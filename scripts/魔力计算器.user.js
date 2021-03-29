@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         魔力计算器
-// @version      1.13
+// @version      1.14
 // @author       mwhds97
 // @match        *.u2.dmhy.org/mpseed.php*
 // @match        *.m-team.cc/mybonus.php*
@@ -107,15 +107,15 @@
     GM_setValue("MT", {"d": parseFloat(params[1]), "Umax": parseFloat(params[2]), "T0": parseFloat(params[3]), "N0": parseFloat(params[4]), "B0": parseFloat(params[5]), "L": parseFloat(params[6]), "sum": parseFloat(params[7])});
   }
   if(/hdchina.*mybonus\.php/.test(document.URL)) {
-    params = /T0 = (\d+(?:\.\d+)?)[\s\S]*N0 = (\d+(?:\.\d+)?)[\s\S]*B0 = (\d+(?:\.\d+)?)[\s\S]*L = (\d+(?:\.\d+)?)[\s\S]*M = (\d+(?:\.\d+)?)[\s\S]*{\n(\d+(?:\.\d+)?),\n(\d+(?:\.\d+)?)[\s\S]*A = (\d+(?:\.\d+)?)[\s\S]*\D+(\d+(?:\.\d+)?)M/.exec(document.getElementsByClassName("normal_tab mybonus")[2].innerText);
-    GM_setValue("HDC", {"T0": parseFloat(params[1]), "N0": parseFloat(params[2]), "B0": parseFloat(params[3]), "L": parseFloat(params[4]), "M": parseFloat(params[5]), "Ra": parseFloat(params[6]), "Rb": parseFloat(params[7]), "A0": parseFloat(params[8]), "Smin": parseFloat(params[9])});
+    params = /T0 = (\d+(?:\.\d+)?)[\s\S]*N0 = (\d+(?:\.\d+)?)[\s\S]*B0 = (\d+(?:\.\d+)?)[\s\S]*L = (\d+(?:\.\d+)?)[\s\S]*M = (\d+(?:\.\d+)?)[\s\S]*{\n(\d+(?:\.\d+)?),\n(\d+(?:\.\d+)?)[\s\S]*(?:A = (\d+(?:\.\d+)?).*A = (?=.*\[.*\[)|A = (\d+(?:\.\d+)?)(?!.*\[.*\[))[\s\S]*\D+(\d+(?:\.\d+)?)M/.exec(document.getElementsByClassName("normal_tab mybonus")[2].innerText);
+    GM_setValue("HDC", {"T0": parseFloat(params[1]), "N0": parseFloat(params[2]), "B0": parseFloat(params[3]), "L": parseFloat(params[4]), "M": parseFloat(params[5]), "Ra": parseFloat(params[6]), "Rb": parseFloat(params[7]), "A0": parseFloat(params[typeof(params[9]) == "undefined" ? 8 : 9]), "Smin": parseFloat(params[10])});
   }
   if(/chdbits.*mybonus\.php/.test(document.URL)) {
     params = /T0 = (\d+(?:\.\d+)?)[\s\S]*N0 = (\d+(?:\.\d+)?)[\s\S]*B0 = (\d+(?:\.\d+)?)[\s\S]*L = (\d+(?:\.\d+)?)[\s\S]*A = (\d+(?:\.\d+)?)/.exec(document.getElementsByClassName("text")[2].innerText);
     GM_setValue("CHD", {"T0": parseFloat(params[1]), "N0": parseFloat(params[2]), "B0": parseFloat(params[3]), "L": parseFloat(params[4]), "A0": parseFloat(params[5])});
   }
   if(/hdsky.*mybonus\.php/.test(document.URL)) {
-    params = /T0 = (\d+(?:\.\d+)?)[\s\S]*N0 = (\d+(?:\.\d+)?)[\s\S]*B0 = (\d+(?:\.\d+)?)[\s\S]*L = (\d+(?:\.\d+)?)[\s\S]*M=(\d+(?:\.\d+)?)[\s\S]*K=(\d+(?:\.\d+)?).*K=(\d+(?:\.\d+)?)[\s\S]*A = (\d+(?:\.\d+)?)/.exec(document.getElementsByClassName("text")[2].innerText);
+    params = /T0 = (\d+(?:\.\d+)?)[\s\S]*N0 = (\d+(?:\.\d+)?)[\s\S]*B0 = (\d+(?:\.\d+)?)[\s\S]*L = (\d+(?:\.\d+)?)[\s\S]*M=(\d+(?:\.\d+)?)[\s\S]*K=(\d+(?:\.\d+)?).*K=(\d+(?:\.\d+)?)[\s\S]*A = (\d+(?:\.\d+)?).*A = /.exec(document.getElementsByClassName("text")[2].innerText);
     GM_setValue("HDS", {"T0": parseFloat(params[1]), "N0": parseFloat(params[2]), "B0": parseFloat(params[3]), "L": parseFloat(params[4]), "M": parseFloat(params[5]), "Ka": parseFloat(params[6]), "Kb": parseFloat(params[7]), "A0": parseFloat(params[8])});
   }
   if(/ourbits.*mybonus\.php/.test(document.URL)) {
@@ -123,7 +123,7 @@
     GM_setValue("OB", {"T0": parseFloat(params[1]), "N0": parseFloat(params[2]), "B0": parseFloat(params[3]), "L": parseFloat(params[4]), "A0": parseFloat(params[5])});
   }
   if(/open.*cd.*mybonus\.php/.test(document.URL)) {
-    params = /T0 = (\d+(?:\.\d+)?)[\s\S]*N0 = (\d+(?:\.\d+)?)[\s\S]*B0 = (\d+(?:\.\d+)?)[\s\S]*L = (\d+(?:\.\d+)?)[\s\S]*A = (\d+(?:\.\d+)?)/.exec(document.getElementsByClassName("text")[2].innerText);
+    params = /T0 = (\d+(?:\.\d+)?)[\s\S]*N0 = (\d+(?:\.\d+)?)[\s\S]*B0 = (\d+(?:\.\d+)?)[\s\S]*L = (\d+(?:\.\d+)?)[\s\S]*A = (\d+(?:\.\d+)?).*A = /.exec(document.getElementsByClassName("text")[2].innerText);
     GM_setValue("OCD", {"T0": parseFloat(params[1]), "N0": parseFloat(params[2]), "B0": parseFloat(params[3]), "L": parseFloat(params[4]), "A0": parseFloat(params[5])});
   }
   if(/springsunday.*mybonus\.php/.test(document.URL)) {
