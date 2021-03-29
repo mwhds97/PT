@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         魔力计算器
-// @version      1.14
+// @version      1.15
 // @author       mwhds97
 // @match        *.u2.dmhy.org/mpseed.php*
 // @match        *.m-team.cc/mybonus.php*
@@ -127,7 +127,7 @@
     GM_setValue("OCD", {"T0": parseFloat(params[1]), "N0": parseFloat(params[2]), "B0": parseFloat(params[3]), "L": parseFloat(params[4]), "A0": parseFloat(params[5])});
   }
   if(/springsunday.*mybonus\.php/.test(document.URL)) {
-    params = /N0 = (\d+(?:\.\d+)?)[\s\S]*E = (\d+(?:\.\d+)?)[\s\S]*D = (\d+(?:\.\d+)?)[\s\S]*(?:\d+(?:\.\d+)?\s+){5}(\d+(?:\.\d+)?)\s+(?:\d+(?:\.\d+)?\s+){2}(\d+(?:\.\d+)?)\s+\d+(?:\.\d+)?/.exec(document.getElementsByClassName("text")[2].innerText);
+    params = /N0 = (\d+(?:\.\d+)?)[\s\S]*E = (\d+(?:\.\d+)?)[\s\S]*D = (\d+(?:\.\d+)?)[\s\S]*(?:[\d\,]+(?:\.\d+)?\s+){5}([\d\,]+(?:\.\d+)?)\s+(?:[\d\,]+(?:\.\d+)?\s+){2}([\d\,]+(?:\.\d+)?)\s+[\d\,]+(?:\.\d+)?/.exec(document.getElementsByClassName("text")[2].innerText);
     GM_setValue("SSD", {"N0": parseFloat(params[1]), "E": parseFloat(params[2]), "D": parseFloat(params[3]), "A0": parseFloat(params[4]), "ratio": parseFloat(params[5])});
   }
 
