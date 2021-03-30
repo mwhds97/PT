@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         魔力计算器
-// @version      1.15
+// @version      1.16
 // @author       mwhds97
 // @match        *.u2.dmhy.org/mpseed.php*
 // @match        *.m-team.cc/mybonus.php*
@@ -128,7 +128,7 @@
   }
   if(/springsunday.*mybonus\.php/.test(document.URL)) {
     params = /N0 = (\d+(?:\.\d+)?)[\s\S]*E = (\d+(?:\.\d+)?)[\s\S]*D = (\d+(?:\.\d+)?)[\s\S]*(?:[\d\,]+(?:\.\d+)?\s+){5}([\d\,]+(?:\.\d+)?)\s+(?:[\d\,]+(?:\.\d+)?\s+){2}([\d\,]+(?:\.\d+)?)\s+[\d\,]+(?:\.\d+)?/.exec(document.getElementsByClassName("text")[2].innerText);
-    GM_setValue("SSD", {"N0": parseFloat(params[1]), "E": parseFloat(params[2]), "D": parseFloat(params[3]), "A0": parseFloat(params[4]), "ratio": parseFloat(params[5])});
+    GM_setValue("SSD", {"N0": parseFloat(params[1]), "E": parseFloat(params[2]), "D": parseFloat(params[3]), "A0": parseFloat(params[4].replace(/\D/g, "")), "ratio": parseFloat(params[5])});
   }
 
   var i, L, S, T, N, SD, U, D, A, dB, table, index_A, index_B;
