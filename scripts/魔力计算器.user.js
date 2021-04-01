@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         魔力计算器
-// @version      2.0
+// @version      2.1
 // @author       mwhds97
 // @match        *.u2.dmhy.org/mpseed.php*
 // @match        *.m-team.cc/mybonus.php*
@@ -31,7 +31,7 @@
   'use strict';
 
   if(typeof(GM_getValue("first")) == "undefined" && /(torrents|adult|movie|music|rescue)\.php/.test(document.URL)) {
-    alert("请点击列表标题以获取或更新必要参数");
+    alert("请进入魔力页面（U2为做种UCoin日志页面）获取或更新必要参数，否则可能无法正常显示！");
     GM_setValue("first", "blood");
   }
 
@@ -128,10 +128,10 @@
         table.rows[0].insertCell(theArgs[1]);
         table.rows[0].insertCell(theArgs[2]);
         table.rows[0].insertCell(theArgs[3]);
-        table.rows[0].cells[theArgs[0]].outerHTML = '<td class="colhead"><a href="mpseed.php">UCoin</a><a href="javascript:void(0)" id="sortU">↓</a></td>';
-        table.rows[0].cells[theArgs[1]].outerHTML = '<td class="colhead"><a href="mpseed.php">效率</a><a href="javascript:void(0)" id="sortE">↓</a></td>';
-        table.rows[0].cells[theArgs[2]].outerHTML = '<td class="colhead"><a href="mpseed.php">麻瓜</a><a href="javascript:void(0)" id="sortUM">↓</a></td>';
-        table.rows[0].cells[theArgs[3]].outerHTML = '<td class="colhead"><a href="mpseed.php">效率</a><a href="javascript:void(0)" id="sortEM">↓</a></td>';
+        table.rows[0].cells[theArgs[0]].outerHTML = '<td class="colhead"><a href="javascript:void(0)" id="sortU">UCoin↓</a></td>';
+        table.rows[0].cells[theArgs[1]].outerHTML = '<td class="colhead"><a href="javascript:void(0)" id="sortE">效率↓</a></td>';
+        table.rows[0].cells[theArgs[2]].outerHTML = '<td class="colhead"><a href="javascript:void(0)" id="sortUM">麻瓜↓</a></td>';
+        table.rows[0].cells[theArgs[3]].outerHTML = '<td class="colhead"><a href="javascript:void(0)" id="sortEM">效率↓</a></td>';
         document.getElementById("sortU").addEventListener("click", function() {
           Sort(table, theArgs[0]);
         }, false);
@@ -160,10 +160,10 @@
         table.rows[0].insertCell(theArgs[1]);
         table.rows[0].insertCell(theArgs[2]);
         table.rows[0].insertCell(theArgs[3]);
-        table.rows[0].cells[theArgs[0]].outerHTML = '<th><a href="mybonus.php">体积</a><a href="javascript:void(0)" id="sortS">↓</a></th>';
-        table.rows[0].cells[theArgs[1]].outerHTML = '<th><a href="mybonus.php">A值</a><a href="javascript:void(0)" id="sortA">↓</a></th>';
-        table.rows[0].cells[theArgs[2]].outerHTML = '<th><a href="mybonus.php">ΔB</a><a href="javascript:void(0)" id="sortB">↓</a></th>';
-        table.rows[0].cells[theArgs[3]].outerHTML = '<th><a href="mybonus.php">效率</a><a href="javascript:void(0)" id="sortE">↓</a></th>';
+        table.rows[0].cells[theArgs[0]].outerHTML = '<th><a href="javascript:void(0)" id="sortS">体积↓</a></th>';
+        table.rows[0].cells[theArgs[1]].outerHTML = '<th><a href="javascript:void(0)" id="sortA">A值↓</a></th>';
+        table.rows[0].cells[theArgs[2]].outerHTML = '<th><a href="javascript:void(0)" id="sortB">ΔB↓</a></th>';
+        table.rows[0].cells[theArgs[3]].outerHTML = '<th><a href="javascript:void(0)" id="sortE">效率↓</a></th>';
         document.getElementById("sortS").addEventListener("click", function() {
           Sort(table, theArgs[0]);
         }, false);
@@ -190,8 +190,8 @@
       case "SSD":
         table.rows[0].insertCell(theArgs[0]);
         table.rows[0].insertCell(theArgs[1]);
-        table.rows[0].cells[theArgs[0]].outerHTML = '<td class="colhead"><a href="mybonus.php">初始A值</a><a href="javascript:void(0)" id="sortA">↓</a></td>';
-        table.rows[0].cells[theArgs[1]].outerHTML = '<td class="colhead"><a href="mybonus.php">效率</a><a href="javascript:void(0)" id="sortE">↓</a></td>';
+        table.rows[0].cells[theArgs[0]].outerHTML = '<td class="colhead"><a href="javascript:void(0)" id="sortA">初始A值↓</a></td>';
+        table.rows[0].cells[theArgs[1]].outerHTML = '<td class="colhead"><a href="javascript:void(0)" id="sortE">效率↓</a></td>';
         document.getElementById("sortA").addEventListener("click", function() {
           Sort(table, theArgs[0]);
         }, false);
@@ -209,9 +209,9 @@
         table.rows[0].insertCell(theArgs[0]);
         table.rows[0].insertCell(theArgs[1]);
         table.rows[0].insertCell(theArgs[2]);
-        table.rows[0].cells[theArgs[0]].outerHTML = '<td class="colhead"><a href="mybonus.php">A值</a><a href="javascript:void(0)" id="sortA">↓</a></td>';
-        table.rows[0].cells[theArgs[1]].outerHTML = '<td class="colhead"><a href="mybonus.php">ΔB</a><a href="javascript:void(0)" id="sortB">↓</a></td>';
-        table.rows[0].cells[theArgs[2]].outerHTML = '<td class="colhead"><a href="mybonus.php">效率</a><a href="javascript:void(0)" id="sortE">↓</a></td>';
+        table.rows[0].cells[theArgs[0]].outerHTML = '<td class="colhead"><a href="javascript:void(0)" id="sortA">A值↓</a></td>';
+        table.rows[0].cells[theArgs[1]].outerHTML = '<td class="colhead"><a href="javascript:void(0)" id="sortB">ΔB↓</a></td>';
+        table.rows[0].cells[theArgs[2]].outerHTML = '<td class="colhead"><a href="javascript:void(0)" id="sortE">效率↓</a></td>';
         document.getElementById("sortA").addEventListener("click", function() {
           Sort(table, theArgs[0]);
         }, false);
