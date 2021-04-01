@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         魔力计算器
-// @version      1.17
+// @version      2.0
 // @author       mwhds97
 // @match        *.u2.dmhy.org/mpseed.php*
 // @match        *.m-team.cc/mybonus.php*
@@ -97,6 +97,256 @@
     }
   }
 
+  function Sort(table, key) {
+    var temp, i, j, rows = new Array(table.rows.length - 1), values = new Array(table.rows.length - 1);
+    for(i = 1; i < table.rows.length; i++) {
+      rows[i - 1] = table.rows[i].outerHTML;
+      values[i - 1] = parseFloat(table.rows[i].cells[key].innerText);
+    }
+    for(i = 0; i < values.length - 1; i++) {
+      for(j = 0; j < values.length - 1 - i; j++) {
+        if(values[j] < values[j + 1]) {
+          temp = values[j];
+          values[j] = values[j + 1];
+          values[j + 1] = temp;
+          temp = rows[j];
+          rows[j] = rows[j + 1];
+          rows[j + 1] = temp;
+        }
+      }
+    }
+    for(i = 1; i < table.rows.length; i++) {
+      table.rows[i].outerHTML = rows[i - 1];
+    }
+  }
+
+  function MakeMagic(site, table, index_T, index_S, index_N, ...theArgs) {
+    var i, S, T, N, U, D, A, dB, UC, UCM;
+    switch(site) {
+      case "U2":
+        table.rows[0].insertCell(theArgs[0]);
+        table.rows[0].insertCell(theArgs[1]);
+        table.rows[0].insertCell(theArgs[2]);
+        table.rows[0].insertCell(theArgs[3]);
+        table.rows[0].cells[theArgs[0]].outerHTML = '<td class="colhead"><a href="mpseed.php">UCoin</a><a href="javascript:void(0)" id="sortU">↓</a></td>';
+        table.rows[0].cells[theArgs[1]].outerHTML = '<td class="colhead"><a href="mpseed.php">效率</a><a href="javascript:void(0)" id="sortE">↓</a></td>';
+        table.rows[0].cells[theArgs[2]].outerHTML = '<td class="colhead"><a href="mpseed.php">麻瓜</a><a href="javascript:void(0)" id="sortUM">↓</a></td>';
+        table.rows[0].cells[theArgs[3]].outerHTML = '<td class="colhead"><a href="mpseed.php">效率</a><a href="javascript:void(0)" id="sortEM">↓</a></td>';
+        document.getElementById("sortU").addEventListener("click", function() {
+          Sort(table, theArgs[0]);
+        }, false);
+        document.getElementById("sortE").addEventListener("click", function() {
+          Sort(table, theArgs[1]);
+        }, false);
+        document.getElementById("sortUM").addEventListener("click", function() {
+          Sort(table, theArgs[2]);
+        }, false);
+        document.getElementById("sortEM").addEventListener("click", function() {
+          Sort(table, theArgs[3]);
+        }, false);
+        for(i = 1; i < table.rows.length; i++) {
+          table.rows[i].insertCell(theArgs[0]);
+          table.rows[i].insertCell(theArgs[1]);
+          table.rows[i].insertCell(theArgs[2]);
+          table.rows[i].insertCell(theArgs[3]);
+          table.rows[i].cells[theArgs[0]].outerHTML = '<td class="rowfollow nowrap"></td>';
+          table.rows[i].cells[theArgs[1]].outerHTML = '<td class="rowfollow nowrap"></td>';
+          table.rows[i].cells[theArgs[2]].outerHTML = '<td class="rowfollow nowrap"></td>';
+          table.rows[i].cells[theArgs[3]].outerHTML = '<td class="rowfollow nowrap"></td>';
+        }
+        break;
+      case "HDC":
+        table.rows[0].insertCell(theArgs[0]);
+        table.rows[0].insertCell(theArgs[1]);
+        table.rows[0].insertCell(theArgs[2]);
+        table.rows[0].insertCell(theArgs[3]);
+        table.rows[0].cells[theArgs[0]].outerHTML = '<th><a href="mybonus.php">体积</a><a href="javascript:void(0)" id="sortS">↓</a></th>';
+        table.rows[0].cells[theArgs[1]].outerHTML = '<th><a href="mybonus.php">A值</a><a href="javascript:void(0)" id="sortA">↓</a></th>';
+        table.rows[0].cells[theArgs[2]].outerHTML = '<th><a href="mybonus.php">ΔB</a><a href="javascript:void(0)" id="sortB">↓</a></th>';
+        table.rows[0].cells[theArgs[3]].outerHTML = '<th><a href="mybonus.php">效率</a><a href="javascript:void(0)" id="sortE">↓</a></th>';
+        document.getElementById("sortS").addEventListener("click", function() {
+          Sort(table, theArgs[0]);
+        }, false);
+        document.getElementById("sortA").addEventListener("click", function() {
+          Sort(table, theArgs[1]);
+        }, false);
+        document.getElementById("sortB").addEventListener("click", function() {
+          Sort(table, theArgs[2]);
+        }, false);
+        document.getElementById("sortE").addEventListener("click", function() {
+          Sort(table, theArgs[3]);
+        }, false);
+        for(i = 1; i < table.rows.length; i++) {
+          table.rows[i].insertCell(theArgs[0]);
+          table.rows[i].insertCell(theArgs[1]);
+          table.rows[i].insertCell(theArgs[2]);
+          table.rows[i].insertCell(theArgs[3]);
+          table.rows[i].cells[theArgs[0]].outerHTML = '<td class="t_size" style="font-size: 12px;"></td>';
+          table.rows[i].cells[theArgs[1]].outerHTML = '<td class="t_time" style="font-size: 12px;"></td>';
+          table.rows[i].cells[theArgs[2]].outerHTML = '<td class="t_size" style="font-size: 12px;"></td>';
+          table.rows[i].cells[theArgs[3]].outerHTML = '<td class="t_time" style="font-size: 12px;"></td>';
+        }
+        break;
+      case "SSD":
+        table.rows[0].insertCell(theArgs[0]);
+        table.rows[0].insertCell(theArgs[1]);
+        table.rows[0].cells[theArgs[0]].outerHTML = '<td class="colhead"><a href="mybonus.php">初始A值</a><a href="javascript:void(0)" id="sortA">↓</a></td>';
+        table.rows[0].cells[theArgs[1]].outerHTML = '<td class="colhead"><a href="mybonus.php">效率</a><a href="javascript:void(0)" id="sortE">↓</a></td>';
+        document.getElementById("sortA").addEventListener("click", function() {
+          Sort(table, theArgs[0]);
+        }, false);
+        document.getElementById("sortE").addEventListener("click", function() {
+          Sort(table, theArgs[1]);
+        }, false);
+        for(i = 1; i < table.rows.length; i++) {
+          table.rows[i].insertCell(theArgs[0]);
+          table.rows[i].insertCell(theArgs[1]);
+          table.rows[i].cells[theArgs[0]].outerHTML = '<td class="rowfollow nowrap"></td>';
+          table.rows[i].cells[theArgs[1]].outerHTML = '<td class="rowfollow nowrap"></td>';
+        }
+        break;
+      default:
+        table.rows[0].insertCell(theArgs[0]);
+        table.rows[0].insertCell(theArgs[1]);
+        table.rows[0].insertCell(theArgs[2]);
+        table.rows[0].cells[theArgs[0]].outerHTML = '<td class="colhead"><a href="mybonus.php">A值</a><a href="javascript:void(0)" id="sortA">↓</a></td>';
+        table.rows[0].cells[theArgs[1]].outerHTML = '<td class="colhead"><a href="mybonus.php">ΔB</a><a href="javascript:void(0)" id="sortB">↓</a></td>';
+        table.rows[0].cells[theArgs[2]].outerHTML = '<td class="colhead"><a href="mybonus.php">效率</a><a href="javascript:void(0)" id="sortE">↓</a></td>';
+        document.getElementById("sortA").addEventListener("click", function() {
+          Sort(table, theArgs[0]);
+        }, false);
+        document.getElementById("sortB").addEventListener("click", function() {
+          Sort(table, theArgs[1]);
+        }, false);
+        document.getElementById("sortE").addEventListener("click", function() {
+          Sort(table, theArgs[2]);
+        }, false);
+        for(i = 1; i < table.rows.length; i++) {
+          table.rows[i].insertCell(theArgs[0]);
+          table.rows[i].insertCell(theArgs[1]);
+          table.rows[i].insertCell(theArgs[2]);
+          table.rows[i].cells[theArgs[0]].outerHTML = '<td class="rowfollow nowrap"></td>';
+          table.rows[i].cells[theArgs[1]].outerHTML = '<td class="rowfollow nowrap"></td>';
+          table.rows[i].cells[theArgs[2]].outerHTML = '<td class="rowfollow nowrap"></td>';
+        }
+        break;
+    }
+    switch(site) {
+      case "U2":
+        for(i = 1; i < table.rows.length; i++) {
+          var type = table.rows[i].cells[0].innerText;
+          var pro = /pro.*alt="([\w\s%]+)"/.exec(table.rows[i].cells[1].innerHTML);
+          if(pro === null) {
+            U = 1.0;
+            D = 1.0;
+          }
+          else if(pro[1] == "FREE") {
+            U = 1.0;
+            D = 0.0;
+          }
+          else if(pro[1] == "2X") {
+            U = 2.0;
+            D = 1.0;
+          }
+          else if(pro[1] == "2X Free") {
+            U = 2.0;
+            D = 0.0;
+          }
+          else if(pro[1] == "50%") {
+            U = 1.0;
+            D = 0.5;
+          }
+          else if(pro[1] == "2X 50%") {
+            U = 2.0;
+            D = 0.5;
+          }
+          else if(pro[1] == "30%") {
+            U = 1.0;
+            D = 0.3;
+          }
+          else {
+            var factors = /<b>(\d+(?:\.\d+)?)X<\/b>.*<b>(\d+(?:\.\d+)?)X<\/b>/.exec(table.rows[i].cells[1].innerHTML);
+            U = parseFloat(factors[1]);
+            D = parseFloat(factors[2]);
+          }
+          T = (new Date().getTime() - new Date(/title="(.+)"/.exec(table.rows[i].cells[index_T].innerHTML)[1]).getTime()) / 86400000;
+          S = size_G(table.rows[i].cells[index_S].innerText);
+          N = parseFloat(table.rows[i].cells[index_N].innerText.replace(/\D/g, ""));
+          UC = calcU(S, T, N + 1, U, D, type);
+          UCM = calcU(S, T, N + 1, 1.0, 1.0, type);
+          table.rows[i].cells[theArgs[0]].innerText = UC.toFixed(3);
+          table.rows[i].cells[theArgs[1]].innerText = (UC / S).toFixed(3);
+          table.rows[i].cells[theArgs[2]].innerText = UCM.toFixed(3);
+          table.rows[i].cells[theArgs[3]].innerText = (UCM / S).toFixed(3);
+        }
+        break;
+      case "MT":
+        var seeding = parseFloat(/gif"\>(\d+)/.exec(document.getElementById("info_block").innerHTML)[1]);
+        if(seeding > GM_getValue("MT").Umax) {
+          seeding = GM_getValue("MT").Umax;
+        }
+        var A0 = GM_getValue("MT").L * Math.tan((GM_getValue("MT").sum - seeding * GM_getValue("MT").d) * Math.PI / (2 * GM_getValue("MT").B0));
+        for(i = 1; i < table.rows.length; i++) {
+          T = (new Date().getTime() - new Date(/title="(.+)"/.exec(table.rows[i].cells[index_T].innerHTML)[1]).getTime()) / 604800000;
+          S = size_G(table.rows[i].cells[index_S].innerText);
+          N = parseFloat(table.rows[i].cells[index_N].innerText.replace(/\D/g, ""));
+          A = calcA(S, T, N + 1, "MT");
+          dB = calcB(A0 + A, "MT") - calcB(A0, "MT");
+          table.rows[i].cells[theArgs[0]].innerText = A.toFixed(3);
+          table.rows[i].cells[theArgs[1]].innerText = dB.toFixed(3);
+          table.rows[i].cells[theArgs[2]].innerText = (A / S).toFixed(3);
+        }
+        break;
+      case "HDC":
+        for(i = 1; i < table.rows.length; i++) {
+          T = (new Date().getTime() - new Date(/title="(.+)"/.exec(table.rows[i].cells[index_T].innerHTML)[1]).getTime()) / 604800000;
+          S = size_G(table.rows[i].cells[index_S].innerText);
+          N = parseFloat(table.rows[i].cells[index_N].innerText.replace(/\D/g, ""));
+          A = calcA_HDC(S, T, N + 1, /(-|@)HD[CW]/.test(table.rows[i].cells[1].innerText));
+          dB = calcB(GM_getValue("HDC").A0 + A, "HDC") - calcB(GM_getValue("HDC").A0, "HDC");
+          table.rows[i].cells[theArgs[0]].innerText = (/(-|@)HD[CW]/.test(table.rows[i].cells[1].innerText) ? S : 400 / Math.PI * Math.atan(S / 100)).toFixed(3);
+          table.rows[i].cells[theArgs[1]].innerText = A.toFixed(3);
+          table.rows[i].cells[theArgs[2]].innerText = dB.toFixed(3);
+          table.rows[i].cells[theArgs[3]].innerText = (A / S).toFixed(3);
+        }
+        break;
+      case "HDS":
+        for(i = 1; i < table.rows.length; i++) {
+          T = (new Date().getTime() - new Date(/title="(.+)"/.exec(table.rows[i].cells[index_T].innerHTML)[1]).getTime()) / 604800000;
+          S = size_G(table.rows[i].cells[index_S].innerText);
+          N = parseFloat(table.rows[i].cells[index_N].innerText.replace(/\D/g, ""));
+          A = calcA_HDS(S, T, N + 1, /(-|@)HDS/.test(table.rows[i].cells[1].innerText));
+          dB = calcB(GM_getValue("HDS").A0 + A, "HDS") - calcB(GM_getValue("HDS").A0, "HDS");
+          table.rows[i].cells[theArgs[0]].innerText = A.toFixed(3);
+          table.rows[i].cells[theArgs[1]].innerText = dB.toFixed(3);
+          table.rows[i].cells[theArgs[2]].innerText = (A / S).toFixed(3);
+        }
+        break;
+      case "SSD":
+        for(i = 1; i < table.rows.length; i++) {
+          T = (new Date().getTime() - new Date(/title="(.+)"/.exec(table.rows[i].cells[index_T].innerHTML)[1]).getTime()) / 604800000;
+          S = size_G(table.rows[i].cells[index_S].innerText);
+          N = parseFloat(table.rows[i].cells[index_N].innerText.replace(/\D/g, ""));
+          A = calcA_SSD(S, 0, N + 1);
+          table.rows[i].cells[theArgs[0]].innerText = A.toFixed(3);
+          table.rows[i].cells[theArgs[1]].innerText = (A / S).toFixed(3);
+        }
+        break;
+      default:
+        for(i = 1; i < table.rows.length; i++) {
+          T = (new Date().getTime() - new Date(/title="(.+)"/.exec(table.rows[i].cells[index_T].innerHTML)[1]).getTime()) / 604800000;
+          S = size_G(table.rows[i].cells[index_S].innerText);
+          N = parseFloat(table.rows[i].cells[index_N].innerText.replace(/\D/g, ""));
+          A = calcA(S, T, N + 1, site);
+          dB = calcB(GM_getValue(site).A0 + A, site) - calcB(GM_getValue(site).A0, site);
+          table.rows[i].cells[theArgs[0]].innerText = A.toFixed(3);
+          table.rows[i].cells[theArgs[1]].innerText = dB.toFixed(3);
+          table.rows[i].cells[theArgs[2]].innerText = (A / S).toFixed(3);
+        }
+        break;
+    }
+  }
+
   var params = {};
   if(/u2.*mpseed\.php/.test(document.URL)) {
     params = /S0=(\d+(?:\.\d+)?)G[\s\S]*b=(\d+(?:\.\d+)?)[\s\S]*d=(\d+(?:\.\d+)?)[\s\S]*E\D*(\d+(?:\.\d+)?)\D*L\D*(\d+(?:\.\d+)?)[\s\S]*SD0=(\d+(?:\.\d+)?)[\s\S]*e=(\d+(?:\.\d+)?)[\s\S]*Pmin\D*(\d+(?:\.\d+)?)\D*(\d+(?:\.\d+)?)/.exec(document.getElementsByClassName("embedded")[1].innerText);
@@ -131,227 +381,37 @@
     GM_setValue("SSD", {"N0": parseFloat(params[1]), "E": parseFloat(params[2]), "D": parseFloat(params[3]), "A0": parseFloat(params[4].replace(/\,/g, "")), "ratio": parseFloat(params[5])});
   }
 
-  var i, L, S, T, N, SD, U, D, A, dB, table, index_A, index_B;
+  var table;
   if(/u2.*torrents\.php/.test(document.URL)) {
     table = document.getElementsByClassName("torrents")[0];
-    index_A = table.rows[0].cells.length;
-    index_B = table.rows[0].cells.length + 1;
-    table.rows[0].insertCell(index_A);
-    table.rows[0].insertCell(index_B);
-    table.rows[0].cells[index_A].outerHTML = '<td class="colhead" style="text-decoration: underline;"><a href="mpseed.php">UCoin</a></td>';
-    table.rows[0].cells[index_B].outerHTML = '<td class="colhead" style="text-decoration: underline;"><a href="mpseed.php">麻瓜</a></td>';
-    for(i = 1; i < table.rows.length; i++) {
-      table.rows[i].insertCell(index_A);
-      table.rows[i].insertCell(index_B);
-      table.rows[i].cells[index_A].outerHTML = '<td class="rowfollow nowrap"></td>';
-      table.rows[i].cells[index_B].outerHTML = '<td class="rowfollow nowrap"></td>';
-    }
-    for(i = 1; i < table.rows.length; i++) {
-      var type = table.rows[i].cells[0].innerText;
-      var pro = /pro.*alt="([\w\s%]+)"/.exec(table.rows[i].cells[1].innerHTML);
-      L = (new Date().getTime() - new Date(/title="(.+)"/.exec(table.rows[i].cells[3].innerHTML)[1]).getTime()) / 86400000;
-      S = size_G(table.rows[i].cells[4].innerText);
-      SD = parseFloat(table.rows[i].cells[5].innerText.replace(/\D/g, ""));
-      if(pro === null) {
-        U = 1.0;
-        D = 1.0;
-      }
-      else if(pro[1] == "FREE") {
-        U = 1.0;
-        D = 0.0;
-      }
-      else if(pro[1] == "2X") {
-        U = 2.0;
-        D = 1.0;
-      }
-      else if(pro[1] == "2X Free") {
-        U = 2.0;
-        D = 0.0;
-      }
-      else if(pro[1] == "50%") {
-        U = 1.0;
-        D = 0.5;
-      }
-      else if(pro[1] == "2X 50%") {
-        U = 2.0;
-        D = 0.5;
-      }
-      else if(pro[1] == "30%") {
-        U = 1.0;
-        D = 0.3;
-      }
-      else {
-        var factors = /<b>(\d+(?:\.\d+)?)X<\/b>.*<b>(\d+(?:\.\d+)?)X<\/b>/.exec(table.rows[i].cells[1].innerHTML);
-        U = parseFloat(factors[1]);
-        D = parseFloat(factors[2]);
-      }
-      table.rows[i].cells[index_A].innerText = calcU(S, L ,SD + 1, U, D, type).toFixed(3);
-      table.rows[i].cells[index_B].innerText = calcU(S, L ,SD + 1, 1.0, 1.0, type).toFixed(3);
-    }
+    MakeMagic("U2", table, 3, 4, 5, table.rows[0].cells.length, table.rows[0].cells.length + 1, table.rows[0].cells.length + 2, table.rows[0].cells.length + 3);
   }
   if(/m-team.*(torrents|adult|movie|music)\.php/.test(document.URL)) {
     table = document.getElementsByClassName("torrents")[0];
-    index_A = table.rows[0].cells.length - 2;
-    index_B = table.rows[0].cells.length - 1;
-    table.rows[0].insertCell(index_A);
-    table.rows[0].insertCell(index_B);
-    table.rows[0].cells[index_A].outerHTML = '<td class="colhead" style="text-decoration: underline;"><a href="mybonus.php">A值</a></td>';
-    table.rows[0].cells[index_B].outerHTML = '<td class="colhead" style="text-decoration: underline;"><a href="mybonus.php">B值增量</a></td>';
-    for(i = 1; i < table.rows.length; i++) {
-      table.rows[i].insertCell(index_A);
-      table.rows[i].insertCell(index_B);
-      table.rows[i].cells[index_A].outerHTML = '<td class="rowfollow nowrap"></td>';
-      table.rows[i].cells[index_B].outerHTML = '<td class="rowfollow nowrap"></td>';
-    }
-    var seeding = parseFloat(/gif"\>(\d+)/.exec(document.getElementById("info_block").innerHTML)[1]);
-    if(seeding > GM_getValue("MT").Umax) {
-      seeding = GM_getValue("MT").Umax;
-    }
-    var A0 = GM_getValue("MT").L * Math.tan((GM_getValue("MT").sum - seeding * GM_getValue("MT").d) * Math.PI / (2 * GM_getValue("MT").B0));
-    for(i = 1; i < table.rows.length; i++) {
-      T = (new Date().getTime() - new Date(/title="(.+)"/.exec(table.rows[i].cells[3].innerHTML)[1]).getTime()) / 604800000;
-      S = size_G(table.rows[i].cells[4].innerText);
-      N = parseFloat(table.rows[i].cells[5].innerText.replace(/\D/g, ""));
-      A = calcA(S, T, N + 1, "MT");
-      dB = calcB(A0 + A, "MT") - calcB(A0, "MT");
-      table.rows[i].cells[index_A].innerText = A.toFixed(3);
-      table.rows[i].cells[index_B].innerText = dB.toFixed(3);
-    }
+    MakeMagic("MT", table, 3, 4, 5, table.rows[0].cells.length - 2, table.rows[0].cells.length - 1, table.rows[0].cells.length);
   }
   if(/hdchina.*torrents\.php/.test(document.URL)) {
     table = document.getElementsByClassName("torrent_list")[0];
-    index_A = table.rows[0].cells.length - 1;
-    index_B = table.rows[0].cells.length;
-    table.rows[0].insertCell(index_A);
-    table.rows[0].insertCell(index_B);
-    table.rows[0].cells[index_A].outerHTML = '<th style="text-decoration: underline;"><a href="mybonus.php">A值</a></th>';
-    table.rows[0].cells[index_B].outerHTML = '<th style="text-decoration: underline;"><a href="mybonus.php">B值增量</a></th>';
-    for(i = 1; i < table.rows.length; i++) {
-      table.rows[i].insertCell(index_A);
-      table.rows[i].insertCell(index_B);
-      table.rows[i].cells[index_A].outerHTML = '<td class="t_size" style="font-size: 12px;"></td>';
-      table.rows[i].cells[index_B].outerHTML = '<td class="t_time" style="font-size: 12px;"></td>';
-    }
-    for(i = 1; i < table.rows.length; i++) {
-      T = (new Date().getTime() - new Date(/title="(.+)"/.exec(table.rows[i].cells[3].innerHTML)[1]).getTime()) / 604800000;
-      S = size_G(table.rows[i].cells[4].innerText);
-      N = parseFloat(table.rows[i].cells[5].innerText.replace(/\D/g, ""));
-      A = calcA_HDC(S, T, N + 1, /HDChina|HDCTV|HDWinG|HDWTV|HDC/.test(table.rows[i].cells[1].innerText));
-      dB = calcB(GM_getValue("HDC").A0 + A, "HDC") - calcB(GM_getValue("HDC").A0, "HDC");
-      table.rows[i].cells[index_A].innerText = A.toFixed(3);
-      table.rows[i].cells[index_B].innerText = dB.toFixed(3);
-    }
+    MakeMagic("HDC", table, 3, 4, 5, table.rows[0].cells.length - 1, table.rows[0].cells.length, table.rows[0].cells.length + 1, table.rows[0].cells.length + 2);
   }
   if(/chdbits.*torrents\.php/.test(document.URL)) {
     table = document.getElementsByClassName("torrents")[0];
-    index_A = table.rows[0].cells.length - 2;
-    index_B = table.rows[0].cells.length - 1;
-    table.rows[0].insertCell(index_A);
-    table.rows[0].insertCell(index_B);
-    table.rows[0].cells[index_A].outerHTML = '<td class="colhead" style="text-decoration: underline;"><a href="mybonus.php">A值</a></td>';
-    table.rows[0].cells[index_B].outerHTML = '<td class="colhead" style="text-decoration: underline;"><a href="mybonus.php">B值增量</a></td>';
-    for(i = 1; i < table.rows.length; i++) {
-      table.rows[i].insertCell(index_A);
-      table.rows[i].insertCell(index_B);
-      table.rows[i].cells[index_A].outerHTML = '<td class="rowfollow nowrap"></td>';
-      table.rows[i].cells[index_B].outerHTML = '<td class="rowfollow nowrap"></td>';
-    }
-    for(i = 1; i < table.rows.length; i++) {
-      T = (new Date().getTime() - new Date(/title="(.+)"/.exec(table.rows[i].cells[3].innerHTML)[1]).getTime()) / 604800000;
-      S = size_G(table.rows[i].cells[4].innerText);
-      N = parseFloat(table.rows[i].cells[5].innerText.replace(/\D/g, ""));
-      A = calcA(S, T, N + 1, "CHD");
-      dB = calcB(GM_getValue("CHD").A0 + A, "CHD") - calcB(GM_getValue("CHD").A0, "CHD");
-      table.rows[i].cells[index_A].innerText = A.toFixed(3);
-      table.rows[i].cells[index_B].innerText = dB.toFixed(3);
-    }
+    MakeMagic("CHD", table, 3, 4, 5, table.rows[0].cells.length - 2, table.rows[0].cells.length - 1, table.rows[0].cells.length);
   }
   if(/hdsky.*torrents\.php/.test(document.URL)) {
     table = document.getElementsByClassName("torrents progresstable")[0];
-    index_A = table.rows[0].cells.length - 2;
-    index_B = table.rows[0].cells.length - 1;
-    table.rows[0].insertCell(index_A);
-    table.rows[0].insertCell(index_B);
-    table.rows[0].cells[index_A].outerHTML = '<td class="colhead" style="text-decoration: underline;"><a href="mybonus.php">A值</a></td>';
-    table.rows[0].cells[index_B].outerHTML = '<td class="colhead" style="text-decoration: underline;"><a href="mybonus.php">B值增量</a></td>';
-    for(i = 1; i < table.rows.length; i++) {
-      table.rows[i].insertCell(index_A);
-      table.rows[i].insertCell(index_B);
-      table.rows[i].cells[index_A].outerHTML = '<td class="rowfollow nowrap"></td>';
-      table.rows[i].cells[index_B].outerHTML = '<td class="rowfollow nowrap"></td>';
-    }
-    for(i = 1; i < table.rows.length; i++) {
-      T = (new Date().getTime() - new Date(/title="(.+)"/.exec(table.rows[i].cells[3].innerHTML)[1]).getTime()) / 604800000;
-      S = size_G(table.rows[i].cells[4].innerText);
-      N = parseFloat(table.rows[i].cells[5].innerText.replace(/\D/g, ""));
-      A = calcA_HDS(S, T, N + 1, /HDSky|HDS|HDS3D|HDSTV|HDSWEB|HDSPad|HDSCD|HDSpecial|HDSAB/.test(table.rows[i].cells[1].innerText));
-      dB = calcB(GM_getValue("HDS").A0 + A, "HDS") - calcB(GM_getValue("HDS").A0, "HDS");
-      table.rows[i].cells[index_A].innerText = A.toFixed(3);
-      table.rows[i].cells[index_B].innerText = dB.toFixed(3);
-    }
+    MakeMagic("HDS", table, 3, 4, 5, table.rows[0].cells.length - 2, table.rows[0].cells.length - 1, table.rows[0].cells.length);
   }
   if(/ourbits.*(torrents|rescue)\.php/.test(document.URL)) {
     table = document.getElementsByClassName("torrents")[0];
-    index_A = table.rows[0].cells.length - 2;
-    index_B = table.rows[0].cells.length - 1;
-    table.rows[0].insertCell(index_A);
-    table.rows[0].insertCell(index_B);
-    table.rows[0].cells[index_A].outerHTML = '<td class="colhead" style="text-decoration: underline;"><a href="mybonus.php">A值</a></td>';
-    table.rows[0].cells[index_B].outerHTML = '<td class="colhead" style="text-decoration: underline;"><a href="mybonus.php">B值增量</a></td>';
-    for(i = 1; i < table.rows.length; i++) {
-      table.rows[i].insertCell(index_A);
-      table.rows[i].insertCell(index_B);
-      table.rows[i].cells[index_A].outerHTML = '<td class="rowfollow nowrap"></td>';
-      table.rows[i].cells[index_B].outerHTML = '<td class="rowfollow nowrap"></td>';
-    }
-    for(i = 1; i < table.rows.length; i++) {
-      T = (new Date().getTime() - new Date(/title="(.+)"/.exec(table.rows[i].cells[3].innerHTML)[1]).getTime()) / 604800000;
-      S = size_G(table.rows[i].cells[4].innerText);
-      N = parseFloat(table.rows[i].cells[5].innerText.replace(/\D/g, ""));
-      A = calcA(S, T, N + 1, "OB");
-      dB = calcB(GM_getValue("OB").A0 + A, "OB") - calcB(GM_getValue("OB").A0, "OB");
-      table.rows[i].cells[index_A].innerText = A.toFixed(3);
-      table.rows[i].cells[index_B].innerText = dB.toFixed(3);
-    }
+    MakeMagic("OB", table, 3, 4, 5, table.rows[0].cells.length - 2, table.rows[0].cells.length - 1, table.rows[0].cells.length);
   }
   if(/open.*cd.*torrents\.php/.test(document.URL)) {
     table = document.getElementsByClassName("torrents")[0];
-    index_A = table.rows[0].cells.length - 1;
-    index_B = table.rows[0].cells.length;
-    table.rows[0].insertCell(index_A);
-    table.rows[0].insertCell(index_B);
-    table.rows[0].cells[index_A].outerHTML = '<td class="colhead" style="text-decoration: underline;"><a href="mybonus.php">A值</a></td>';
-    table.rows[0].cells[index_B].outerHTML = '<td class="colhead" style="text-decoration: underline;"><a href="mybonus.php">B值增量</a></td>';
-    for(i = 1; i < table.rows.length; i++) {
-      table.rows[i].insertCell(index_A);
-      table.rows[i].insertCell(index_B);
-      table.rows[i].cells[index_A].outerHTML = '<td class="rowfollow nowrap"></td>';
-      table.rows[i].cells[index_B].outerHTML = '<td class="rowfollow nowrap"></td>';
-    }
-    for(i = 1; i < table.rows.length; i++) {
-      T = (new Date().getTime() - new Date(/title="(.+)"/.exec(table.rows[i].cells[5].innerHTML)[1]).getTime()) / 604800000;
-      S = size_G(table.rows[i].cells[6].innerText);
-      N = parseFloat(table.rows[i].cells[7].innerText.replace(/\D/g, ""));
-      A = calcA(S, T, N + 1, "OCD");
-      dB = calcB(GM_getValue("OCD").A0 + A, "OCD") - calcB(GM_getValue("OCD").A0, "OCD");
-      table.rows[i].cells[index_A].innerText = A.toFixed(3);
-      table.rows[i].cells[index_B].innerText = dB.toFixed(3);
-    }
+    MakeMagic("OCD", table, 5, 6, 7, table.rows[0].cells.length - 1, table.rows[0].cells.length, table.rows[0].cells.length + 1);
   }
   if(/springsunday.*(torrents|rescue)\.php/.test(document.URL)) {
     table = document.getElementsByClassName("torrents")[0];
-    index_A = table.rows[0].cells.length - 1;
-    table.rows[0].insertCell(index_A);
-    table.rows[0].cells[index_A].outerHTML = '<td class="colhead" style="text-decoration: underline;"><a href="mybonus.php">初始A值</a></td>';
-    for(i = 1; i < table.rows.length; i++) {
-      table.rows[i].insertCell(index_A);
-      table.rows[i].cells[index_A].outerHTML = '<td class="rowfollow nowrap"></td>';
-    }
-    for(i = 1; i < table.rows.length; i++) {
-      S = size_G(table.rows[i].cells[5].innerText);
-      N = parseFloat(table.rows[i].cells[6].innerText.replace(/\D/g, ""));
-      A = calcA_SSD(S, 0, N + 1);
-      table.rows[i].cells[index_A].innerText = A.toFixed(3);
-    }
+    MakeMagic("SSD", table, 4, 5, 6, table.rows[0].cells.length - 1, table.rows[0].cells.length);
   }
 })();
