@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         魔力计算器
-// @version      2.1
+// @version      2.2
 // @author       mwhds97
 // @match        *.u2.dmhy.org/mpseed.php*
 // @match        *.m-team.cc/mybonus.php*
@@ -384,34 +384,34 @@
   var table;
   if(/u2.*torrents\.php/.test(document.URL)) {
     table = document.getElementsByClassName("torrents")[0];
-    MakeMagic("U2", table, 3, 4, 5, table.rows[0].cells.length, table.rows[0].cells.length + 1, table.rows[0].cells.length + 2, table.rows[0].cells.length + 3);
+    MakeMagic("U2", table, 3, 4, 5, 8, 9, 10, 11);
   }
   if(/m-team.*(torrents|adult|movie|music)\.php/.test(document.URL)) {
     table = document.getElementsByClassName("torrents")[0];
-    MakeMagic("MT", table, 3, 4, 5, table.rows[0].cells.length - 2, table.rows[0].cells.length - 1, table.rows[0].cells.length);
+    MakeMagic("MT", table, 3, 4, 5, 8, 9, 10);
   }
   if(/hdchina.*torrents\.php/.test(document.URL)) {
     table = document.getElementsByClassName("torrent_list")[0];
-    MakeMagic("HDC", table, 3, 4, 5, table.rows[0].cells.length - 1, table.rows[0].cells.length, table.rows[0].cells.length + 1, table.rows[0].cells.length + 2);
+    MakeMagic("HDC", table, 3, 4, 5, 8, 9, 10, 11);
   }
   if(/chdbits.*torrents\.php/.test(document.URL)) {
     table = document.getElementsByClassName("torrents")[0];
-    MakeMagic("CHD", table, 3, 4, 5, table.rows[0].cells.length - 2, table.rows[0].cells.length - 1, table.rows[0].cells.length);
+    MakeMagic("CHD", table, 3, 4, 5, 8, 9, 10);
   }
   if(/hdsky.*torrents\.php/.test(document.URL)) {
     table = document.getElementsByClassName("torrents progresstable")[0];
-    MakeMagic("HDS", table, 3, 4, 5, table.rows[0].cells.length - 2, table.rows[0].cells.length - 1, table.rows[0].cells.length);
+    MakeMagic("HDS", table, 3, 4, 5, 8, 9, 10);
   }
   if(/ourbits.*(torrents|rescue)\.php/.test(document.URL)) {
     table = document.getElementsByClassName("torrents")[0];
-    MakeMagic("OB", table, 3, 4, 5, table.rows[0].cells.length - 2, table.rows[0].cells.length - 1, table.rows[0].cells.length);
+    MakeMagic("OB", table, 3, 4, 5, 8, 9, 10);
   }
   if(/open.*cd.*torrents\.php/.test(document.URL)) {
     table = document.getElementsByClassName("torrents")[0];
-    MakeMagic("OCD", table, 5, 6, 7, table.rows[0].cells.length - 1, table.rows[0].cells.length, table.rows[0].cells.length + 1);
+    MakeMagic("OCD", table, 5, 6, 7, 10, 11, 12);
   }
   if(/springsunday.*(torrents|rescue)\.php/.test(document.URL)) {
     table = document.getElementsByClassName("torrents")[0];
-    MakeMagic("SSD", table, 4, 5, 6, table.rows[0].cells.length - 1, table.rows[0].cells.length);
+    MakeMagic("SSD", table, 4, 5, 6, 9, 10);
   }
 })();
