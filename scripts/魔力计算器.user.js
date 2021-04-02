@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         魔力计算器
-// @version      2.2
+// @version      2.3
 // @author       mwhds97
 // @match        *.u2.dmhy.org/mpseed.php*
 // @match        *.m-team.cc/mybonus.php*
@@ -96,10 +96,20 @@
       return parseFloat(size[1]) * 1024;
     }
   }
+  function CountRows(table) {
+    var count = 1;
+    for(var i = 1; i < table.rows.length; i++) {
+      if(table.rows[i].cells.length == table.rows[0].cells.length) {
+        count++;
+      }
+    }
+    return count;
+  }
 
   function Sort(table, key) {
-    var temp, i, j, rows = new Array(table.rows.length - 1), values = new Array(table.rows.length - 1);
-    for(i = 1; i < table.rows.length; i++) {
+    var len = CountRows(table);
+    var temp, i, j, rows = new Array(len - 1), values = new Array(len - 1);
+    for(i = 1; i < len; i++) {
       rows[i - 1] = table.rows[i].outerHTML;
       values[i - 1] = parseFloat(table.rows[i].cells[key].innerText);
     }
@@ -115,13 +125,14 @@
         }
       }
     }
-    for(i = 1; i < table.rows.length; i++) {
+    for(i = 1; i < len; i++) {
       table.rows[i].outerHTML = rows[i - 1];
     }
   }
 
   function MakeMagic(site, table, index_T, index_S, index_N, ...theArgs) {
     var i, S, T, N, U, D, A, dB, UC, UCM;
+    var len = CountRows(table);
     switch(site) {
       case "U2":
         table.rows[0].insertCell(theArgs[0]);
@@ -144,7 +155,7 @@
         document.getElementById("sortEM").addEventListener("click", function() {
           Sort(table, theArgs[3]);
         }, false);
-        for(i = 1; i < table.rows.length; i++) {
+        for(i = 1; i < len; i++) {
           table.rows[i].insertCell(theArgs[0]);
           table.rows[i].insertCell(theArgs[1]);
           table.rows[i].insertCell(theArgs[2]);
@@ -176,7 +187,7 @@
         document.getElementById("sortE").addEventListener("click", function() {
           Sort(table, theArgs[3]);
         }, false);
-        for(i = 1; i < table.rows.length; i++) {
+        for(i = 1; i < len; i++) {
           table.rows[i].insertCell(theArgs[0]);
           table.rows[i].insertCell(theArgs[1]);
           table.rows[i].insertCell(theArgs[2]);
@@ -198,7 +209,7 @@
         document.getElementById("sortE").addEventListener("click", function() {
           Sort(table, theArgs[1]);
         }, false);
-        for(i = 1; i < table.rows.length; i++) {
+        for(i = 1; i < len; i++) {
           table.rows[i].insertCell(theArgs[0]);
           table.rows[i].insertCell(theArgs[1]);
           table.rows[i].cells[theArgs[0]].outerHTML = '<td class="rowfollow nowrap"></td>';
@@ -221,7 +232,7 @@
         document.getElementById("sortE").addEventListener("click", function() {
           Sort(table, theArgs[2]);
         }, false);
-        for(i = 1; i < table.rows.length; i++) {
+        for(i = 1; i < len; i++) {
           table.rows[i].insertCell(theArgs[0]);
           table.rows[i].insertCell(theArgs[1]);
           table.rows[i].insertCell(theArgs[2]);
@@ -233,7 +244,7 @@
     }
     switch(site) {
       case "U2":
-        for(i = 1; i < table.rows.length; i++) {
+        for(i = 1; i < len; i++) {
           var type = table.rows[i].cells[0].innerText;
           var pro = /pro.*alt="([\w\s%]+)"/.exec(table.rows[i].cells[1].innerHTML);
           if(pro === null) {
@@ -286,7 +297,7 @@
           seeding = GM_getValue("MT").Umax;
         }
         var A0 = GM_getValue("MT").L * Math.tan((GM_getValue("MT").sum - seeding * GM_getValue("MT").d) * Math.PI / (2 * GM_getValue("MT").B0));
-        for(i = 1; i < table.rows.length; i++) {
+        for(i = 1; i < len; i++) {
           T = (new Date().getTime() - new Date(/title="(.+)"/.exec(table.rows[i].cells[index_T].innerHTML)[1]).getTime()) / 604800000;
           S = size_G(table.rows[i].cells[index_S].innerText);
           N = parseFloat(table.rows[i].cells[index_N].innerText.replace(/\D/g, ""));
@@ -298,7 +309,7 @@
         }
         break;
       case "HDC":
-        for(i = 1; i < table.rows.length; i++) {
+        for(i = 1; i < len; i++) {
           T = (new Date().getTime() - new Date(/title="(.+)"/.exec(table.rows[i].cells[index_T].innerHTML)[1]).getTime()) / 604800000;
           S = size_G(table.rows[i].cells[index_S].innerText);
           N = parseFloat(table.rows[i].cells[index_N].innerText.replace(/\D/g, ""));
@@ -311,7 +322,7 @@
         }
         break;
       case "HDS":
-        for(i = 1; i < table.rows.length; i++) {
+        for(i = 1; i < len; i++) {
           T = (new Date().getTime() - new Date(/title="(.+)"/.exec(table.rows[i].cells[index_T].innerHTML)[1]).getTime()) / 604800000;
           S = size_G(table.rows[i].cells[index_S].innerText);
           N = parseFloat(table.rows[i].cells[index_N].innerText.replace(/\D/g, ""));
@@ -323,7 +334,7 @@
         }
         break;
       case "SSD":
-        for(i = 1; i < table.rows.length; i++) {
+        for(i = 1; i < len; i++) {
           T = (new Date().getTime() - new Date(/title="(.+)"/.exec(table.rows[i].cells[index_T].innerHTML)[1]).getTime()) / 604800000;
           S = size_G(table.rows[i].cells[index_S].innerText);
           N = parseFloat(table.rows[i].cells[index_N].innerText.replace(/\D/g, ""));
@@ -333,7 +344,7 @@
         }
         break;
       default:
-        for(i = 1; i < table.rows.length; i++) {
+        for(i = 1; i < len; i++) {
           T = (new Date().getTime() - new Date(/title="(.+)"/.exec(table.rows[i].cells[index_T].innerHTML)[1]).getTime()) / 604800000;
           S = size_G(table.rows[i].cells[index_S].innerText);
           N = parseFloat(table.rows[i].cells[index_N].innerText.replace(/\D/g, ""));
