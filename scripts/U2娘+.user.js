@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         U2娘+
-// @version      1.7
+// @version      1.8
 // @author       mwhds97
 // @match        *.u2.dmhy.org/*
 // @grant        none
@@ -65,6 +65,7 @@
   {"name": "attack", "value": "出击", "word": "出击"},
   {"name": "gohome", "value": "带回家", "word": "跟我回家去"},
   {"name": "pour", "value": "倒茶", "word": "倒茶"},
+  {"name": "recurse", "value": "递归", "word": "递归"},
   {"name": "railgun", "value": "电磁炮", "word": "电磁炮S全剧终"},
   {"name": "wind", "value": "风儿", "word": "今天的风儿好喧嚣啊"},
   {"name": "creed", "value": "教义", "word": "教义"},
