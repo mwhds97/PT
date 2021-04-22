@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         U2娘+
-// @version      1.8
+// @version      1.9
 // @author       mwhds97
 // @match        *.u2.dmhy.org/*
 // @grant        none
@@ -103,7 +103,7 @@
   {"name": "omni", "value": "万能", "word": "万能的U2群聊区啊"},
   {"name": "newhalf", "value": "伪娘", "word": "伪娘"},
   {"name": "love", "value": "我爱你", "word": "我爱你"},
-  {"name": "head", "value": "我的头", "word": "我的头"},
+  {"name": "myhead", "value": "我的头", "word": "我的头"},
   {"name": "imoe", "value": "我好萌", "word": "我好萌"},
   {"name": "back", "value": "我回来了", "word": "我回来了"},
   {"name": "thirsty", "value": "我渴了", "word": "我渴了"},
