@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         U2娘+
-// @version      1.9
+// @version      1.10
 // @author       mwhds97
 // @match        *.u2.dmhy.org/*
 // @grant        none
@@ -41,8 +41,6 @@
   {"name": "boynum", "value": "男生数", "word": "U2有多少男生"},
   {"name": "girlnum", "value": "女生数", "word": "U2有多少女生"},
   {"name": "nhnum", "value": "伪娘数", "word": "U2有多少伪娘"},
-  {"name": "gentleman", "value": "绅士", "word": "何为绅士"},
-  {"name": "lady", "value": "淑女", "word": "何为淑女"},
   {"name": "comfort", "value": "求安慰", "word": "求安慰"},
   {"name": "daddy", "value": "求包养", "word": "求包养"},
   {"name": "merge", "value": "求合体", "word": "求合体"},
@@ -98,6 +96,7 @@
   {"name": "misaki", "value": "食蜂操祈", "word": "食蜂操祈"},
   {"name": "world", "value": "世界线", "word": "世界线"},
   {"name": "model", "value": "手办", "word": "你的手办多少钱"},
+  {"name": "lady", "value": "淑女", "word": "何为淑女"},
   {"name": "rabbit", "value": "兔纸", "word": "兔纸"},
   {"name": "push", "value": "推倒", "word": "推倒"},
   {"name": "omni", "value": "万能", "word": "万能的U2群聊区啊"},
