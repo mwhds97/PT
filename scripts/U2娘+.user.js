@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         U2娘+
-// @version      1.10
+// @version      1.11
 // @author       mwhds97
 // @match        *.u2.dmhy.org/*
 // @grant        none
@@ -61,6 +61,7 @@
   {"name": "roll", "value": "抽种子", "word": "手气不错"},
   {"name": "comeout", "value": "出柜", "word": "出柜"},
   {"name": "attack", "value": "出击", "word": "出击"},
+  {"name": "answer", "value": "答案", "word": "the answer to life, the universe, and everything"},
   {"name": "gohome", "value": "带回家", "word": "跟我回家去"},
   {"name": "pour", "value": "倒茶", "word": "倒茶"},
   {"name": "recurse", "value": "递归", "word": "递归"},
