@@ -27,7 +27,7 @@ def size_G(size_str):
         return float(size[0]) * 1024
 
 
-with open("config.yaml", "r") as f:
+with open("hdsky.yaml", "r") as f:
     config = yaml.load(f, yaml.FullLoader)
 client = DelugeRPCClient(
     config["host"].split(":")[0],
