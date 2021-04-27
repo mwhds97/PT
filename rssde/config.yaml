@@ -1,0 +1,10 @@
+host: '127.0.0.1:58846'
+user: 'localclient'
+pass: 'deluge'
+rss: ''
+path: ''
+size: [10, 100]
+space: 1024
+publish: 600
+interval: 300
+seeding: 3600
