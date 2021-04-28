@@ -9,8 +9,10 @@ import yaml
 from deluge_client import DelugeRPCClient
 
 
-def print_t(text):
-    print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + " " + text)
+def print_t(text, eol="\n", sol="\x1b[2K"):
+    print(
+        sol + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + " " + text, end=eol
+    )
 
 
 def size_G(size_str):
@@ -40,7 +42,7 @@ client.connect()
 while True:
     try:
         if client.connected:
-            print_t("连接正常")
+            print_t("连接正常", "\r")
         else:
             raise Exception
         torrents = client.call(
