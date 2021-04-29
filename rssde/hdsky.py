@@ -87,9 +87,7 @@ while True:
                         )
                     )
                 except Exception as e:
-                    if "Torrent already in session" in repr(e):
-                        pass
-                    else:
+                    if not "Torrent already in session" in repr(e):
                         raise Exception
         time.sleep(config["interval"])
     except KeyboardInterrupt:
