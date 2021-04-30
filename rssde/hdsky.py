@@ -29,26 +29,28 @@ def size_G(size_str):
         return float(size[0]) * 1024
 
 
+def NewClient(config):
+    client = DelugeRPCClient(
+        config["host"].split(":")[0],
+        int(config["host"].split(":")[1]),
+        config["user"],
+        config["pass"],
+        True,
+        False,
+    )
+    return client
+
+
 with open("hdsky.yaml", "r") as f:
     config = yaml.load(f, yaml.FullLoader)
-client = DelugeRPCClient(
-    config["host"].split(":")[0],
-    int(config["host"].split(":")[1]),
-    config["user"],
-    config["pass"],
-    True,
-    False,
-)
+client = NewClient(config)
 client.connect()
 while True:
     try:
-        if client.connected:
-            print_t("连接正常", "\r")
-        else:
-            raise Exception
         torrents = client.call(
             "core.get_torrents_status", {}, ["hash", "total_size", "seeding_time"]
         )
+        print_t("连接正常", "\r")
         currentTotalSize = 0
         for t in list(torrents.values()):
             if t["seeding_time"] >= config["str"] * t["total_size"] / 1073741824 * 60:
@@ -98,7 +100,7 @@ while True:
         print_t("出现异常，尝试重连", "\r")
         try:
             client.disconnect()
-            time.sleep(10)
+            client = NewClient(config)
             client.connect()
             time.sleep(10)
         except KeyboardInterrupt:
