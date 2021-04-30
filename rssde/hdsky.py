@@ -51,7 +51,7 @@ while True:
         )
         currentTotalSize = 0
         for t in list(torrents.values()):
-            if t["seeding_time"] >= config["seeding"]:
+            if t["seeding_time"] >= config["str"] * t["total_size"] / 1073741824 * 60:
                 client.call("core.remove_torrent", t["hash"], True)
                 print_t("删除种子（{}GB）".format("%.2f" % (t["total_size"] / 1073741824)))
             else:
