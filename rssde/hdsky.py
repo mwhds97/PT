@@ -37,6 +37,7 @@ client = DelugeRPCClient(
     config["user"],
     config["pass"],
     True,
+    False,
 )
 client.connect()
 while True:
@@ -91,10 +92,9 @@ while True:
                         raise Exception
         time.sleep(config["interval"])
     except KeyboardInterrupt:
-        client.disconnect()
         break
     except:
         print_t("出现异常，尝试重连", "\r")
         client.disconnect()
-        time.sleep(60)
+        time.sleep(30)
         client.connect()
