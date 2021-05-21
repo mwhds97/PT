@@ -48,12 +48,17 @@ client.connect()
 while True:
     try:
         torrents = client.call(
-            "core.get_torrents_status", {}, ["hash", "total_size", "seeding_time"]
+            "core.get_torrents_status",
+            {},
+            ["hash", "total_size", "seeding_time", "tracker_status"],
         )
         print_t("连接正常", "\r")
         currentTotalSize = 0
         for t in list(torrents.values()):
-            if t["seeding_time"] >= config["str"] * t["total_size"] / 1073741824 * 60:
+            if (
+                t["seeding_time"] >= config["str"] * t["total_size"] / 1073741824 * 60
+                or "registered" in t["tracker_status"]
+            ):
                 client.call("core.remove_torrent", t["hash"], True)
                 print_t("删除种子（{}GB）".format("%.2f" % (t["total_size"] / 1073741824)))
             else:

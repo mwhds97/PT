@@ -1,28 +1,8 @@
 // ==UserScript==
 // @name         魔力计算器
-// @version      2.3
+// @version      2.4
 // @author       mwhds97
-// @match        *.u2.dmhy.org/mpseed.php*
-// @match        *.m-team.cc/mybonus.php*
-// @match        *.hdchina.org/mybonus.php*
-// @match        *.chdbits.co/mybonus.php*
-// @match        *.hdsky.me/mybonus.php*
-// @match        *.ourbits.club/mybonus.php*
-// @match        *.open.cd/mybonus.php*
-// @match        *.springsunday.net/mybonus.php*
-// @match        *.u2.dmhy.org/torrents.php*
-// @match        *.m-team.cc/torrents.php*
-// @match        *.m-team.cc/adult.php*
-// @match        *.m-team.cc/movie.php*
-// @match        *.m-team.cc/music.php*
-// @match        *.hdchina.org/torrents.php*
-// @match        *.chdbits.co/torrents.php*
-// @match        *.hdsky.me/torrents.php*
-// @match        *.ourbits.club/torrents.php*
-// @match        *.ourbits.club/rescue.php*
-// @match        *.open.cd/torrents.php*
-// @match        *.springsunday.net/torrents.php*
-// @match        *.springsunday.net/rescue.php*
+// @include      /^https?:\/\/.*(u2.*dmhy|m-team|hdchina|chdbits|hdsky|ourbits|open.*cd|springsunday).*\/(mpseed|mybonus|torrents|rescue|adult|movie|music)\.php.*$/
 // @grant        GM_setValue
 // @grant        GM_getValue
 // ==/UserScript==
@@ -30,7 +10,7 @@
 (function() {
   'use strict';
 
-  if(typeof(GM_getValue("first")) == "undefined" && /(torrents|adult|movie|music|rescue)\.php/.test(document.URL)) {
+  if(typeof (GM_getValue("first")) == "undefined" && /(torrents|adult|movie|music|rescue)\.php/.test(document.URL)) {
     alert("请进入魔力页面（U2为做种UCoin日志页面）获取或更新必要参数，否则可能无法正常显示！");
     GM_setValue("first", "blood");
   }
@@ -80,7 +60,7 @@
   }
   function size_G(size_str) {
     var size = /(\d+(?:\.\d+)?)[\n\s]*([KMGT])?i?B/.exec(size_str);
-    if(typeof(size[2]) == "undefined") {
+    if(typeof (size[2]) == "undefined") {
       return parseFloat(size[1]) / 1073741824;
     }
     else if(size[2] == "K") {
@@ -369,7 +349,7 @@
   }
   if(/hdchina.*mybonus\.php/.test(document.URL)) {
     params = /T0 = (\d+(?:\.\d+)?)[\s\S]*N0 = (\d+(?:\.\d+)?)[\s\S]*B0 = (\d+(?:\.\d+)?)[\s\S]*L = (\d+(?:\.\d+)?)[\s\S]*M = (\d+(?:\.\d+)?)[\s\S]*{\n(\d+(?:\.\d+)?),\n(\d+(?:\.\d+)?)[\s\S]*(?:A = (\d+(?:\.\d+)?).*A = (?=.*\[.*\[)|A = (\d+(?:\.\d+)?)(?!.*\[.*\[))[\s\S]*\D+(\d+(?:\.\d+)?)M/.exec(document.getElementsByClassName("normal_tab mybonus")[2].innerText);
-    GM_setValue("HDC", {"T0": parseFloat(params[1]), "N0": parseFloat(params[2]), "B0": parseFloat(params[3]), "L": parseFloat(params[4]), "M": parseFloat(params[5]), "Ra": parseFloat(params[6]), "Rb": parseFloat(params[7]), "A0": parseFloat(params[typeof(params[9]) == "undefined" ? 8 : 9]), "Smin": parseFloat(params[10])});
+    GM_setValue("HDC", {"T0": parseFloat(params[1]), "N0": parseFloat(params[2]), "B0": parseFloat(params[3]), "L": parseFloat(params[4]), "M": parseFloat(params[5]), "Ra": parseFloat(params[6]), "Rb": parseFloat(params[7]), "A0": parseFloat(params[typeof (params[9]) == "undefined" ? 8 : 9]), "Smin": parseFloat(params[10])});
   }
   if(/chdbits.*mybonus\.php/.test(document.URL)) {
     params = /T0 = (\d+(?:\.\d+)?)[\s\S]*N0 = (\d+(?:\.\d+)?)[\s\S]*B0 = (\d+(?:\.\d+)?)[\s\S]*L = (\d+(?:\.\d+)?)[\s\S]*A = (\d+(?:\.\d+)?)/.exec(document.getElementsByClassName("text")[2].innerText);

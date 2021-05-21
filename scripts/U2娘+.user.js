@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         U2娘+
-// @version      1.11
+// @version      1.12
 // @author       mwhds97
-// @match        *.u2.dmhy.org/*
+// @include      /^https?:\/\/.*u2.*dmhy.*$/
 // @grant        none
 // @noframes
 // ==/UserScript==

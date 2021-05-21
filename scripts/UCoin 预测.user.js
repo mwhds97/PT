@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         UCoin 预测
-// @version      1.0
+// @version      1.1
 // @author       mwhds97
-// @match        *.u2.dmhy.org/mpseed.php*
+// @include      /^https?:\/\/.*u2.*dmhy.*\/mpseed\.php.*$/
 // @grant        none
 // ==/UserScript==
 
