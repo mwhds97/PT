@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         U2娘+
-// @version      1.12
+// @version      1.13
 // @author       mwhds97
 // @include      /^https?:\/\/.*u2.*dmhy.*$/
 // @grant        none
@@ -118,7 +118,7 @@
 
   var shbox = document.getElementsByName("shbox")[0];
   for(var i in shbox.childNodes) {
-    if(shbox.childNodes[i].value == "清除") {
+    if(shbox.childNodes[i].type == "reset") {
       i = parseInt(i);
       break;
     }
