@@ -60,7 +60,7 @@ while True:
                 or "registered" in t["tracker_status"]
             ):
                 client.call("core.remove_torrent", t["hash"], True)
-                print_t("删除种子（{}GB）".format("%.2f" % (t["total_size"] / 1073741824)))
+                print_t("删除种子（{:.2f}GB）".format(t["total_size"] / 1073741824))
             else:
                 currentTotalSize += t["total_size"] / 1073741824
         feed = feedparser.parse(config["rss"])
@@ -90,8 +90,8 @@ while True:
                     )
                     currentTotalSize += e["size"]
                     print_t(
-                        "添加种子（{}GB），总体积 {}GB".format(
-                            "%.2f" % e["size"], "%.2f" % currentTotalSize
+                        "添加种子（{:.2f}GB），总体积 {:.2f}GB".format(
+                            e["size"], currentTotalSize
                         )
                     )
                 except Exception as e:
