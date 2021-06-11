@@ -126,6 +126,7 @@ while True:
             if (
                 config["free"]
                 and t["seeding_time"] == 0
+                and t["hash"] in eod
                 and eod[t["hash"]] != None
                 and eod[t["hash"]] - time.mktime(time.localtime()) <= config["interval"]
             ):
