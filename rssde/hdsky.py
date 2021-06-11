@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#coding=utf-8
+# coding=utf-8
 
 import re
 import time
@@ -106,6 +106,8 @@ while True:
                                 if e["hash"] in eod:
                                     eod[e["hash"]] = e["end"]
                             else:
+                                e["free"] = False
+                                e["end"] = None
                                 if e["hash"] in eod:
                                     eod[e["hash"]] = 0
                             break
@@ -138,7 +140,7 @@ while True:
             if config["free"] and e["free"] or not config["free"]:
                 if currentTotalSize + e["size"] <= config["space"]:
                     try:
-                        if config["free"]:
+                        if config["free"] and not e["hash"] in eod:
                             eod[e["hash"]] = e["end"]
                         client.call(
                             "core.add_torrent_url",
