@@ -2,6 +2,7 @@
 # coding=utf-8
 
 import re
+import sys
 import time
 
 import feedparser
@@ -52,7 +53,6 @@ def RemoveTorrent(torrent, info):
 with open("hdsky.yaml", "r") as f:
     config = yaml.load(f, yaml.FullLoader)
 client = NewClient(config)
-client.connect()
 eod = {}
 while True:
     try:
@@ -112,64 +112,74 @@ while True:
                                     eod[e["hash"]] = 0
                             break
             entries = list(filter(lambda e: e["free"], entries))
-    except:
-        pass
-    try:
-        torrents = client.call(
-            "core.get_torrents_status",
-            {},
-            ["hash", "total_size", "seeding_time", "tracker_status"],
-        )
-        print_t("连接正常", "\r")
-        currentTotalSize = 0
-        for t in list(torrents.values()):
-            if (
-                config["free"]
-                and t["seeding_time"] == 0
-                and t["hash"] in eod
-                and eod[t["hash"]] != None
-                and eod[t["hash"]] - time.mktime(time.localtime()) <= config["interval"]
-            ):
-                RemoveTorrent(t, "免费到期")
-            elif t["seeding_time"] >= config["str"] * t["total_size"] / 1073741824 * 60:
-                RemoveTorrent(t, "做种时间达到要求")
-            elif "registered" in t["tracker_status"]:
-                RemoveTorrent(t, "种子被撤回")
-            else:
-                currentTotalSize += t["total_size"] / 1073741824
-        for e in entries:
-            if config["free"] and e["free"] or not config["free"]:
-                if currentTotalSize + e["size"] <= config["space"]:
-                    try:
-                        if config["free"] and not e["hash"] in eod:
-                            eod[e["hash"]] = e["end"]
-                        client.call(
-                            "core.add_torrent_url",
-                            e["link"],
-                            {"download_location": config["path"]},
-                        )
-                        currentTotalSize += e["size"]
-                        print_t(
-                            "添加种子（{:.2f}GB），总体积 {:.2f}GB".format(
-                                e["size"], currentTotalSize
-                            )
-                        )
-                    except Exception as e:
-                        if not "Torrent already in session" in repr(e):
-                            raise Exception
-        time.sleep(config["interval"])
     except KeyboardInterrupt:
         client.disconnect()
-        break
+        sys.exit(0)
     except:
-        print_t("出现异常，尝试重连", "\r")
+        pass
+    while True:
         try:
-            client.disconnect()
-            client = NewClient(config)
-            client.connect()
-            time.sleep(10)
+            if not client.connected:
+                client.connect()
+            torrents = client.call(
+                "core.get_torrents_status",
+                {},
+                ["hash", "total_size", "seeding_time", "tracker_status"],
+            )
+            print_t("连接正常", "\r")
+            currentTotalSize = 0
+            for t in list(torrents.values()):
+                if (
+                    config["free"]
+                    and t["seeding_time"] == 0
+                    and t["hash"] in eod
+                    and eod[t["hash"]] != None
+                    and eod[t["hash"]] - time.mktime(time.localtime())
+                    <= config["interval"]
+                ):
+                    RemoveTorrent(t, "免费到期")
+                elif (
+                    t["seeding_time"]
+                    >= config["str"] * t["total_size"] / 1073741824 * 60
+                ):
+                    RemoveTorrent(t, "做种时间达到要求")
+                elif "registered" in t["tracker_status"]:
+                    RemoveTorrent(t, "种子被撤回")
+                else:
+                    currentTotalSize += t["total_size"] / 1073741824
+            for e in entries:
+                if config["free"] and e["free"] or not config["free"]:
+                    if currentTotalSize + e["size"] <= config["space"]:
+                        try:
+                            if config["free"] and not e["hash"] in eod:
+                                eod[e["hash"]] = e["end"]
+                            client.call(
+                                "core.add_torrent_url",
+                                e["link"],
+                                {"download_location": config["path"]},
+                            )
+                            currentTotalSize += e["size"]
+                            print_t(
+                                "添加种子（{:.2f}GB），总体积 {:.2f}GB".format(
+                                    e["size"], currentTotalSize
+                                )
+                            )
+                        except Exception as e:
+                            if not "Torrent already in session" in repr(e):
+                                raise Exception
+            time.sleep(config["interval"])
+            break
         except KeyboardInterrupt:
             client.disconnect()
-            break
+            sys.exit(0)
         except:
-            pass
+            print_t("出现异常，尝试重连", "\r")
+            try:
+                client.disconnect()
+                client = NewClient(config)
+                time.sleep(10)
+            except KeyboardInterrupt:
+                client.disconnect()
+                sys.exit(0)
+            except:
+                pass
