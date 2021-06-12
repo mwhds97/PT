@@ -165,7 +165,7 @@ while True:
                                 )
                             )
                         except Exception as e:
-                            if not "Torrent already in session" in repr(e):
+                            if not "already" in repr(e):
                                 raise Exception
             time.sleep(config["interval"])
             break
