@@ -2,7 +2,7 @@ host: '127.0.0.1:58846'
 user: 'localclient'
 pass: 'deluge'
 path: ''
-rss: 'https://hdsky.me/torrentrss.php?rows=20&tea6=1&tea1=1&tea28=1&tea9=1&tea31=1&tea18=1&tea22=1&tea34=1&tea35=1&tea36=1&isize=1&linktype=dl&passkey='
+rss: 'https://hdsky.me/torrentrss.php?rows=50&tea6=1&tea1=1&tea28=1&tea9=1&tea31=1&tea18=1&tea22=1&tea34=1&tea35=1&tea36=1&isize=1&linktype=dl&passkey='
 cookie:
   c_secure_login: ''
   c_secure_pass: ''
