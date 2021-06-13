@@ -137,7 +137,9 @@ while True:
                     id = re.search("id=(\d+)\D", str(r)).group(1)
                     for e in entries:
                         if e["id"] == id:
-                            if 'alt="Free"' in str(r) and not "即将结束" in str(r):
+                            if re.search(
+                                r"alt=\".*Free\"", str(r)
+                            ) != None and not "即将结束" in str(r):
                                 e["free"] = True
                                 end = re.search(r"<b><span title=\"(.*?)\"", str(r))
                                 e["end"] = (
