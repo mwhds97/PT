@@ -4,7 +4,6 @@
 import re
 import sys
 import time
-
 import feedparser
 import requests
 import yaml
@@ -150,22 +149,25 @@ while True:
             for e in entries:
                 if config["free"] and e["free"] or not config["free"]:
                     if currentTotalSize + e["size"] <= config["space"]:
-                        try:
-                            if config["free"] and not e["hash"] in eod:
-                                eod[e["hash"]] = e["end"]
-                            client.call(
-                                "core.add_torrent_url",
-                                e["link"],
-                                {"download_location": config["path"]},
-                            )
-                            currentTotalSize += e["size"]
-                            print_t(
-                                "添加种子（{:.2f}GB），总体积 {:.2f}GB".format(
-                                    e["size"], currentTotalSize
+                        if config["free"] and not e["hash"] in eod:
+                            eod[e["hash"]] = e["end"]
+                        for t in list(torrents.values()):
+                            if t["hash"] == e["hash"]:
+                                break
+                        else:
+                            try:
+                                client.call(
+                                    "core.add_torrent_url",
+                                    e["link"],
+                                    {"download_location": config["path"]},
                                 )
-                            )
-                        except Exception as ex:
-                            if not "already" in repr(ex):
+                                currentTotalSize += e["size"]
+                                print_t(
+                                    "添加种子（{:.2f}GB），总体积 {:.2f}GB".format(
+                                        e["size"], currentTotalSize
+                                    )
+                                )
+                            except:
                                 print_t(
                                     "试添加种子（{:.2f}GB），总体积 {:.2f}GB".format(
                                         e["size"], currentTotalSize + e["size"]
