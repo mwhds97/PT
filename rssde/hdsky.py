@@ -155,7 +155,6 @@ while True:
                                 if e["hash"] in eod:
                                     eod[e["hash"]] = 0
                             break
-            entries = list(filter(lambda e: e["free"], entries))
     except KeyboardInterrupt:
         client.disconnect()
         sys.exit(0)
@@ -191,17 +190,18 @@ while True:
                     RemoveTorrent(t, "种子被撤回")
                 else:
                     currentTotalSize += t["total_size"] / 1073741824
+            if config["free"]:
+                entries = list(filter(lambda e: e["free"], entries))
             for e in entries:
-                if config["free"] and e["free"] or not config["free"]:
-                    if currentTotalSize + e["size"] <= config["space"]:
-                        if config["free"] and not e["hash"] in eod:
-                            eod[e["hash"]] = e["end"]
-                        for t in list(torrents.values()):
-                            if t["hash"] == e["hash"]:
-                                break
-                        else:
-                            AddTorrent(e, currentTotalSize)
-                            currentTotalSize += e["size"]
+                if currentTotalSize + e["size"] <= config["space"]:
+                    if config["free"] and not e["hash"] in eod:
+                        eod[e["hash"]] = e["end"]
+                    for t in list(torrents.values()):
+                        if t["hash"] == e["hash"]:
+                            break
+                    else:
+                        AddTorrent(e, currentTotalSize)
+                        currentTotalSize += e["size"]
             time.sleep(config["interval"])
             break
         except KeyboardInterrupt:
