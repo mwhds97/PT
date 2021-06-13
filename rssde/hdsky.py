@@ -4,6 +4,7 @@
 import re
 import sys
 import time
+
 import feedparser
 import requests
 import yaml
@@ -47,6 +48,50 @@ def RemoveTorrent(torrent, info):
         del eod[torrent["hash"]]
     client.call("core.remove_torrent", torrent["hash"], True)
     print_t("删除种子（{:.2f}GB），原因：{}".format(torrent["total_size"] / 1073741824, info))
+
+
+def AddTorrent(torrent, size):
+    end = (
+        "N/A"
+        if torrent["end"] == None
+        else time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(torrent["end"]))
+    )
+    try:
+        client.call(
+            "core.add_torrent_url",
+            torrent["link"],
+            {"download_location": config["path"]},
+        )
+        if config["free"]:
+            print_t(
+                "添加种子（{:.2f}GB），总体积 {:.2f}GB，免费到期时间：{}".format(
+                    torrent["size"],
+                    size + torrent["size"],
+                    end,
+                )
+            )
+        else:
+            print_t(
+                "添加种子（{:.2f}GB），总体积 {:.2f}GB".format(
+                    torrent["size"], size + torrent["size"]
+                )
+            )
+    except:
+        if config["free"]:
+            print_t(
+                "试添加种子（{:.2f}GB），总体积 {:.2f}GB，免费到期时间：{}".format(
+                    torrent["size"],
+                    size + torrent["size"],
+                    end,
+                )
+            )
+        else:
+            print_t(
+                "试添加种子（{:.2f}GB），总体积 {:.2f}GB".format(
+                    torrent["size"], size + torrent["size"]
+                )
+            )
+        raise Exception
 
 
 with open("hdsky.yaml", "r") as f:
@@ -155,25 +200,8 @@ while True:
                             if t["hash"] == e["hash"]:
                                 break
                         else:
-                            try:
-                                client.call(
-                                    "core.add_torrent_url",
-                                    e["link"],
-                                    {"download_location": config["path"]},
-                                )
-                                currentTotalSize += e["size"]
-                                print_t(
-                                    "添加种子（{:.2f}GB），总体积 {:.2f}GB".format(
-                                        e["size"], currentTotalSize
-                                    )
-                                )
-                            except:
-                                print_t(
-                                    "试添加种子（{:.2f}GB），总体积 {:.2f}GB".format(
-                                        e["size"], currentTotalSize + e["size"]
-                                    )
-                                )
-                                raise Exception
+                            AddTorrent(e, currentTotalSize)
+                            currentTotalSize += e["size"]
             time.sleep(config["interval"])
             break
         except KeyboardInterrupt:
