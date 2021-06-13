@@ -166,6 +166,11 @@ while True:
                             )
                         except Exception as e:
                             if not "already" in repr(e):
+                                print_t(
+                                    "试添加种子（{:.2f}GB），总体积 {:.2f}GB".format(
+                                        e["size"], currentTotalSize + e["size"]
+                                    )
+                                )
                                 raise Exception
             time.sleep(config["interval"])
             break
