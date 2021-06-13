@@ -152,8 +152,6 @@ while True:
                                 if e["hash"] in eod:
                                     eod[e["hash"]] = e["end"]
                             else:
-                                e["free"] = False
-                                e["end"] = None
                                 if e["hash"] in eod:
                                     eod[e["hash"]] = 0
                             break
