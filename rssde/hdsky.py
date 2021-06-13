@@ -164,8 +164,8 @@ while True:
                                     e["size"], currentTotalSize
                                 )
                             )
-                        except Exception as e:
-                            if not "already" in repr(e):
+                        except Exception as ex:
+                            if not "already" in repr(ex):
                                 print_t(
                                     "试添加种子（{:.2f}GB），总体积 {:.2f}GB".format(
                                         e["size"], currentTotalSize + e["size"]
