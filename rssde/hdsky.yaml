@@ -3,12 +3,14 @@ user: 'localclient'
 pass: 'deluge'
 path: ''
 rss: 'https://hdsky.me/torrentrss.php?rows=50&tea6=1&tea1=1&tea28=1&tea9=1&tea31=1&tea18=1&tea22=1&tea34=1&tea35=1&tea36=1&isize=1&linktype=dl&passkey='
+regexp: '(-|@)HDS'
 cookie:
   c_secure_login: ''
   c_secure_pass: ''
   c_secure_ssl: ''
   c_secure_tracker_ssl: ''
   c_secure_uid: ''
+ua: 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36'
 free: true
 size: [10, 100]
 space: 1024

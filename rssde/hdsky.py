@@ -105,6 +105,7 @@ while True:
             {
                 "id": re.search(r"id=(\d+)", f["link"]).group(1),
                 "hash": f["id"],
+                "title": f["title"],
                 "time": time.mktime(time.gmtime()) - time.mktime(f["published_parsed"]),
                 "size": size_G(re.search(r"\[(.*)\]$", f["title"]).group(1)),
                 "link": f["links"][1]["href"],
@@ -116,7 +117,8 @@ while True:
         entries = list(
             filter(
                 lambda e: e["time"] <= config["publish"]
-                and config["size"][0] <= e["size"] <= config["size"][1],
+                and config["size"][0] <= e["size"] <= config["size"][1]
+                and re.search(config["regexp"], e["title"]) != None,
                 entries,
             )
         )
@@ -124,9 +126,7 @@ while True:
         if config["free"]:
             response = requests.get(
                 "https://hdsky.me/torrents.php",
-                headers={
-                    "user-agent": "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36"
-                },
+                headers={"user-agent": config["ua"]},
                 cookies=config["cookie"],
                 timeout=15,
             )
