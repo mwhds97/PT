@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         U2娘+
-// @version      1.13
+// @version      2.0
 // @author       mwhds97
 // @include      /^https?:\/\/.*u2.*dmhy.*$/
 // @grant        none
@@ -123,7 +123,11 @@
       break;
     }
   }
-  for(var j = 0; j < buttons.length; j++) {
-    CreateButton(shbox, i + j + 1, buttons[j].name, buttons[j].value, buttons[j].word);
-  }
+  shbox.childNodes[i + 1].outerHTML = '<a href="javascript:void(0)" id="expand">U2娘的小秘密</a>';
+  document.getElementById("expand").addEventListener("mouseover", function() {
+    for(var j = 0; j < buttons.length; j++) {
+      CreateButton(shbox, i + j + 1, buttons[j].name, buttons[j].value, buttons[j].word);
+    }
+    shbox.removeChild(document.getElementById("expand"));
+  }, false);
 })();
