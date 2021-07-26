@@ -1,0 +1,63 @@
+host: '127.0.0.1:58846'
+user: 'localclient'
+pass: 'deluge'
+space: 1024
+task_count_max: 10
+run_interval: 30
+torrent_pool_size: 1000
+order_by_site: false
+sites:
+- 'CHDBits'
+- 'HDSky'
+CHDBits:
+  rss: 'https://chdbits.co/torrentrss.php?rows=50&isize=1&linktype=dl&passkey='
+  regexp: '(-|@)(CHD|OneHD)'
+  cookies:
+    c_secure_login: ''
+    c_secure_pass: ''
+    c_secure_ssl: ''
+    c_secure_tracker_ssl: ''
+    c_secure_uid: ''
+  user_agent: 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36'
+  http_proxy: null
+  https_proxy: null
+  fetch_interval: 300
+  publish_within: 600
+  free_only: true
+  free_time_min: 21600
+  exclude_hr: false
+  ignore_hr: false
+  size: [10, 100]
+  path: ''
+  extra_options: {}
+  seed_by_size: true
+  seed_time_size_ratio: 1.0
+  seed_time_fixed: 3600
+  seed_delay_hr: 1800
+  seed_ratio_hr: null
+HDSky:
+  rss: 'https://hdsky.me/torrentrss.php?rows=50&isize=1&linktype=dl&passkey='
+  regexp: '(-|@)(HDS)|WOWOW|NHK|TVAsahi'
+  cookies:
+    c_secure_login: ''
+    c_secure_pass: ''
+    c_secure_ssl: ''
+    c_secure_tracker_ssl: ''
+    c_secure_uid: ''
+  user_agent: 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36'
+  http_proxy: null
+  https_proxy: null
+  fetch_interval: 300
+  publish_within: 600
+  free_only: true
+  free_time_min: 21600
+  exclude_hr: false
+  ignore_hr: false
+  size: [10, 100]
+  path: ''
+  extra_options: {}
+  seed_by_size: true
+  seed_time_size_ratio: 1.0
+  seed_time_fixed: 3600
+  seed_delay_hr: 1800
+  seed_ratio_hr: null
