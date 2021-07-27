@@ -73,7 +73,7 @@ def CHDBits(config):
                     )
                 hr = re.search("circle-text.+?(\d+)</div>", str(row))
                 if hr != None:
-                    web_info["hr"] = int(hr.group(1)) * 3600
+                    web_info["hr"] = int(hr.group(1)) * 86400
                 if re.search("%</td>", str(row)) != None:
                     web_info["downloaded"] = True
                 torrents[id] = dict(torrents[id], **web_info)
