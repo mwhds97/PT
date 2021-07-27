@@ -167,8 +167,8 @@ def task_processor():
 def torrent_fetcher(site):
     def template():
         while True:
-            torrents = eval(site + "(config)")
-            if torrents != {}:
+            try:
+                torrents = eval(site + "(config)")
                 lock.acquire()
                 for name, torrent in torrents.items():
                     if name in torrent_pool:
@@ -178,7 +178,9 @@ def torrent_fetcher(site):
                         name_queue.append(name)
                 lock.release()
                 time.sleep(config[site]["fetch_interval"])
-            else:
+            except Exception:
+                if lock.locked():
+                    lock.release()
                 print_t("[{}]获取种子信息失败，正在重试…".format(site), "\r")
                 time.sleep(5)
 
