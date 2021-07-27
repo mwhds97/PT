@@ -179,7 +179,7 @@ def torrent_fetcher(site):
                 lock.release()
                 time.sleep(config[site]["fetch_interval"])
             else:
-                print_t("[{}]获取种子信息失败，正在重试…".format(site))
+                print_t("[{}]获取种子信息失败，正在重试…".format(site), "\r")
                 time.sleep(5)
 
     return template
