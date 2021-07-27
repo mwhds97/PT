@@ -65,6 +65,9 @@ def task_processor():
                     if "registered" in stats["tracker_status"]:
                         to_remove = True
                         info = "种子被撤除"
+                    elif stats["active_time"] >= config[site]["life"]:
+                        to_remove = True
+                        info = "活动时长超过限制"
                     elif (
                         config[site]["free_only"]
                         and stats["seeding_time"] == 0
@@ -155,7 +158,7 @@ def task_processor():
             if lock.locked():
                 lock.release()
             try:
-                print_t("出现异常，重新连接客户端…", "\r")
+                print_t("出现异常，正在重新连接客户端…", "\r")
                 daemon.reconnect()
             except Exception:
                 pass
@@ -164,8 +167,8 @@ def task_processor():
 def torrent_fetcher(site):
     def template():
         while True:
-            try:
-                torrents = eval(site + "(config)")
+            torrents = eval(site + "(config)")
+            if torrents != {}:
                 lock.acquire()
                 for name, torrent in torrents.items():
                     if name in torrent_pool:
@@ -175,9 +178,8 @@ def torrent_fetcher(site):
                         name_queue.append(name)
                 lock.release()
                 time.sleep(config[site]["fetch_interval"])
-            except Exception:
-                if lock.locked():
-                    lock.release()
+            else:
+                print_t("[{}]获取种子信息失败，正在重试…".format(site))
                 time.sleep(5)
 
     return template

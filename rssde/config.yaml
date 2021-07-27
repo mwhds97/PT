@@ -19,12 +19,11 @@ CHDBits:
     c_secure_tracker_ssl: ''
     c_secure_uid: ''
   user_agent: 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36'
-  http_proxy: null
-  https_proxy: null
+  proxies: {}
   fetch_interval: 300
-  publish_within: 600
+  publish_within: 660
   free_only: true
-  free_time_min: 21600
+  free_time_min: 21000
   exclude_hr: false
   ignore_hr: false
   size: [10, 100]
@@ -35,6 +34,7 @@ CHDBits:
   seed_time_fixed: 3600
   seed_delay_hr: 1800
   seed_ratio_hr: null
+  life: 259200
 HDSky:
   rss: 'https://hdsky.me/torrentrss.php?rows=50&isize=1&linktype=dl&passkey='
   regexp: '(-|@)(HDS)|WOWOW|NHK|TVAsahi'
@@ -45,12 +45,11 @@ HDSky:
     c_secure_tracker_ssl: ''
     c_secure_uid: ''
   user_agent: 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36'
-  http_proxy: null
-  https_proxy: null
+  proxies: {}
   fetch_interval: 300
-  publish_within: 600
+  publish_within: 660
   free_only: true
-  free_time_min: 21600
+  free_time_min: 21000
   exclude_hr: false
   ignore_hr: false
   size: [10, 100]
@@ -61,3 +60,4 @@ HDSky:
   seed_time_fixed: 3600
   seed_delay_hr: 1800
   seed_ratio_hr: null
+  life: 259200

@@ -11,21 +11,12 @@ from utils import *
 
 def HDSky(config):
     try:
-        if (
-            config["HDSky"]["http_proxy"] == None
-            and config["HDSky"]["https_proxy"] == None
-        ):
+        if config["HDSky"]["proxies"] == {}:
             feed = feedparser.parse(config["HDSky"]["rss"])
         else:
             feed = feedparser.parse(
                 config["HDSky"]["rss"],
-                handlers=urllib.request.ProxyHandler(
-                    {
-                        key[:-6]: value
-                        for key, value in config["HDSky"].items()
-                        if key in ["http_proxy", "https_proxy"] and value != None
-                    }
-                ),
+                handlers=urllib.request.ProxyHandler(config["HDSky"]["proxies"]),
             )
         torrents = {
             re.search("id=(\d+)", entry["link"]).group(1): {

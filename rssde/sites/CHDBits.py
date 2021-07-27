@@ -11,21 +11,12 @@ from utils import *
 
 def CHDBits(config):
     try:
-        if (
-            config["CHDBits"]["http_proxy"] == None
-            and config["CHDBits"]["https_proxy"] == None
-        ):
+        if config["CHDBits"]["proxies"] == {}:
             feed = feedparser.parse(config["CHDBits"]["rss"])
         else:
             feed = feedparser.parse(
                 config["CHDBits"]["rss"],
-                handlers=urllib.request.ProxyHandler(
-                    {
-                        key[:-6]: value
-                        for key, value in config["CHDBits"].items()
-                        if key in ["http_proxy", "https_proxy"] and value != None
-                    }
-                ),
+                handlers=urllib.request.ProxyHandler(config["CHDBits"]["proxies"]),
             )
         torrents = {
             re.search("id=(\d+)", entry["link"]).group(1): {

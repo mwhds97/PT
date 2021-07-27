@@ -35,7 +35,14 @@ class deluge:
         self.tasks = self.client.call(
             "core.get_torrents_status",
             {},
-            ["name", "total_size", "seeding_time", "ratio", "tracker_status"],
+            [
+                "name",
+                "total_size",
+                "active_time",
+                "seeding_time",
+                "ratio",
+                "tracker_status",
+            ],
         )
         self.tasks = {
             stats["name"]: dict(
