@@ -11,7 +11,7 @@ sites:
 - 'HDSky'
 CHDBits:
   rss: 'https://chdbits.co/torrentrss.php?rows=50&isize=1&linktype=dl&passkey='
-  regexp: '(-|@)(CHD|OneHD)'
+  regexp: '(-|@)(CHD(?!Bits)|OneHD)|(@CHDBits)'
   cookies:
     c_secure_login: ''
     c_secure_pass: ''

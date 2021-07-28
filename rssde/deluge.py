@@ -59,6 +59,7 @@ class deluge:
         self.task_count = len(self.tasks)
 
     def add_torrent(self, torrent, name):
+        self.flush()
         text = "添加种子（{:.2f}GB）（{}），免费：{}，到期时间：{}，H&R：{}，总体积：{:.2f}GB".format(
             torrent["size"],
             torrent["site"],
@@ -86,10 +87,18 @@ class deluge:
             self.flush()
             print_t(text)
         except Exception as e:
-            print_t("试" + text)
-            raise e
+            hash = re.match("Torrent already in session \((\w{40})\)", str(e))
+            if hash != None:
+                self.client.call(
+                    "core.set_torrent_options", hash.group(1), {"name": name}
+                )
+                self.flush()
+            elif re.match("Torrent already being added", str(e)) == None:
+                print_t("试" + text)
+                raise e
 
     def remove_torrent(self, name, info):
+        self.flush()
         text = "删除种子（{:.2f}GB）（{}），原因：{}，总体积：{:.2f}GB".format(
             self.tasks[name]["total_size"] / 1073741824,
             re.search("\[(\w+)\]", name).group(1),

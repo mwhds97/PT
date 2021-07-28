@@ -1,14 +1,14 @@
 # 使用手册
 
-## 简介
+### 简介
 
 这个东西是配合 [Deluge](https://github.com/deluge-torrent/deluge) 玩一些 PT 站用的
 
 ---
 
-## 依赖
+### 依赖
 
-python >= 3.7.9
+python >= 3.7
 
 依赖库可用以下命令安装：
 
@@ -16,7 +16,7 @@ python >= 3.7.9
 
 ---
 
-## 配置
+### 配置
 
 `config.yaml`
 
@@ -35,7 +35,7 @@ sites: #指定要执行任务的站点
 - '站点n'
 站点1:
   rss: 'https://站点1.com/torrentrss.php?rows=50&isize=1&linktype=dl&passkey=' #站点的 RSS 地址，要求包含大小信息，即 isize=1
-  regexp: '(-|@)(CHD|OneHD)' #用于根据标题筛选种子的正则表达式
+  regexp: '(-|@)(站点1))' #用于根据标题筛选种子的正则表达式
   cookies: {}
   user_agent: 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36'
   proxies: {} #代理设置，例如 {'http': 'http://127.0.0.1:7890', 'https': 'http://127.0.0.1:7890'}
@@ -63,7 +63,7 @@ sites: #指定要执行任务的站点
 
 ---
 
-## 使用
+### 使用
 
 直接运行 `main.py` 即可
 

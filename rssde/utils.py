@@ -7,12 +7,10 @@ import yaml
 
 
 def print_t(text, nowrap=False):
-    print("".ljust(100), end="")
-    for i in range(100):
-        print("\b", end="")
+    full_text = "\r" + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + " " + text
     print(
-        time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + " " + text,
-        end="\r" if nowrap else "\n",
+        f"{full_text: <50}",
+        end="" if nowrap else "\n",
     )
 
 
