@@ -45,7 +45,7 @@ name_queue.extend(yaml_read("name_queue.yaml"))
 try:
     daemon = deluge(config)
 except Exception:
-    print_t("无法连接客户端，请重试", sol="")
+    print_t("无法连接客户端，请重试")
     sys.exit(0)
 lock = threading.Lock()
 
@@ -55,7 +55,7 @@ def task_processor():
     while True:
         try:
             daemon.flush()
-            print_t("客户端连接正常，正在等候任务…", "\r")
+            print_t("客户端连接正常，正在等候任务…", True)
             lock.acquire()
             for name, stats in daemon.tasks.items():
                 to_remove = False
@@ -161,7 +161,7 @@ def task_processor():
             if lock.locked():
                 lock.release()
             try:
-                print_t("出现异常，正在重新连接客户端…", "\r")
+                print_t("出现异常，正在重新连接客户端…", True)
                 daemon.reconnect()
             except Exception:
                 pass
@@ -184,8 +184,8 @@ def torrent_fetcher(site):
             except Exception:
                 if lock.locked():
                     lock.release()
-                print_t("[{}]获取种子信息失败，正在重试…".format(site), "\r")
-                time.sleep(5)
+                print_t("[{}]获取种子信息失败，正在重试…".format(site), True)
+                time.sleep(config[site]["retry_interval"])
 
     return template
 

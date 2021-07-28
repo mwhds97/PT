@@ -21,6 +21,7 @@ CHDBits:
   user_agent: 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36'
   proxies: {}
   fetch_interval: 300
+  retry_interval: 30
   publish_within: 660
   free_only: true
   free_time_min: 21000
@@ -47,6 +48,7 @@ HDSky:
   user_agent: 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36'
   proxies: {}
   fetch_interval: 300
+  retry_interval: 30
   publish_within: 660
   free_only: true
   free_time_min: 21000

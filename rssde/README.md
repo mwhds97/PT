@@ -40,6 +40,7 @@ sites: #指定要执行任务的站点
   user_agent: 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36'
   proxies: {} #代理设置，例如 {'http': 'http://127.0.0.1:7890', 'https': 'http://127.0.0.1:7890'}
   fetch_interval: 300 #获取种子信息的间隔（单位：秒）
+  retry_interval: 30 #获取种子失败时重试的间隔（单位：秒）
   publish_within: 660 #发布时间在该值（单位：秒）之前的种子将被忽略（考虑到程序延迟，建议略大于期望值）
   free_only: true #若该值为 true，则非免费的种子将被忽略，下载中的免费到期的种子（包括带有 H&R 要求的）将被移除
   free_time_min: 21000 #仅当 free_only 的值为 true 时有效，免费时长小于该值（单位：秒）的种子将被忽略（考虑到程序延迟，建议略小于期望值）

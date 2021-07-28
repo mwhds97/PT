@@ -1,13 +1,22 @@
+# coding=utf-8
+
 import re
+import sys
 import time
 
 import yaml
 
 
-def print_t(text, eol="\n", sol="\x1b[2K"):
-    print(
-        sol + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + " " + text, end=eol
+def print_t(text, nowrap=False):
+    sys.stdout.write("".ljust(100))
+    sys.stdout.write("".ljust(100, "\b"))
+    sys.stdout.write(
+        time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        + " "
+        + text
+        + ("\r" if nowrap else "\n")
     )
+    sys.stdout.flush()
 
 
 def size_G(size_str):
