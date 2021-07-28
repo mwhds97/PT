@@ -9,7 +9,8 @@ import yaml
 
 def print_t(text, nowrap=False):
     sys.stdout.write("".ljust(100))
-    sys.stdout.write("".ljust(100, "\b"))
+    for i in range(100):
+        sys.stdout.write("\b")
     sys.stdout.write(
         time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         + " "
