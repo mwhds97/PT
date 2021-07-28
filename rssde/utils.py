@@ -1,23 +1,19 @@
 # coding=utf-8
 
 import re
-import sys
 import time
 
 import yaml
 
 
 def print_t(text, nowrap=False):
-    sys.stdout.write("".ljust(100))
+    print("".ljust(100), end="")
     for i in range(100):
-        sys.stdout.write("\b")
-    sys.stdout.write(
-        time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-        + " "
-        + text
-        + ("\r" if nowrap else "\n")
+        print("\b", end="")
+    print(
+        time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + " " + text,
+        end="\r" if nowrap else "\n",
     )
-    sys.stdout.flush()
 
 
 def size_G(size_str):
