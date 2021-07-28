@@ -9,7 +9,7 @@ import yaml
 def print_t(text, nowrap=False):
     full_text = "\r" + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + " " + text
     print(
-        f"{full_text: <50}",
+        f"{full_text: <75}",
         end="" if nowrap else "\n",
     )
 
