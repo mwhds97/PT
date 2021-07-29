@@ -3,4 +3,5 @@ deluge-client>=1.9.0
 feedparser>=6.0.0
 lxml>=4.6.0
 PyYAML>=5.4.0
+qbittorrent-api>=2021.5.1
 requests>=2.25.0

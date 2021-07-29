@@ -3,6 +3,7 @@
 import re
 import time
 
+import qbittorrentapi
 from deluge_client import DelugeRPCClient
 
 from utils import *
@@ -60,18 +61,11 @@ class deluge:
 
     def add_torrent(self, torrent, name):
         self.flush()
-        text = "添加种子（{:.2f}GB）（{}），免费：{}，到期时间：{}，H&R：{}，总体积：{:.2f}GB".format(
-            torrent["size"],
-            torrent["site"],
-            "是" if torrent["free"] else "否",
-            "N/A"
-            if not torrent["free"] or torrent["free_end"] == None
-            else time.strftime(
-                "%Y-%m-%d %H:%M:%S", time.localtime(torrent["free_end"])
-            ),
-            "无" if torrent["hr"] == None else "{:.2f}小时".format(torrent["hr"] / 3600),
-            self.total_size + torrent["size"],
-        )
+        text = f'''添加种子（{torrent["size"]:.2f}GB）（{torrent["site"]}）\
+，免费：{"是" if torrent["free"] else "否"}\
+，到期时间：{"N/A" if not torrent["free"] or torrent["free_end"] == None else time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(torrent["free_end"]))}\
+，H&R：{"无" if torrent["hr"] == None else f'{torrent["hr"] / 3600:.2f}小时'}\
+，总体积：{self.total_size + torrent["size"]:.2f}GB'''
         try:
             self.client.call(
                 "core.add_torrent_url",
@@ -95,16 +89,14 @@ class deluge:
                 self.flush()
             elif re.match("Torrent already being added", str(e)) == None:
                 print_t("试" + text)
+                torrent["retry_count"] += 1
                 raise e
 
     def remove_torrent(self, name, info):
         self.flush()
-        text = "删除种子（{:.2f}GB）（{}），原因：{}，总体积：{:.2f}GB".format(
-            self.tasks[name]["total_size"] / 1073741824,
-            re.search("\[(\w+)\]", name).group(1),
-            info,
-            self.total_size - self.tasks[name]["total_size"] / 1073741824 + 0,
-        )
+        text = f'删除种子（{self.tasks[name]["total_size"] / 1073741824:.2f}GB）（{re.search("\[(\w+)\]", name).group(1)}）\
+，原因：{info}\
+，总体积：{self.total_size - self.tasks[name]["total_size"] / 1073741824 + 0:.2f}GB'
         try:
             self.client.call("core.remove_torrent", self.tasks[name]["hash"], True)
             self.flush()
@@ -112,3 +104,7 @@ class deluge:
         except Exception as e:
             print_t("试" + text)
             raise e
+
+
+class qbittorrent:
+    pass

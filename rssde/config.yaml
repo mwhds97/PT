@@ -1,3 +1,4 @@
+client: 'deluge'
 host: '127.0.0.1:58846'
 user: 'localclient'
 pass: 'deluge'
@@ -22,6 +23,7 @@ CHDBits:
   proxies: {}
   fetch_interval: 300
   retry_interval: 30
+  retry_count_max: 2
   publish_within: 660
   free_only: true
   free_time_min: 21000
@@ -49,6 +51,7 @@ HDSky:
   proxies: {}
   fetch_interval: 300
   retry_interval: 30
+  retry_count_max: 2
   publish_within: 660
   free_only: true
   free_time_min: 21000

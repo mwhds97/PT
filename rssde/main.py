@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 # coding=utf-8
 
+import os.path
 import signal
 import sys
 import threading
 import time
 from collections import deque
 
-from deluge import *
+from clients import *
 from sites import *
 from utils import *
 
@@ -15,8 +16,8 @@ from utils import *
 def uncaught_exception_handler(type, value, traceback):
     print_t("发生未知错误，正在保存种子数据…")
     lock.acquire()
-    yaml_dump(torrent_pool, "torrent_pool.yaml")
-    yaml_dump(list(name_queue), "name_queue.yaml")
+    yaml_dump(torrent_pool, os.path.join(script_dir, "torrent_pool.yaml"))
+    yaml_dump(list(name_queue), os.path.join(script_dir, "name_queue.yaml"))
     lock.release()
     print_t("正在停止…")
     sys.exit(0)
@@ -28,8 +29,8 @@ sys.excepthook = uncaught_exception_handler
 def SIGINT_handler(signum, frame):
     print_t("正在保存种子数据…")
     lock.acquire()
-    yaml_dump(torrent_pool, "torrent_pool.yaml")
-    yaml_dump(list(name_queue), "name_queue.yaml")
+    yaml_dump(torrent_pool, os.path.join(script_dir, "torrent_pool.yaml"))
+    yaml_dump(list(name_queue), os.path.join(script_dir, "name_queue.yaml"))
     lock.release()
     print_t("正在停止…")
     sys.exit(0)
@@ -38,12 +39,13 @@ def SIGINT_handler(signum, frame):
 signal.signal(signal.SIGINT, SIGINT_handler)
 
 
-config = yaml_read("config.yaml")
-torrent_pool = yaml_read("torrent_pool.yaml")
+script_dir = os.path.dirname(__file__)
+config = yaml_read(os.path.join(script_dir, "config.yaml"))
+torrent_pool = yaml_read(os.path.join(script_dir, "torrent_pool.yaml"))
 name_queue = deque(maxlen=config["torrent_pool_size"])
-name_queue.extend(yaml_read("name_queue.yaml"))
+name_queue.extend(yaml_read(os.path.join(script_dir, "name_queue.yaml")))
 try:
-    daemon = deluge(config)
+    client = eval(config["client"] + "(config)")
 except Exception:
     print_t("无法连接客户端，请重试")
     sys.exit(0)
@@ -54,10 +56,10 @@ def task_processor():
     global torrent_pool
     while True:
         try:
-            daemon.flush()
+            client.flush()
             print_t("客户端连接正常，正在等候任务…", True)
             lock.acquire()
-            for name, stats in daemon.tasks.items():
+            for name, stats in client.tasks.items():
                 to_remove = False
                 if name in torrent_pool:
                     torrent = torrent_pool[name]
@@ -108,7 +110,7 @@ def task_processor():
                                 to_remove = True
                                 info = "做种时长（固定）达到要求"
                 if to_remove:
-                    daemon.remove_torrent(name, info)
+                    client.remove_torrent(name, info)
             torrent_pool = {
                 name: torrent
                 for name, torrent in torrent_pool.items()
@@ -134,15 +136,16 @@ def task_processor():
             for name, torrent in torrent_pool.items():
                 site = torrent["site"]
                 if (
-                    daemon.task_count < config["task_count_max"]
-                    and not name in daemon.tasks
+                    client.task_count < config["task_count_max"]
+                    and not name in client.tasks
+                    and torrent["retry_count"] <= config[site]["retry_count_max"]
                     and "downloaded" in torrent
                     and not torrent["downloaded"]
                     and (
                         time.mktime(time.localtime()) - torrent["publish_at"]
                         <= config[site]["publish_within"]
                     )
-                    and daemon.total_size + torrent["size"] <= config["space"]
+                    and client.total_size + torrent["size"] <= config["space"]
                     and (
                         not config[site]["free_only"]
                         or torrent["free"]
@@ -154,7 +157,7 @@ def task_processor():
                     )
                     and (not (config[site]["exclude_hr"] and torrent["hr"] != None))
                 ):
-                    daemon.add_torrent(torrent, name)
+                    client.add_torrent(torrent, name)
             lock.release()
             time.sleep(config["run_interval"])
         except Exception:
@@ -162,7 +165,7 @@ def task_processor():
                 lock.release()
             try:
                 print_t("出现异常，正在重新连接客户端…", True)
-                daemon.reconnect()
+                client.reconnect()
             except Exception:
                 pass
 
@@ -177,14 +180,14 @@ def torrent_fetcher(site):
                     if name in torrent_pool:
                         torrent_pool[name] = dict(torrent_pool[name], **torrent)
                     else:
-                        torrent_pool[name] = torrent
+                        torrent_pool[name] = dict(torrent, **{"retry_count": 0})
                         name_queue.append(name)
                 lock.release()
                 time.sleep(config[site]["fetch_interval"])
             except Exception:
                 if lock.locked():
                     lock.release()
-                print_t("[{}]获取种子信息失败，正在重试…".format(site), True)
+                print_t(f"[{site}]获取种子信息失败，正在重试…", True)
                 time.sleep(config[site]["retry_interval"])
 
     return template
@@ -197,4 +200,4 @@ for thread in threads:
     thread.setDaemon(True)
     thread.start()
 while True:
-    time.sleep(1)
+    time.sleep(86400)
