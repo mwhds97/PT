@@ -50,7 +50,7 @@ class deluge:
         self.tasks = {
             stats["name"]: dict(
                 {"hash": hash},
-                **{key: value for key, value in stats.items() if key != "name"}
+                **{key: value for key, value in stats.items() if key != "name"},
             )
             for hash, stats in self.tasks.items()
         }
@@ -61,11 +61,11 @@ class deluge:
 
     def add_torrent(self, torrent, name):
         self.flush()
-        text = f'''添加种子（{torrent["size"]:.2f}GB）（{torrent["site"]}）\
+        text = f"""添加种子（{torrent["size"]:.2f}GB）（{torrent["site"]}）\
 ，免费：{"是" if torrent["free"] else "否"}\
 ，到期时间：{"N/A" if not torrent["free"] or torrent["free_end"] == None else time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(torrent["free_end"]))}\
 ，H&R：{"无" if torrent["hr"] == None else f'{torrent["hr"] / 3600:.2f}小时'}\
-，总体积：{self.total_size + torrent["size"]:.2f}GB'''
+，总体积：{self.total_size + torrent["size"]:.2f}GB"""
         try:
             self.client.call(
                 "core.add_torrent_url",
@@ -75,7 +75,7 @@ class deluge:
                         "name": name,
                         "download_location": self.config[torrent["site"]]["path"],
                     },
-                    **self.config[torrent["site"]]["extra_options"]
+                    **self.config[torrent["site"]]["extra_options"],
                 ),
             )
             self.flush()
@@ -94,7 +94,8 @@ class deluge:
 
     def remove_torrent(self, name, info):
         self.flush()
-        text = f'删除种子（{self.tasks[name]["total_size"] / 1073741824:.2f}GB）（{re.search("\[(\w+)\]", name).group(1)}）\
+        pattern = "\[(\w+)\]"
+        text = f'删除种子（{self.tasks[name]["total_size"] / 1073741824:.2f}GB）（{re.search(pattern, name).group(1)}）\
 ，原因：{info}\
 ，总体积：{self.total_size - self.tasks[name]["total_size"] / 1073741824 + 0:.2f}GB'
         try:
