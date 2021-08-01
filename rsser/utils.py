@@ -6,12 +6,17 @@ import time
 import yaml
 
 
-def print_t(text, nowrap=False):
+def print_t(text, nowrap=False, logger=None):
     full_text = "\r" + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + " " + text
     print(
         f"{full_text: <75}",
         end="" if nowrap else "\n",
     )
+    if logger != None:
+        log_text = (
+            time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + " " + text + "\n"
+        )
+        logger.write(log_text)
 
 
 def size_G(size_str):

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # coding=utf-8
 
-import os.path
+import os
 import signal
 import sys
 import threading
@@ -14,12 +14,13 @@ from utils import *
 
 
 def uncaught_exception_handler(type, value, traceback):
-    print_t("发生未知错误，正在保存种子数据…")
+    print_t("发生未知错误，正在保存种子数据…", logger=logger)
     lock.acquire()
     yaml_dump(torrent_pool, os.path.join(script_dir, "torrent_pool.yaml"))
     yaml_dump(list(name_queue), os.path.join(script_dir, "name_queue.yaml"))
     lock.release()
-    print_t("正在停止…")
+    print_t("正在停止…", logger=logger)
+    logger.close()
     sys.exit(0)
 
 
@@ -27,12 +28,13 @@ sys.excepthook = uncaught_exception_handler
 
 
 def SIGINT_handler(signum, frame):
-    print_t("正在保存种子数据…")
+    print_t("正在保存种子数据…", logger=logger)
     lock.acquire()
     yaml_dump(torrent_pool, os.path.join(script_dir, "torrent_pool.yaml"))
     yaml_dump(list(name_queue), os.path.join(script_dir, "name_queue.yaml"))
     lock.release()
-    print_t("正在停止…")
+    print_t("正在停止…", logger=logger)
+    logger.close()
     sys.exit(0)
 
 
@@ -44,10 +46,21 @@ config = yaml_read(os.path.join(script_dir, "config.yaml"))
 torrent_pool = yaml_read(os.path.join(script_dir, "torrent_pool.yaml"))
 name_queue = deque(maxlen=config["torrent_pool_size"])
 name_queue.extend(yaml_read(os.path.join(script_dir, "name_queue.yaml")))
+os.makedirs(os.path.join(script_dir, "logs"), exist_ok=True)
+logger = open(
+    os.path.join(
+        script_dir,
+        "logs",
+        time.strftime("%Y-%m-%d %H-%M-%S", time.localtime()) + ".log",
+    ),
+    "a",
+    encoding="utf-8",
+    newline="\n",
+)
 try:
     client = eval(config["client"] + "(config)")
 except Exception:
-    print_t("无法连接客户端，请重试")
+    print_t("无法连接客户端，请重试", logger=logger)
     sys.exit(0)
 lock = threading.Lock()
 
@@ -110,7 +123,7 @@ def task_processor():
                                 to_remove = True
                                 info = "做种时长（固定）达到要求"
                 if to_remove:
-                    client.remove_torrent(name, info)
+                    client.remove_torrent(name, info, logger)
             torrent_pool = {
                 name: torrent
                 for name, torrent in torrent_pool.items()
@@ -157,14 +170,14 @@ def task_processor():
                     )
                     and (not (config[site]["exclude_hr"] and torrent["hr"] != None))
                 ):
-                    client.add_torrent(torrent, name)
+                    client.add_torrent(torrent, name, logger)
             lock.release()
             time.sleep(config["run_interval"])
         except Exception:
             if lock.locked():
                 lock.release()
             try:
-                print_t("出现异常，正在重新连接客户端…", True)
+                print_t("出现异常，正在重新连接客户端…", True, logger)
                 client.reconnect()
             except Exception:
                 pass
@@ -187,7 +200,7 @@ def torrent_fetcher(site):
             except Exception:
                 if lock.locked():
                     lock.release()
-                print_t(f"[{site}]获取种子信息失败，正在重试…", True)
+                print_t(f"[{site}]获取种子信息失败，正在重试…", True, logger)
                 time.sleep(config[site]["retry_interval"])
 
     return template
