@@ -2,7 +2,7 @@
 
 import re
 import time
-import urllib.request
+from io import BytesIO
 
 import feedparser
 import requests
@@ -12,13 +12,13 @@ from utils import *
 
 
 def CHDBits(config):
-    if config["CHDBits"]["proxies"] == {}:
-        feed = feedparser.parse(config["CHDBits"]["rss"])
+    response = requests.get(
+        config["CHDBits"]["rss"], proxies=config["CHDBits"]["proxies"], timeout=15
+    )
+    if response.status_code == 200:
+        feed = feedparser.parse(BytesIO(response.content))
     else:
-        feed = feedparser.parse(
-            config["CHDBits"]["rss"],
-            handlers=urllib.request.ProxyHandler(config["CHDBits"]["proxies"]),
-        )
+        raise Exception
     torrents = {
         re.search("id=(\d+)", entry["link"]).group(1): {
             "site": "CHDBits",

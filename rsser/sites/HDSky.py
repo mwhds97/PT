@@ -2,7 +2,7 @@
 
 import re
 import time
-import urllib.request
+from io import BytesIO
 
 import feedparser
 import requests
@@ -12,13 +12,13 @@ from utils import *
 
 
 def HDSky(config):
-    if config["HDSky"]["proxies"] == {}:
-        feed = feedparser.parse(config["HDSky"]["rss"])
+    response = requests.get(
+        config["HDSky"]["rss"], proxies=config["HDSky"]["proxies"], timeout=15
+    )
+    if response.status_code == 200:
+        feed = feedparser.parse(BytesIO(response.content))
     else:
-        feed = feedparser.parse(
-            config["HDSky"]["rss"],
-            handlers=urllib.request.ProxyHandler(config["HDSky"]["proxies"]),
-        )
+        raise Exception
     torrents = {
         re.search("id=(\d+)", entry["link"]).group(1): {
             "site": "HDSky",
