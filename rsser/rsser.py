@@ -103,25 +103,25 @@ def task_processor():
                         else:
                             hr_time = torrent["hr"] + config[site]["seed_delay_hr"]
                         if (
-                            config[site]["ignore_hr"] or torrent["hr"] == None
-                        ) and stats["active_time"] >= config[site]["life"]:
+                            hr_time == 0
+                            and stats["active_time"] >= config[site]["life"]
+                        ):
                             to_remove = True
                             info = "活动时长超过限制"
-                        else:
-                            if config[site]["seed_by_size"]:
-                                if stats["seeding_time"] >= max(
-                                    config[site]["seed_time_size_ratio"]
-                                    * torrent["size"]
-                                    * 60,
-                                    hr_time,
-                                ):
-                                    to_remove = True
-                                    info = "做种时长（弹性）达到要求"
-                            elif stats["seeding_time"] >= max(
-                                config[site]["seed_time_fixed"], hr_time
+                        if config[site]["seed_by_size"]:
+                            if stats["seeding_time"] >= max(
+                                config[site]["seed_time_size_ratio"]
+                                * torrent["size"]
+                                * 60,
+                                hr_time,
                             ):
                                 to_remove = True
-                                info = "做种时长（固定）达到要求"
+                                info = "做种时长（弹性）达到要求"
+                        elif stats["seeding_time"] >= max(
+                            config[site]["seed_time_fixed"], hr_time
+                        ):
+                            to_remove = True
+                            info = "做种时长（固定）达到要求"
                 if to_remove:
                     client.remove_torrent(name, info, logger)
             torrent_pool = {
