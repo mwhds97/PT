@@ -39,7 +39,7 @@ sites: #指定要执行任务的站点
   rss: 'https://站点1.com/torrentrss.php?rows=50&isize=1&linktype=dl&passkey=' #站点的 RSS 地址，要求包含大小信息，即 isize=1
   regexp: '(-|@)(站点1))' #用于根据标题筛选种子的正则表达式
   cookies: {} #用于访问站点的 cookies
-  user_agent: 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36'
+  user_agent: '' #用于访问站点的 user-agent
   proxies: {} #代理设置，例如 {'http': 'http://127.0.0.1:7890', 'https': 'http://127.0.0.1:7890'}
   fetch_interval: 300 #获取种子信息的间隔（单位：秒）
   retry_interval: 30 #获取种子失败时重试的间隔（单位：秒）
