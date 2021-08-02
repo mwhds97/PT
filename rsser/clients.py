@@ -78,6 +78,7 @@ class deluge:
                     {
                         "name": name,
                         "download_location": self.config[torrent["site"]]["path"],
+                        "add_paused": False,
                     },
                     **self.config[torrent["site"]]["extra_options"],
                 ),
@@ -196,6 +197,7 @@ class qbittorrent:
                 urls=torrent["link"],
                 save_path=self.config[torrent["site"]]["path"],
                 rename=name,
+                is_paused=False,
                 **self.config[torrent["site"]]["extra_options"],
             )
             if response != "Ok.":
