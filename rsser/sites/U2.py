@@ -9,11 +9,11 @@ from bs4 import BeautifulSoup
 from utils import *
 
 
-def HDSky(config):
+def U2(config):
     response = requests.get(
-        config["HDSky"]["rss"],
-        proxies=config["HDSky"]["proxies"],
-        timeout=config["HDSky"]["rss_timeout"],
+        config["U2"]["rss"],
+        proxies=config["U2"]["proxies"],
+        timeout=config["U2"]["rss_timeout"],
     )
     if response.status_code == 200:
         feed = feedparser.parse(BytesIO(response.content))
@@ -21,7 +21,7 @@ def HDSky(config):
         raise Exception
     torrents = {
         re.search("id=(\d+)", entry["link"]).group(1): {
-            "site": "HDSky",
+            "site": "U2",
             "title": entry["title"],
             "size": size_G(re.search("\[([\w\.\s]+)\]$", entry["title"]).group(1)),
             "publish_at": time.mktime(entry["published_parsed"]) - time.timezone,
@@ -31,25 +31,23 @@ def HDSky(config):
     }
     torrents = dict(
         filter(
-            lambda torrent: config["HDSky"]["size"][0]
+            lambda torrent: config["U2"]["size"][0]
             <= torrent[1]["size"]
-            <= config["HDSky"]["size"][1]
-            and re.search(config["HDSky"]["regexp"], torrent[1]["title"]) != None,
+            <= config["U2"]["size"][1]
+            and re.search(config["U2"]["regexp"], torrent[1]["title"]) != None,
             torrents.items(),
         )
     )
     response = requests.get(
-        config["HDSky"]["web"],
-        headers={"user-agent": config["HDSky"]["user_agent"]},
-        cookies=config["HDSky"]["cookies"],
-        proxies=config["HDSky"]["proxies"],
-        timeout=config["HDSky"]["web_timeout"],
+        config["U2"]["web"],
+        headers={"user-agent": config["U2"]["user_agent"]},
+        cookies=config["U2"]["cookies"],
+        proxies=config["U2"]["proxies"],
+        timeout=config["U2"]["web_timeout"],
     )
     if response.status_code == 200:
         soup = BeautifulSoup(response.text, "lxml")
-        rows = soup.find("table", class_="torrents progresstable").find_all(
-            "tr", recursive=False
-        )
+        rows = soup.find("table", class_="torrents").find_all("tr", recursive=False)
         if rows == []:
             raise Exception
         for row in rows[1:]:
@@ -61,11 +59,13 @@ def HDSky(config):
                     "hr": None,
                     "downloaded": False,
                 }
-                if re.search(
-                    'class="pro_\S*free', str(row)
-                ) != None and not "即将结束" in str(row):
+                if (
+                    re.search('class="pro_\S*free', str(row)) != None
+                    or re.search('class="pro_custom.+arrowdown.+0\.00X', str(row))
+                    != None
+                ):
                     web_info["free"] = True
-                    free_end = re.search('<b><span title="(.+?)"', str(row))
+                    free_end = re.search('\[.+<time title="(.+?)".+\]', str(row))
                     web_info["free_end"] = (
                         None
                         if free_end == None
@@ -75,9 +75,9 @@ def HDSky(config):
                         - time.timezone
                         - 28800
                     )
-                if re.search('<div class="\w', str(row)) != None:
+                if re.search('class="rowfollow snatchhlc', str(row)) != None:
                     web_info["downloaded"] = True
                 torrents[id] = dict(torrents[id], **web_info)
-        return {"[HDSky]" + id: torrent for id, torrent in torrents.items()}
+        return {"[U2]" + id: torrent for id, torrent in torrents.items()}
     else:
         raise Exception

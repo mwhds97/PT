@@ -11,9 +11,12 @@ order_by_site: false
 sites:
 - 'CHDBits'
 - 'HDSky'
+- 'U2'
 CHDBits:
   rss: 'https://chdbits.co/torrentrss.php?rows=50&isize=1&linktype=dl&passkey='
-  regexp: '(-|@)(CHD(?!Bits)|OneHD)|(@CHDBits)'
+  rss_timeout: 15
+  web: 'https://chdbits.co/torrents.php?sort=4&type=desc'
+  web_timeout: 15
   cookies:
     c_secure_login: ''
     c_secure_pass: ''
@@ -25,6 +28,7 @@ CHDBits:
   fetch_interval: 300
   retry_interval: 30
   retry_count_max: 2
+  regexp: '(-|@)(CHD(?!Bits)|OneHD)|(@CHDBits)'
   publish_within: 660
   free_only: true
   free_time_min: 21000
@@ -41,7 +45,9 @@ CHDBits:
   life: 259200
 HDSky:
   rss: 'https://hdsky.me/torrentrss.php?rows=50&isize=1&linktype=dl&passkey='
-  regexp: '(-|@)(HDS)|WOWOW|NHK|TVAsahi'
+  rss_timeout: 15
+  web: 'https://hdsky.me/torrents.php?sort=4&type=desc'
+  web_timeout: 15
   cookies:
     c_secure_login: ''
     c_secure_pass: ''
@@ -53,6 +59,34 @@ HDSky:
   fetch_interval: 300
   retry_interval: 30
   retry_count_max: 2
+  regexp: '(-|@)(HDS)|WOWOW|NHK|TVAsahi'
+  publish_within: 660
+  free_only: true
+  free_time_min: 21000
+  exclude_hr: false
+  ignore_hr: false
+  size: [10, 100]
+  path: ''
+  extra_options: {}
+  seed_by_size: true
+  seed_time_size_ratio: 1.0
+  seed_time_fixed: 3600
+  seed_delay_hr: 1800
+  seed_ratio_hr: null
+  life: 259200
+U2:
+  rss: 'https://u2.dmhy.org/torrentrss.php?rows=50&isize=1&trackerssl=1&linktype=dl&passkey='
+  rss_timeout: 15
+  web: 'https://u2.dmhy.org/torrents.php?sort=4&type=desc'
+  web_timeout: 15
+  cookies:
+    nexusphp_u2: ''
+  user_agent: 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36'
+  proxies: {}
+  fetch_interval: 300
+  retry_interval: 30
+  retry_count_max: 2
+  regexp: '.*'
   publish_within: 660
   free_only: true
   free_time_min: 21000

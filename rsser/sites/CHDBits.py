@@ -11,7 +11,9 @@ from utils import *
 
 def CHDBits(config):
     response = requests.get(
-        config["CHDBits"]["rss"], proxies=config["CHDBits"]["proxies"], timeout=15
+        config["CHDBits"]["rss"],
+        proxies=config["CHDBits"]["proxies"],
+        timeout=config["CHDBits"]["rss_timeout"],
     )
     if response.status_code == 200:
         feed = feedparser.parse(BytesIO(response.content))
@@ -37,20 +39,18 @@ def CHDBits(config):
         )
     )
     response = requests.get(
-        "https://chdbits.co/torrents.php?sort=4&type=desc",
+        config["CHDBits"]["web"],
         headers={"user-agent": config["CHDBits"]["user_agent"]},
         cookies=config["CHDBits"]["cookies"],
         proxies=config["CHDBits"]["proxies"],
-        timeout=15,
+        timeout=config["CHDBits"]["web_timeout"],
     )
     if response.status_code == 200:
         soup = BeautifulSoup(response.text, "lxml")
-        rows = soup.find("table", class_="torrents").find_all(
-            "tr", class_=re.compile(".+"), recursive=False
-        )
+        rows = soup.find("table", class_="torrents").find_all("tr", recursive=False)
         if rows == []:
             raise Exception
-        for row in rows:
+        for row in rows[1:]:
             id = re.search("id=(\d+)", str(row)).group(1)
             if id in torrents:
                 web_info = {
@@ -61,7 +61,7 @@ def CHDBits(config):
                 }
                 if re.search('class="pro_\S*free', str(row)) != None:
                     web_info["free"] = True
-                    free_end = re.search('限时：<span title="(.+?)"', str(row))
+                    free_end = re.search('[^>]<span title="(.+?)"', str(row))
                     web_info["free_end"] = (
                         None
                         if free_end == None
