@@ -39,12 +39,19 @@ class deluge:
         self.new_client()
 
     def flush(self):
+        key_map = {
+            "total_wanted": "size",
+            "active_time": "active_time",
+            "seeding_time": "seeding_time",
+            "ratio": "ratio",
+            "tracker_status": "tracker_status",
+        }
         self.tasks = self.client.call(
             "core.get_torrents_status",
             {},
             [
                 "name",
-                "total_size",
+                "total_wanted",
                 "active_time",
                 "seeding_time",
                 "ratio",
@@ -54,12 +61,14 @@ class deluge:
         self.tasks = {
             stats["name"]: dict(
                 {"hash": hash},
-                **{key: value for key, value in stats.items() if key != "name"},
+                **{
+                    key_map[key]: value for key, value in stats.items() if key != "name"
+                },
             )
             for hash, stats in self.tasks.items()
         }
         self.total_size = (
-            sum([task["total_size"] for _, task in self.tasks.items()]) / 1073741824
+            sum([task["size"] for _, task in self.tasks.items()]) / 1073741824
         )
         self.task_count = len(self.tasks)
 
@@ -100,9 +109,9 @@ class deluge:
     def remove_torrent(self, name, info, logger):
         self.flush()
         pattern = "\[(\w+)\]"
-        text = f'删除种子（{self.tasks[name]["total_size"] / 1073741824:.2f}GB）（{re.search(pattern, name).group(1)}）\
+        text = f'删除种子（{self.tasks[name]["size"] / 1073741824:.2f}GB）（{re.search(pattern, name).group(1)}）\
 ，原因：{info}\
-，总体积：{self.total_size - self.tasks[name]["total_size"] / 1073741824 + 0:.2f}GB'
+，总体积：{self.total_size - self.tasks[name]["size"] / 1073741824 + 0:.2f}GB'
         try:
             self.client.call("core.remove_torrent", self.tasks[name]["hash"], True)
             self.flush()
@@ -146,8 +155,7 @@ class qbittorrent:
     def flush(self):
         key_map = {
             "hash": "hash",
-            "name": "name",
-            "total_size": "total_size",
+            "size": "size",
             "time_active": "active_time",
             "seeding_time": "seeding_time",
             "ratio": "ratio",
@@ -161,7 +169,7 @@ class qbittorrent:
                 if key
                 in [
                     "hash",
-                    "total_size",
+                    "size",
                     "time_active",
                     "seeding_time",
                     "ratio",
@@ -181,7 +189,7 @@ class qbittorrent:
                     pass
             self.tasks[name]["tracker_status"] = tracker_status
         self.total_size = (
-            sum([task["total_size"] for _, task in self.tasks.items()]) / 1073741824
+            sum([task["size"] for _, task in self.tasks.items()]) / 1073741824
         )
         self.task_count = len(self.tasks)
 
@@ -212,9 +220,9 @@ class qbittorrent:
     def remove_torrent(self, name, info, logger):
         self.flush()
         pattern = "\[(\w+)\]"
-        text = f'删除种子（{self.tasks[name]["total_size"] / 1073741824:.2f}GB）（{re.search(pattern, name).group(1)}）\
+        text = f'删除种子（{self.tasks[name]["size"] / 1073741824:.2f}GB）（{re.search(pattern, name).group(1)}）\
 ，原因：{info}\
-，总体积：{self.total_size - self.tasks[name]["total_size"] / 1073741824 + 0:.2f}GB'
+，总体积：{self.total_size - self.tasks[name]["size"] / 1073741824 + 0:.2f}GB'
         try:
             self.client.torrents_delete(True, self.tasks[name]["hash"])
             self.flush()
