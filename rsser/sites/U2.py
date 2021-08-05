@@ -1,6 +1,5 @@
 import re
 import time
-from io import BytesIO
 
 import feedparser
 import requests
@@ -16,7 +15,7 @@ def U2(config):
         timeout=config["U2"]["rss_timeout"],
     )
     if response.status_code == 200:
-        feed = feedparser.parse(BytesIO(response.content))
+        feed = feedparser.parse(response.text)
     else:
         raise Exception
     torrents = {

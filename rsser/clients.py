@@ -1,7 +1,8 @@
+import json
 import re
 import time
 
-import qbittorrentapi
+import requests
 from deluge_client import DelugeRPCClient
 
 from utils import *
@@ -27,8 +28,8 @@ class deluge:
             True,
             False,
         )
+        self.client.timeout = self.config["timeout"]
         self.client.connect()
-        self.flush()
 
     def reconnect(self):
         try:
@@ -78,7 +79,8 @@ class deluge:
 ，免费：{"是" if torrent["free"] else "否"}\
 ，到期时间：{"N/A" if not torrent["free"] or torrent["free_end"] == None else time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(torrent["free_end"]))}\
 ，H&R：{"无" if torrent["hr"] == None else f'{torrent["hr"] / 3600:.2f}小时'}\
-，总体积：{self.total_size + torrent["size"]:.2f}GB"""
+，总体积：{self.total_size + torrent["size"]:.2f}GB\
+，任务数：{self.task_count + 1}"""
         try:
             self.client.call(
                 "core.add_torrent_url",
@@ -111,7 +113,8 @@ class deluge:
         pattern = "\[(\w+)\]"
         text = f'删除种子（{self.tasks[name]["size"] / 1073741824:.2f}GB）（{re.search(pattern, name).group(1)}）\
 ，原因：{info}\
-，总体积：{self.total_size - self.tasks[name]["size"] / 1073741824 + 0:.2f}GB'
+，总体积：{self.total_size - self.tasks[name]["size"] / 1073741824 + 0:.2f}GB\
+，任务数：{self.task_count - 1}'
         try:
             self.client.call("core.remove_torrent", self.tasks[name]["hash"], True)
             self.flush()
@@ -127,28 +130,40 @@ class qbittorrent:
         self.new_client()
 
     def __del__(self):
+        self.get_response("/api/v2/auth/logout", nobreak=True)
+
+    def get_response(self, api, data={}, nobreak=False):
         try:
-            self.client.auth_log_out()
-        except Exception:
-            pass
+            response = requests.post(
+                url=self.config["host"] + api,
+                headers=dict(
+                    {
+                        "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
+                        "Cookie": self.cookies,
+                    },
+                    **self.config["headers"],
+                ),
+                data=data,
+                timeout=self.config["timeout"],
+            )
+            if response.status_code != 200:
+                raise Exception
+        except Exception as e:
+            if nobreak:
+                return requests.Response()
+            raise e
+        return response
 
     def new_client(self):
-        self.client = qbittorrentapi.Client(
-            host=self.config["host"],
-            username=self.config["user"],
-            password=self.config["pass"],
-            VERIFY_WEBUI_CERTIFICATE=False,
-            EXTRA_HEADERS=self.config["headers"],
-            DISABLE_LOGGING_DEBUG_OUTPUT=True,
+        self.cookies = ""
+        response = self.get_response(
+            "/api/v2/auth/login",
+            {"username": self.config["user"], "password": self.config["pass"]},
         )
-        self.client.auth_log_in()
-        self.flush()
+        self.cookies = response.headers["set-cookie"]
 
     def reconnect(self):
-        try:
-            self.client.auth_log_out()
-        except Exception:
-            pass
+        self.get_response("/api/v2/auth/logout", nobreak=True)
         time.sleep(5)
         self.new_client()
 
@@ -161,7 +176,8 @@ class qbittorrent:
             "ratio": "ratio",
             "tracker": "tracker_status",
         }
-        self.tasks = self.client.torrents_info()
+        response = self.get_response("/api/v2/torrents/info")
+        self.tasks = json.loads(response.text)
         self.tasks = {
             task["name"]: {
                 key_map[key]: value
@@ -181,12 +197,12 @@ class qbittorrent:
         for name, stats in self.tasks.items():
             tracker_status = ""
             if stats["tracker_status"] == "":
-                try:
-                    trackers = self.client.torrents_trackers(stats["hash"])
-                    for i in range(3, len(trackers)):
-                        tracker_status += trackers[i]["msg"]
-                except Exception:
-                    pass
+                response = self.get_response(
+                    "/api/v2/torrents/trackers", {"hash": stats["hash"]}, True
+                )
+                trackers = json.loads(response.text) if response.text != "" else []
+                for i in range(3, len(trackers)):
+                    tracker_status += trackers[i]["msg"]
             self.tasks[name]["tracker_status"] = tracker_status
         self.total_size = (
             sum([task["size"] for _, task in self.tasks.items()]) / 1073741824
@@ -199,17 +215,21 @@ class qbittorrent:
 ，免费：{"是" if torrent["free"] else "否"}\
 ，到期时间：{"N/A" if not torrent["free"] or torrent["free_end"] == None else time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(torrent["free_end"]))}\
 ，H&R：{"无" if torrent["hr"] == None else f'{torrent["hr"] / 3600:.2f}小时'}\
-，总体积：{self.total_size + torrent["size"]:.2f}GB"""
+，总体积：{self.total_size + torrent["size"]:.2f}GB\
+，任务数：{self.task_count + 1}"""
         try:
-            response = self.client.torrents_add(
-                urls=torrent["link"],
-                save_path=self.config[torrent["site"]]["path"],
-                rename=name,
-                is_paused=False,
-                **self.config[torrent["site"]]["extra_options"],
+            self.get_response(
+                "/api/v2/torrents/add",
+                dict(
+                    {
+                        "urls": torrent["link"],
+                        "savepath": self.config[torrent["site"]]["path"],
+                        "rename": name,
+                        "paused": "false",
+                    },
+                    **self.config[torrent["site"]]["extra_options"],
+                ),
             )
-            if response != "Ok.":
-                raise Exception
             self.flush()
             print_t(text, logger=logger)
         except Exception as e:
@@ -222,9 +242,13 @@ class qbittorrent:
         pattern = "\[(\w+)\]"
         text = f'删除种子（{self.tasks[name]["size"] / 1073741824:.2f}GB）（{re.search(pattern, name).group(1)}）\
 ，原因：{info}\
-，总体积：{self.total_size - self.tasks[name]["size"] / 1073741824 + 0:.2f}GB'
+，总体积：{self.total_size - self.tasks[name]["size"] / 1073741824 + 0:.2f}GB\
+，任务数：{self.task_count - 1}'
         try:
-            self.client.torrents_delete(True, self.tasks[name]["hash"])
+            self.get_response(
+                "/api/v2/torrents/delete",
+                {"hashes": self.tasks[name]["hash"], "deleteFiles": "true"},
+            )
             self.flush()
             print_t(text, logger=logger)
         except Exception as e:

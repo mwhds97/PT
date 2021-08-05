@@ -3,6 +3,7 @@ host: '127.0.0.1:58846'
 user: 'localclient'
 pass: 'deluge'
 headers: {}
+timeout: 15
 space: 1024
 task_count_max: 10
 run_interval: 30
