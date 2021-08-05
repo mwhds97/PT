@@ -43,7 +43,7 @@ sites: #指定要执行任务的站点，不执行的站点不要出现在这里
 站点1:
   rss: 'https://站点1.com/torrentrss.php?rows=50&isize=1&linktype=dl&passkey=' #站点的 RSS 地址，要求包含大小信息，即 isize=1
   rss_timeout: 15 #获取站点 RSS 信息的超时阈值（单位：秒）
-  web: 'https://u2.dmhy.org/torrents.php?sort=4&type=desc' #站点的种子页面地址，建议按发布时间降序排列
+  web: 'https://站点1.com/torrents.php?sort=4&type=desc' #站点的种子页面地址，建议按发布时间降序排列
   web_timeout: 15 #获取站点种子页面信息的超时阈值（单位：秒）
   cookies: {} #用于访问站点的 cookies
   user_agent: '' #用于访问站点的 user-agent
