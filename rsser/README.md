@@ -22,12 +22,13 @@ python >= 3.7
 
 ```yaml
 client: 'deluge' #客户端类型，可设定为 'deluge' 或 'qbittorrent'
-#若要使用 qBittorrent，请在 Web UI 设置中取消勾选 `启用跨站请求伪造（CSRF）保护`
+#若要使用 qBittorrent，请在 Web UI 设置中取消勾选“启用跨站请求伪造（CSRF）保护”
 host: '127.0.0.1:58846' #Deluge daemon 或者 qBittorrent Web UI 地址
+#qBittorrent Web UI 地址必须包含协议头，Deluge daemon 地址不可含有协议头
 user: 'localclient' #Deluge daemon 或者 qBittorrent Web UI 用户名
 pass: 'deluge' #Deluge daemon 或者 qBittorrent Web UI 密码
 headers: {} #用于访问 qBittorrent Web UI 的 request headers
-#如果 Web UI 设置中的 `启用 Host header 属性验证` 被勾选，则该值必须包含 `"Host": "设定域名（若为 * 则可取任意值）:本地监听端口（Web UI）"`
+#如果 Web UI 设置中的“启用 Host header 属性验证”被勾选，则该值必须包含 'Host': '设定域名（若为 * 则可取任意值）:本地监听端口（Web UI）'
 timeout: 15 #与客户端连接的超时阈值（单位：秒）
 space: 1024 #总空间大小（单位：GB），任务的总体积不会超过该值
 task_count_max: 10 #同时进行的最大任务数量（所有状态的任务都会被计入）
@@ -58,7 +59,7 @@ sites: #指定要执行任务的站点，不执行的站点不要出现在这里
   size: [10, 100] #体积超过该范围（单位：GB）的种子将被忽略
   path: '' #种子的保存路径，不需要转义
   extra_options: {} #任务的其他设置（例如限速、分类等），参见 Deluge 源代码和 qBittorrent API 文档
-  #若使用 qBittorrent，请用 `"true"` `"false"` 替代布尔值
+  #若使用 qBittorrent，请用 'true' 'false' 替代布尔值
   seed_by_size: true #若该值为 true，则做种时间将和种子体积成正比，否则做种时间将为固定值
   seed_time_size_ratio: 1.0 #仅当 seed_by_size 的值为 true 时有效，做种时间（单位：分）= 该值 * 种子体积（单位：GB）
   seed_time_fixed: 3600 #仅当 seed_by_size 的值为 false 时有效，做种时间（单位：秒）= 该值（单位：秒）
