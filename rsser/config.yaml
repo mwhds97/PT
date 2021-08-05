@@ -4,6 +4,7 @@ user: 'localclient'
 pass: 'deluge'
 headers: {}
 timeout: 15
+reconnect_interval: 10
 space: 1024
 task_count_max: 10
 run_interval: 30

@@ -36,7 +36,7 @@ class deluge:
             self.client.disconnect()
         except Exception:
             pass
-        time.sleep(5)
+        time.sleep(self.config["reconnect_interval"])
         self.new_client()
 
     def flush(self):
@@ -164,7 +164,7 @@ class qbittorrent:
 
     def reconnect(self):
         self.get_response("/api/v2/auth/logout", nobreak=True)
-        time.sleep(5)
+        time.sleep(self.config["reconnect_interval"])
         self.new_client()
 
     def flush(self):

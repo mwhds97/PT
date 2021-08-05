@@ -29,10 +29,11 @@ user: 'localclient' #Deluge daemon 或者 qBittorrent Web UI 用户名
 pass: 'deluge' #Deluge daemon 或者 qBittorrent Web UI 密码
 headers: {} #用于访问 qBittorrent Web UI 的 request headers
 #如果 Web UI 设置中的“启用 Host header 属性验证”被勾选，则该值必须包含 'Host': '设定域名（若为 * 则可取任意值）:本地监听端口（Web UI）'
-timeout: 15 #与客户端连接的超时阈值（单位：秒）
+timeout: 15 #连接客户端超时的阈值（单位：秒）
+reconnect_interval: 10 #重新连接客户端的时间间隔（单位：秒）
 space: 1024 #总空间大小（单位：GB），任务的总体积不会超过该值
 task_count_max: 10 #同时进行的最大任务数量（所有状态的任务都会被计入）
-run_interval: 30 #任务操作（包括添加、移除种子等）的间隔（单位：秒）
+run_interval: 30 #任务操作（包括添加、移除种子等）的时间间隔（单位：秒）
 torrent_pool_size: 1000 #保留信息的种子数量，若获取过的种子总数超过该值，最早获取的种子信息将被删除（找不到种子信息的任务将无法操作）
 order_by_site: false #若该值为 true，种子信息将按下方 sites 设定的站点顺序排列
 sites: #指定要执行任务的站点，不执行的站点不要出现在这里
@@ -47,8 +48,8 @@ sites: #指定要执行任务的站点，不执行的站点不要出现在这里
   cookies: {} #用于访问站点的 cookies
   user_agent: '' #用于访问站点的 user-agent
   proxies: {} #代理设置，例如 {'http': 'http://127.0.0.1:7890', 'https': 'http://127.0.0.1:7890'}
-  fetch_interval: 300 #获取种子信息的间隔（单位：秒）
-  retry_interval: 30 #获取种子失败时重试的间隔（单位：秒）
+  fetch_interval: 300 #获取种子信息的时间间隔（单位：秒）
+  retry_interval: 30 #获取种子失败时重试的时间间隔（单位：秒）
   retry_count_max: 2 #添加任务失败时重试的最大次数
   regexp: '(-|@)(站点1)' #用于根据标题筛选种子的正则表达式
   publish_within: 660 #发布时间在该值（单位：秒）之前的种子将被忽略（考虑到程序延迟，建议略大于期望值）
