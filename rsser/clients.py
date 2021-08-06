@@ -94,7 +94,6 @@ class deluge:
                     **self.config[torrent["site"]]["extra_options"],
                 ),
             )
-            self.flush()
             print_t(text, logger=logger)
         except Exception as e:
             hash = re.match("Torrent already in session \((\w{40})\)", str(e))
@@ -102,7 +101,6 @@ class deluge:
                 self.client.call(
                     "core.set_torrent_options", hash.group(1), {"name": name}
                 )
-                self.flush()
             elif re.match("Torrent already being added", str(e)) == None:
                 print_t("试" + text, logger=logger)
                 torrent["retry_count"] += 1
@@ -117,7 +115,6 @@ class deluge:
 ，任务数：{self.task_count - 1}'
         try:
             self.client.call("core.remove_torrent", self.tasks[name]["hash"], True)
-            self.flush()
             print_t(text, logger=logger)
         except Exception as e:
             print_t("试" + text, logger=logger)
@@ -230,7 +227,6 @@ class qbittorrent:
                     **self.config[torrent["site"]]["extra_options"],
                 ),
             )
-            self.flush()
             print_t(text, logger=logger)
         except Exception as e:
             print_t("试" + text, logger=logger)
@@ -249,7 +245,6 @@ class qbittorrent:
                 "/api/v2/torrents/delete",
                 {"hashes": self.tasks[name]["hash"], "deleteFiles": "true"},
             )
-            self.flush()
             print_t(text, logger=logger)
         except Exception as e:
             print_t("试" + text, logger=logger)
