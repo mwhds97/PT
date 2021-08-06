@@ -37,46 +37,48 @@ def U2(config):
             torrents.items(),
         )
     )
-    response = requests.get(
-        config["U2"]["web"],
-        headers={"user-agent": config["U2"]["user_agent"]},
-        cookies=config["U2"]["cookies"],
-        proxies=config["U2"]["proxies"],
-        timeout=config["U2"]["web_timeout"],
-    )
-    if response.status_code == 200:
-        soup = BeautifulSoup(response.text, "lxml")
-        rows = soup.find("table", class_="torrents").find_all("tr", recursive=False)
-        if rows == []:
-            raise Exception
-        for row in rows[1:]:
-            id = re.search("id=(\d+)", str(row)).group(1)
-            if id in torrents:
-                web_info = {
-                    "free": False,
-                    "free_end": None,
-                    "hr": None,
-                    "downloaded": False,
-                }
-                if (
-                    re.search('class="pro_\S*free', str(row)) != None
-                    or re.search('class="pro_custom.+arrowdown.+0\.00X', str(row))
-                    != None
-                ):
-                    web_info["free"] = True
-                    free_end = re.search('\[.+<time title="(.+?)".+\]', str(row))
-                    web_info["free_end"] = (
-                        None
-                        if free_end == None
-                        else time.mktime(
-                            time.strptime(free_end.group(1), "%Y-%m-%d %H:%M:%S")
+    for web in config["U2"]["web"]:
+        response = requests.get(
+            web,
+            headers={"user-agent": config["U2"]["user_agent"]},
+            cookies=config["U2"]["cookies"],
+            proxies=config["U2"]["proxies"],
+            timeout=config["U2"]["web_timeout"],
+        )
+        if response.status_code == 200:
+            soup = BeautifulSoup(response.text, "lxml")
+            rows = soup.find("table", class_="torrents").find_all("tr", recursive=False)
+            if rows == []:
+                raise Exception
+            for row in rows[1:]:
+                id = re.search("id=(\d+)", str(row)).group(1)
+                if id in torrents:
+                    web_info = {
+                        "free": False,
+                        "free_end": None,
+                        "hr": None,
+                        "downloaded": False,
+                    }
+                    if (
+                        re.search('class="pro_\S*free', str(row)) != None
+                        or re.search('class="pro_custom.+arrowdown.+0\.00X', str(row))
+                        != None
+                    ):
+                        web_info["free"] = True
+                        free_end = re.search('\[.+<time title="(.+?)".+\]', str(row))
+                        web_info["free_end"] = (
+                            None
+                            if free_end == None
+                            else time.mktime(
+                                time.strptime(free_end.group(1), "%Y-%m-%d %H:%M:%S")
+                            )
+                            - time.timezone
+                            - 28800
                         )
-                        - time.timezone
-                        - 28800
-                    )
-                if re.search('class="rowfollow snatchhlc', str(row)) != None:
-                    web_info["downloaded"] = True
-                torrents[id] = dict(torrents[id], **web_info)
-        return {"[U2]" + id: torrent for id, torrent in torrents.items()}
-    else:
-        raise Exception
+                    if re.search('class="rowfollow snatchhlc', str(row)) != None:
+                        web_info["downloaded"] = True
+                    torrents[id] = dict(torrents[id], **web_info)
+        else:
+            raise Exception
+        time.sleep(1)
+    return {"[U2]" + id: torrent for id, torrent in torrents.items()}

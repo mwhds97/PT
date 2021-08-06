@@ -17,7 +17,8 @@ sites:
 CHDBits:
   rss: 'https://chdbits.co/torrentrss.php?rows=50&isize=1&linktype=dl&passkey='
   rss_timeout: 15
-  web: 'https://chdbits.co/torrents.php?sort=4&type=desc'
+  web:
+  - 'https://chdbits.co/torrents.php?sort=4&type=desc'
   web_timeout: 15
   cookies:
     c_secure_login: ''
@@ -48,7 +49,8 @@ CHDBits:
 HDSky:
   rss: 'https://hdsky.me/torrentrss.php?rows=50&isize=1&linktype=dl&passkey='
   rss_timeout: 15
-  web: 'https://hdsky.me/torrents.php?sort=4&type=desc'
+  web:
+  - 'https://hdsky.me/torrents.php?sort=4&type=desc'
   web_timeout: 15
   cookies:
     c_secure_login: ''
@@ -79,7 +81,8 @@ HDSky:
 U2:
   rss: 'https://u2.dmhy.org/torrentrss.php?rows=50&isize=1&trackerssl=1&linktype=dl&passkey='
   rss_timeout: 15
-  web: 'https://u2.dmhy.org/torrents.php?sort=4&type=desc'
+  web:
+  - 'https://u2.dmhy.org/torrents.php?sort=4&type=desc'
   web_timeout: 15
   cookies:
     nexusphp_u2: ''

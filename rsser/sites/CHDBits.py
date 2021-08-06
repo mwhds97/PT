@@ -37,45 +37,47 @@ def CHDBits(config):
             torrents.items(),
         )
     )
-    response = requests.get(
-        config["CHDBits"]["web"],
-        headers={"user-agent": config["CHDBits"]["user_agent"]},
-        cookies=config["CHDBits"]["cookies"],
-        proxies=config["CHDBits"]["proxies"],
-        timeout=config["CHDBits"]["web_timeout"],
-    )
-    if response.status_code == 200:
-        soup = BeautifulSoup(response.text, "lxml")
-        rows = soup.find("table", class_="torrents").find_all("tr", recursive=False)
-        if rows == []:
-            raise Exception
-        for row in rows[1:]:
-            id = re.search("id=(\d+)", str(row)).group(1)
-            if id in torrents:
-                web_info = {
-                    "free": False,
-                    "free_end": None,
-                    "hr": None,
-                    "downloaded": False,
-                }
-                if re.search('class="pro_\S*free', str(row)) != None:
-                    web_info["free"] = True
-                    free_end = re.search('[^>]<span title="(.+?)"', str(row))
-                    web_info["free_end"] = (
-                        None
-                        if free_end == None
-                        else time.mktime(
-                            time.strptime(free_end.group(1), "%Y-%m-%d %H:%M:%S")
+    for web in config["CHDBits"]["web"]:
+        response = requests.get(
+            web,
+            headers={"user-agent": config["CHDBits"]["user_agent"]},
+            cookies=config["CHDBits"]["cookies"],
+            proxies=config["CHDBits"]["proxies"],
+            timeout=config["CHDBits"]["web_timeout"],
+        )
+        if response.status_code == 200:
+            soup = BeautifulSoup(response.text, "lxml")
+            rows = soup.find("table", class_="torrents").find_all("tr", recursive=False)
+            if rows == []:
+                raise Exception
+            for row in rows[1:]:
+                id = re.search("id=(\d+)", str(row)).group(1)
+                if id in torrents:
+                    web_info = {
+                        "free": False,
+                        "free_end": None,
+                        "hr": None,
+                        "downloaded": False,
+                    }
+                    if re.search('class="pro_\S*free', str(row)) != None:
+                        web_info["free"] = True
+                        free_end = re.search('\(.+<span title="(.+?)".+\)', str(row))
+                        web_info["free_end"] = (
+                            None
+                            if free_end == None
+                            else time.mktime(
+                                time.strptime(free_end.group(1), "%Y-%m-%d %H:%M:%S")
+                            )
+                            - time.timezone
+                            - 28800
                         )
-                        - time.timezone
-                        - 28800
-                    )
-                hr = re.search("circle-text.+?(\d+)</div>", str(row))
-                if hr != None:
-                    web_info["hr"] = int(hr.group(1)) * 86400
-                if re.search("%</td>", str(row)) != None:
-                    web_info["downloaded"] = True
-                torrents[id] = dict(torrents[id], **web_info)
-        return {"[CHDBits]" + id: torrent for id, torrent in torrents.items()}
-    else:
-        raise Exception
+                    hr = re.search("circle-text.+?(\d+)</div>", str(row))
+                    if hr != None:
+                        web_info["hr"] = int(hr.group(1)) * 86400
+                    if re.search("%</td>", str(row)) != None:
+                        web_info["downloaded"] = True
+                    torrents[id] = dict(torrents[id], **web_info)
+        else:
+            raise Exception
+        time.sleep(1)
+    return {"[CHDBits]" + id: torrent for id, torrent in torrents.items()}

@@ -37,46 +37,52 @@ def HDSky(config):
             torrents.items(),
         )
     )
-    response = requests.get(
-        config["HDSky"]["web"],
-        headers={"user-agent": config["HDSky"]["user_agent"]},
-        cookies=config["HDSky"]["cookies"],
-        proxies=config["HDSky"]["proxies"],
-        timeout=config["HDSky"]["web_timeout"],
-    )
-    if response.status_code == 200:
-        soup = BeautifulSoup(response.text, "lxml")
-        rows = soup.find("table", class_="torrents progresstable").find_all(
-            "tr", recursive=False
+    for web in config["HDSky"]["web"]:
+        response = requests.get(
+            web,
+            headers={"user-agent": config["HDSky"]["user_agent"]},
+            cookies=config["HDSky"]["cookies"],
+            proxies=config["HDSky"]["proxies"],
+            timeout=config["HDSky"]["web_timeout"],
         )
-        if rows == []:
+        if response.status_code == 200:
+            soup = BeautifulSoup(response.text, "lxml")
+            rows = soup.find("table", class_="torrents progresstable").find_all(
+                "tr", recursive=False
+            )
+            if rows == []:
+                raise Exception
+            for row in rows[1:]:
+                id = re.search("id=(\d+)", str(row)).group(1)
+                if id in torrents:
+                    web_info = {
+                        "free": False,
+                        "free_end": None,
+                        "hr": None,
+                        "downloaded": False,
+                    }
+                    if re.search('class="pro_\S*free', str(row)) != None:
+                        if re.search("\[.+<b>.+\]", str(row)) == None:
+                            web_info["free"] = True
+                        else:
+                            free_end = re.search(
+                                '\[.+<span title="(.+?)".+\]', str(row)
+                            )
+                            if free_end != None:
+                                web_info["free"] = True
+                                web_info["free_end"] = (
+                                    time.mktime(
+                                        time.strptime(
+                                            free_end.group(1), "%Y-%m-%d %H:%M:%S"
+                                        )
+                                    )
+                                    - time.timezone
+                                    - 28800
+                                )
+                    if re.search('<div class="\w', str(row)) != None:
+                        web_info["downloaded"] = True
+                    torrents[id] = dict(torrents[id], **web_info)
+        else:
             raise Exception
-        for row in rows[1:]:
-            id = re.search("id=(\d+)", str(row)).group(1)
-            if id in torrents:
-                web_info = {
-                    "free": False,
-                    "free_end": None,
-                    "hr": None,
-                    "downloaded": False,
-                }
-                if re.search(
-                    'class="pro_\S*free', str(row)
-                ) != None and not "即将结束" in str(row):
-                    web_info["free"] = True
-                    free_end = re.search('<b><span title="(.+?)"', str(row))
-                    web_info["free_end"] = (
-                        None
-                        if free_end == None
-                        else time.mktime(
-                            time.strptime(free_end.group(1), "%Y-%m-%d %H:%M:%S")
-                        )
-                        - time.timezone
-                        - 28800
-                    )
-                if re.search('<div class="\w', str(row)) != None:
-                    web_info["downloaded"] = True
-                torrents[id] = dict(torrents[id], **web_info)
-        return {"[HDSky]" + id: torrent for id, torrent in torrents.items()}
-    else:
-        raise Exception
+        time.sleep(1)
+    return {"[HDSky]" + id: torrent for id, torrent in torrents.items()}
