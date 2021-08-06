@@ -125,7 +125,7 @@ def task_processor():
                             info = "做种时长（固定）达到要求"
                 if to_remove:
                     client.remove_torrent(name, info, logger)
-                    time.sleep(1)
+                    time.sleep(5 if config["client"] == "qbittorrent" else 1)
             torrent_pool = {
                 name: torrent
                 for name, torrent in torrent_pool.items()
@@ -175,7 +175,7 @@ def task_processor():
                     and (not (config[site]["exclude_hr"] and torrent["hr"] != None))
                 ):
                     client.add_torrent(torrent, name, logger)
-                    time.sleep(1)
+                    time.sleep(10 if config["client"] == "qbittorrent" else 1)
             lock.release()
             time.sleep(config["run_interval"])
         except Exception:
