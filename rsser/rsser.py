@@ -60,6 +60,7 @@ try:
     client = eval(config["client"] + "(config)")
 except Exception:
     print_t("无法连接客户端，请重试", logger=logger)
+    logger.close()
     sys.exit(0)
 lock = threading.Lock()
 
