@@ -29,12 +29,12 @@ requests >= 2.25.0
 `config.yaml`
 
 ```yaml
-client: 'deluge' #客户端类型，可设定为 'deluge' 或 'qbittorrent'
+client: '' #客户端类型，可设定为 'deluge' 或 'qbittorrent'
 #若要使用 qBittorrent，请在 Web UI 设置中取消勾选“启用跨站请求伪造（CSRF）保护”
-host: '127.0.0.1:58846' #Deluge daemon 或者 qBittorrent Web UI 地址
+host: '' #Deluge daemon 或者 qBittorrent Web UI 地址，必须包含端口
 #qBittorrent Web UI 地址必须包含协议头，Deluge daemon 地址不可含有协议头
-user: 'localclient' #Deluge daemon 或者 qBittorrent Web UI 用户名
-pass: 'deluge' #Deluge daemon 或者 qBittorrent Web UI 密码
+user: '' #Deluge daemon 或者 qBittorrent Web UI 用户名
+pass: '' #Deluge daemon 或者 qBittorrent Web UI 密码
 headers: {} #用于访问 qBittorrent Web UI 的 request headers
 #如果 Web UI 设置中的“启用 Host header 属性验证”被勾选，则该值必须包含 'Host': '设定域名（若为 * 则可取任意值）:本地监听端口（Web UI）'
 timeout: 15 #连接客户端超时的阈值（单位：秒）
@@ -51,10 +51,10 @@ sort_by: #给种子信息排序的关键字，以下关键字可自由组合（�
   snatch: false #按完成人数排序
   site: false #按站点的 priority 设定排序
 站点1:
-  rss: 'https://站点1.com/torrentrss.php?rows=50&isize=1&linktype=dl&passkey=' #站点的 RSS 地址，要求包含大小信息，即 isize=1
+  rss: '' #站点的 RSS 地址，要求包含大小信息，即 isize=1
   rss_timeout: 15 #获取站点 RSS 信息的超时阈值（单位：秒）
   web: #站点的种子页面地址列表，建议每个页面都按发布时间降序排列种子
-  - 'https://站点1.com/torrents.php?sort=4&type=desc'
+  - ''
   web_timeout: 15 #获取站点种子页面信息的超时阈值（单位：秒）
   cookies: {} #用于访问站点的 cookies
   user_agent: '' #用于访问站点的 user-agent
@@ -63,13 +63,13 @@ sort_by: #给种子信息排序的关键字，以下关键字可自由组合（�
   fetch_interval: 300 #获取种子信息的时间间隔（单位：秒）
   retry_interval: 30 #获取种子失败时重试的时间间隔（单位：秒）
   retry_count_max: 2 #添加任务失败时重试的最大次数
-  regexp: '(-|@)(站点1)' #用于根据标题筛选种子的正则表达式
+  regexp: '' #用于根据标题筛选种子的正则表达式
   publish_within: 660 #发布时间在该值（单位：秒）之前的种子将被忽略（考虑到程序延迟，建议略大于期望值）
   free_only: true #若该值为 true，则非免费的种子将被忽略，下载中的免费到期的种子将被移除（是否规避 H&R 将由 ignore_hr_escape 的值决定）
   free_time_min: 21000 #仅当 free_only 的值为 true 时有效，免费时长小于该值（单位：秒）的种子将被忽略（考虑到程序延迟，建议略小于期望值）
   exclude_hr: false #若该值为 true，则带有 H&R 要求的种子将被忽略
   ignore_hr_seeding: false #若该值为 true，则做种中的种子的 H&R 要求将被忽略
-  ignore_hr_escape: true #若该值为 true，则移除下载中的免费到期的种子时，其 H&R 要求将被忽略
+  ignore_hr_escape: true #若该值为 true，则下载中的种子的 H&R 要求将被忽略
   size: [10, 100] #体积不在该范围（单位：GB）内的种子将被忽略
   seeder: [0, 5] #做种人数不在该范围内的种子将被忽略
   leecher: [0, 5000] #下载人数不在该范围内的种子将被忽略
@@ -82,7 +82,7 @@ sort_by: #给种子信息排序的关键字，以下关键字可自由组合（�
   #当 seed_by_size 的值为 false 时，做种时间（单位：秒）= 该值（单位：秒）
   seed_delay_hr: 1800 #满足 H&R 要求后继续做种的时间（单位：秒），防止因未及时汇报或服务器问题触发 H&R
   seed_ratio_hr: null #若站点的 H&R 规则允许达到一定分享率后停止做种，则可将该值设定为对应分享率
-  life: 259200 #活动时间超过该值的任务（无 H&R 要求）将被删除
+  life: 259200 #活动时间超过该值的任务将被删除（是否规避 H&R 将由 ignore_hr_escape 的值决定）
   priority: 1 #种子信息排序所需的站点优先级，该值越小则站点优先级越高
   timezone: +8 #站点的时区，一般设置为 +8 即可
 站点2:

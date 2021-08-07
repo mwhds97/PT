@@ -97,6 +97,11 @@ def task_processor():
                         to_remove = True
                         info = "免费失效"
                     else:
+                        if (
+                            config[site]["ignore_hr_escape"] or torrent["hr"] == None
+                        ) and stats["active_time"] >= config[site]["life"]:
+                            to_remove = True
+                            info = "活动时长超过限制"
                         if config[site]["ignore_hr_seeding"] or torrent["hr"] == None:
                             hr_time = 0
                         elif (
@@ -106,12 +111,6 @@ def task_processor():
                             hr_time = config[site]["seed_delay_hr"]
                         else:
                             hr_time = torrent["hr"] + config[site]["seed_delay_hr"]
-                        if (
-                            hr_time == 0
-                            and stats["active_time"] >= config[site]["life"]
-                        ):
-                            to_remove = True
-                            info = "活动时长超过限制"
                         if config[site]["seed_by_size"]:
                             if stats["seeding_time"] >= max(
                                 config[site]["seed_time_par"] * torrent["size"] * 60,
