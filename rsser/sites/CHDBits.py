@@ -58,6 +58,9 @@ def CHDBits(config):
                         "free_end": None,
                         "hr": None,
                         "downloaded": False,
+                        "seeder": -1,
+                        "leecher": -1,
+                        "snatch": -1,
                     }
                     if re.search('class="pro_\S*free', str(row)) != None:
                         web_info["free"] = True
@@ -69,7 +72,7 @@ def CHDBits(config):
                                 time.strptime(free_end.group(1), "%Y-%m-%d %H:%M:%S")
                             )
                             - time.timezone
-                            - 28800
+                            - config["CHDBits"]["timezone"] * 3600
                         )
                     hr = re.search("circle-text.+?(\d+)</div>", str(row))
                     if hr != None:
@@ -80,4 +83,8 @@ def CHDBits(config):
         else:
             raise Exception
         time.sleep(1)
-    return {"[CHDBits]" + id: torrent for id, torrent in torrents.items()}
+    return {
+        "[CHDBits]" + id: torrent
+        for id, torrent in torrents.items()
+        if "downloaded" in torrent
+    }

@@ -58,6 +58,9 @@ def U2(config):
                         "free_end": None,
                         "hr": None,
                         "downloaded": False,
+                        "seeder": -1,
+                        "leecher": -1,
+                        "snatch": -1,
                     }
                     if (
                         re.search('class="pro_\S*free', str(row)) != None
@@ -73,7 +76,7 @@ def U2(config):
                                 time.strptime(free_end.group(1), "%Y-%m-%d %H:%M:%S")
                             )
                             - time.timezone
-                            - 28800
+                            - config["U2"]["timezone"] * 3600
                         )
                     if re.search('class="rowfollow snatchhlc', str(row)) != None:
                         web_info["downloaded"] = True
@@ -81,4 +84,8 @@ def U2(config):
         else:
             raise Exception
         time.sleep(1)
-    return {"[U2]" + id: torrent for id, torrent in torrents.items()}
+    return {
+        "[U2]" + id: torrent
+        for id, torrent in torrents.items()
+        if "downloaded" in torrent
+    }

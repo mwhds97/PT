@@ -84,17 +84,20 @@ def task_processor():
                     elif (
                         config[site]["free_only"]
                         and stats["seeding_time"] == 0
+                        and (config[site]["ignore_hr_escape"] or torrent["hr"] == None)
                         and (
                             not torrent["free"]
-                            or torrent["free_end"] != None
-                            and torrent["free_end"] - time.mktime(time.localtime())
-                            <= config["run_interval"]
+                            or (
+                                torrent["free_end"] != None
+                                and torrent["free_end"] - time.mktime(time.localtime())
+                                <= config["run_interval"]
+                            )
                         )
                     ):
                         to_remove = True
                         info = "免费失效"
                     else:
-                        if config[site]["ignore_hr"] or torrent["hr"] == None:
+                        if config[site]["ignore_hr_seeding"] or torrent["hr"] == None:
                             hr_time = 0
                         elif (
                             config[site]["seed_ratio_hr"] != None
@@ -111,15 +114,13 @@ def task_processor():
                             info = "活动时长超过限制"
                         if config[site]["seed_by_size"]:
                             if stats["seeding_time"] >= max(
-                                config[site]["seed_time_size_ratio"]
-                                * torrent["size"]
-                                * 60,
+                                config[site]["seed_time_par"] * torrent["size"] * 60,
                                 hr_time,
                             ):
                                 to_remove = True
                                 info = "做种时长（弹性）达到要求"
                         elif stats["seeding_time"] >= max(
-                            config[site]["seed_time_fixed"], hr_time
+                            config[site]["seed_time_par"], hr_time
                         ):
                             to_remove = True
                             info = "做种时长（固定）达到要求"
@@ -131,21 +132,15 @@ def task_processor():
                 for name, torrent in torrent_pool.items()
                 if name in name_queue
             }
-            torrent_pool = dict(
-                sorted(
-                    torrent_pool.items(),
-                    key=lambda torrent: torrent[1]["size"],
-                    reverse=True,
-                )
-            )
-            if config["order_by_site"]:
-                site_order = {}
-                for i in range(len(config["sites"])):
-                    site_order[config["sites"][i]] = i
+            sort_keys = reversed(list(config["sort_by"].keys()))
+            for key in sort_keys:
                 torrent_pool = dict(
                     sorted(
                         torrent_pool.items(),
-                        key=lambda torrent: site_order[torrent[1]["site"]],
+                        key=lambda torrent: torrent[1][
+                            key if key != "site" else "priority"
+                        ],
+                        reverse=config["sort_by"][key],
                     )
                 )
             client.flush()
@@ -156,8 +151,16 @@ def task_processor():
                     client.task_count < config["task_count_max"]
                     and not name in client.tasks
                     and torrent["retry_count"] <= config[site]["retry_count_max"]
-                    and "downloaded" in torrent
                     and not torrent["downloaded"]
+                    and config[site]["seeder"][0]
+                    <= torrent["seeder"]
+                    <= config[site]["seeder"][1]
+                    and config[site]["leecher"][0]
+                    <= torrent["leecher"]
+                    <= config[site]["leecher"][1]
+                    and config[site]["snatch"][0]
+                    <= torrent["snatch"]
+                    <= config[site]["snatch"][1]
                     and (
                         time.mktime(time.localtime()) - torrent["publish_at"]
                         <= config[site]["publish_within"]
@@ -165,14 +168,16 @@ def task_processor():
                     and client.total_size + torrent["size"] <= config["space"]
                     and (
                         not config[site]["free_only"]
-                        or torrent["free"]
-                        and (
-                            torrent["free_end"] == None
-                            or torrent["free_end"] - time.mktime(time.localtime())
-                            >= config[site]["free_time_min"]
+                        or (
+                            torrent["free"]
+                            and (
+                                torrent["free_end"] == None
+                                or torrent["free_end"] - time.mktime(time.localtime())
+                                >= config[site]["free_time_min"]
+                            )
                         )
                     )
-                    and (not (config[site]["exclude_hr"] and torrent["hr"] != None))
+                    and not (config[site]["exclude_hr"] and torrent["hr"] != None)
                 ):
                     client.add_torrent(torrent, name, logger)
                     time.sleep(10 if config["client"] == "qbittorrent" else 1)
@@ -212,7 +217,7 @@ def torrent_fetcher(site):
 
 
 threads = [threading.Thread(target=task_processor)]
-for site in config["sites"]:
+for site in list(config.keys())[12:]:
     threads.append(threading.Thread(target=torrent_fetcher(site)))
 for thread in threads:
     thread.setDaemon(True)

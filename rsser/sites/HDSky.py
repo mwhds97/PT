@@ -60,6 +60,9 @@ def HDSky(config):
                         "free_end": None,
                         "hr": None,
                         "downloaded": False,
+                        "seeder": -1,
+                        "leecher": -1,
+                        "snatch": -1,
                     }
                     if re.search('class="pro_\S*free', str(row)) != None:
                         if re.search("\[.+<b>.+\]", str(row)) == None:
@@ -77,7 +80,7 @@ def HDSky(config):
                                         )
                                     )
                                     - time.timezone
-                                    - 28800
+                                    - config["HDSky"]["timezone"] * 3600
                                 )
                     if re.search('<div class="\w', str(row)) != None:
                         web_info["downloaded"] = True
@@ -85,4 +88,8 @@ def HDSky(config):
         else:
             raise Exception
         time.sleep(1)
-    return {"[HDSky]" + id: torrent for id, torrent in torrents.items()}
+    return {
+        "[HDSky]" + id: torrent
+        for id, torrent in torrents.items()
+        if "downloaded" in torrent
+    }

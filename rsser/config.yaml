@@ -9,11 +9,9 @@ space: 1024
 task_count_max: 10
 run_interval: 30
 torrent_pool_size: 1000
-order_by_site: false
-sites:
-- 'CHDBits'
-- 'HDSky'
-- 'U2'
+sort_by:
+  "size": true
+  "publish_time": true
 CHDBits:
   rss: 'https://chdbits.co/torrentrss.php?rows=50&isize=1&linktype=dl&passkey='
   rss_timeout: 15
@@ -28,6 +26,7 @@ CHDBits:
     c_secure_uid: ''
   user_agent: 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36'
   proxies: {}
+  path: ''
   fetch_interval: 300
   retry_interval: 30
   retry_count_max: 2
@@ -36,16 +35,20 @@ CHDBits:
   free_only: true
   free_time_min: 21000
   exclude_hr: false
-  ignore_hr: false
+  ignore_hr_seeding: false
+  ignore_hr_escape: true
   size: [10, 100]
-  path: ''
+  seeder: [0, 5]
+  leecher: [0, 5000]
+  snatch: [0, 5]
   extra_options: {}
   seed_by_size: true
-  seed_time_size_ratio: 1.0
-  seed_time_fixed: 3600
+  seed_time_par: 1.0
   seed_delay_hr: 1800
   seed_ratio_hr: null
   life: 259200
+  priority: 1
+  timezone: +8
 HDSky:
   rss: 'https://hdsky.me/torrentrss.php?rows=50&isize=1&linktype=dl&passkey='
   rss_timeout: 15
@@ -60,6 +63,7 @@ HDSky:
     c_secure_uid: ''
   user_agent: 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36'
   proxies: {}
+  path: ''
   fetch_interval: 300
   retry_interval: 30
   retry_count_max: 2
@@ -68,16 +72,20 @@ HDSky:
   free_only: true
   free_time_min: 21000
   exclude_hr: false
-  ignore_hr: false
+  ignore_hr_seeding: false
+  ignore_hr_escape: true
   size: [10, 100]
-  path: ''
+  seeder: [0, 5]
+  leecher: [0, 5000]
+  snatch: [0, 5]
   extra_options: {}
   seed_by_size: true
-  seed_time_size_ratio: 1.0
-  seed_time_fixed: 3600
+  seed_time_par: 1.0
   seed_delay_hr: 1800
   seed_ratio_hr: null
   life: 259200
+  priority: 2
+  timezone: +8
 U2:
   rss: 'https://u2.dmhy.org/torrentrss.php?rows=50&isize=1&trackerssl=1&linktype=dl&passkey='
   rss_timeout: 15
@@ -88,6 +96,7 @@ U2:
     nexusphp_u2: ''
   user_agent: 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36'
   proxies: {}
+  path: ''
   fetch_interval: 300
   retry_interval: 30
   retry_count_max: 2
@@ -96,13 +105,17 @@ U2:
   free_only: true
   free_time_min: 21000
   exclude_hr: false
-  ignore_hr: false
+  ignore_hr_seeding: false
+  ignore_hr_escape: true
   size: [10, 100]
-  path: ''
+  seeder: [0, 5]
+  leecher: [0, 5000]
+  snatch: [0, 5]
   extra_options: {}
   seed_by_size: true
-  seed_time_size_ratio: 1.0
-  seed_time_fixed: 3600
+  seed_time_par: 1.0
   seed_delay_hr: 1800
   seed_ratio_hr: null
   life: 259200
+  priority: 3
+  timezone: +8
