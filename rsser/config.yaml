@@ -10,8 +10,8 @@ task_count_max: 10
 run_interval: 30
 torrent_pool_size: 1000
 sort_by:
-  "size": true
-  "publish_time": true
+  size: true
+  publish_time: true
 CHDBits:
   rss: 'https://chdbits.co/torrentrss.php?rows=50&isize=1&linktype=dl&passkey='
   rss_timeout: 15
