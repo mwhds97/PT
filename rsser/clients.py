@@ -37,7 +37,10 @@ class deluge:
         except Exception:
             pass
         time.sleep(self.config["reconnect_interval"])
-        self.new_client()
+        try:
+            self.new_client()
+        except Exception:
+            pass
 
     def flush(self):
         key_map = {
@@ -75,10 +78,11 @@ class deluge:
 
     def add_torrent(self, torrent, name, logger):
         self.flush()
-        text = f"""添加种子（{torrent["size"]:.2f}GB）（{torrent["site"]}）\
+        text = f"""添加种子（{name}）\
 ，免费：{"是" if torrent["free"] else "否"}\
 ，到期时间：{"N/A" if not torrent["free"] or torrent["free_end"] == None else time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(torrent["free_end"]))}\
 ，H&R：{"无" if torrent["hr"] == None else f'{torrent["hr"] / 3600:.2f}小时'}\
+，体积：{torrent["size"]:.2f}GB\
 ，总体积：{self.total_size + torrent["size"]:.2f}GB\
 ，任务数：{self.task_count + 1}"""
         try:
@@ -102,22 +106,18 @@ class deluge:
                     "core.set_torrent_options", hash.group(1), {"name": name}
                 )
             elif re.match("Torrent already being added", str(e)) == None:
-                print_t("试" + text, logger=logger)
                 torrent["retry_count"] += 1
                 raise e
 
     def remove_torrent(self, torrent, name, info, logger):
         self.flush()
-        text = f'删除种子（{torrent["size"]:.2f}GB）（{torrent["site"]}）\
+        text = f'删除种子（{name}）\
 ，原因：{info}\
+，体积：{torrent["size"]:.2f}GB\
 ，总体积：{self.total_size - self.tasks[name]["size"] / 1073741824 + 0:.2f}GB\
 ，任务数：{self.task_count - 1}'
-        try:
-            self.client.call("core.remove_torrent", self.tasks[name]["hash"], True)
-            print_t(text, logger=logger)
-        except Exception as e:
-            print_t("试" + text, logger=logger)
-            raise e
+        self.client.call("core.remove_torrent", self.tasks[name]["hash"], True)
+        print_t(text, logger=logger)
 
 
 class qbittorrent:
@@ -161,7 +161,10 @@ class qbittorrent:
     def reconnect(self):
         self.get_response("/api/v2/auth/logout", nobreak=True)
         time.sleep(self.config["reconnect_interval"])
-        self.new_client()
+        try:
+            self.new_client()
+        except Exception:
+            pass
 
     def flush(self):
         key_map = {
@@ -207,10 +210,11 @@ class qbittorrent:
 
     def add_torrent(self, torrent, name, logger):
         self.flush()
-        text = f"""添加种子（{torrent["size"]:.2f}GB）（{torrent["site"]}）\
+        text = f"""添加种子（{name}）\
 ，免费：{"是" if torrent["free"] else "否"}\
 ，到期时间：{"N/A" if not torrent["free"] or torrent["free_end"] == None else time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(torrent["free_end"]))}\
 ，H&R：{"无" if torrent["hr"] == None else f'{torrent["hr"] / 3600:.2f}小时'}\
+，体积：{torrent["size"]:.2f}GB\
 ，总体积：{self.total_size + torrent["size"]:.2f}GB\
 ，任务数：{self.task_count + 1}"""
         try:
@@ -228,22 +232,18 @@ class qbittorrent:
             )
             print_t(text, logger=logger)
         except Exception as e:
-            print_t("试" + text, logger=logger)
             torrent["retry_count"] += 1
             raise e
 
     def remove_torrent(self, torrent, name, info, logger):
         self.flush()
-        text = f'删除种子（{torrent["size"]:.2f}GB）（{torrent["site"]}）\
+        text = f'删除种子（{name}）\
 ，原因：{info}\
+，体积：{torrent["size"]:.2f}GB\
 ，总体积：{self.total_size - self.tasks[name]["size"] / 1073741824 + 0:.2f}GB\
 ，任务数：{self.task_count - 1}'
-        try:
-            self.get_response(
-                "/api/v2/torrents/delete",
-                {"hashes": self.tasks[name]["hash"], "deleteFiles": "true"},
-            )
-            print_t(text, logger=logger)
-        except Exception as e:
-            print_t("试" + text, logger=logger)
-            raise e
+        self.get_response(
+            "/api/v2/torrents/delete",
+            {"hashes": self.tasks[name]["hash"], "deleteFiles": "true"},
+        )
+        print_t(text, logger=logger)

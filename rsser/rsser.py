@@ -74,58 +74,70 @@ def task_processor():
             time.sleep(1)
             lock.acquire()
             for name, stats in client.tasks.items():
-                to_remove = False
-                if name in torrent_pool:
-                    torrent = torrent_pool[name]
-                    site = torrent["site"]
-                    if "registered" in stats["tracker_status"]:
-                        to_remove = True
-                        info = "种子被撤除"
-                    elif stats["seeding_time"] == 0:
-                        if config[site]["ignore_hr_leeching"] or torrent["hr"] == None:
-                            if config[site]["free_only"] and (
-                                not torrent["free"]
-                                or (
-                                    torrent["free_end"] != None
-                                    and torrent["free_end"]
-                                    - time.mktime(time.localtime())
-                                    <= config["run_interval"]
-                                )
+                try:
+                    to_remove = False
+                    if name in torrent_pool:
+                        torrent = torrent_pool[name]
+                        site = torrent["site"]
+                        if "registered" in stats["tracker_status"]:
+                            to_remove = True
+                            info = "种子被撤除"
+                        elif stats["seeding_time"] == 0:
+                            if (
+                                config[site]["ignore_hr_leeching"]
+                                or torrent["hr"] == None
                             ):
-                                to_remove = True
-                                info = "免费失效"
-                            if stats["active_time"] >= config[site]["life"]:
-                                to_remove = True
-                                info = "活动时长超过限制"
-                    else:
-                        if config[site]["ignore_hr_seeding"] or torrent["hr"] == None:
-                            hr_time = 0
-                        elif (
-                            config[site]["seed_ratio_hr"] != None
-                            and stats["ratio"] >= config[site]["seed_ratio_hr"]
-                        ):
-                            hr_time = config[site]["seed_delay_hr"]
-                        else:
-                            hr_time = torrent["hr"] + config[site]["seed_delay_hr"]
-                        if stats["seeding_time"] >= hr_time:
-                            if stats["active_time"] >= config[site]["life"]:
-                                to_remove = True
-                                info = "活动时长超过限制"
-                            if config[site]["seed_by_size"]:
-                                if (
-                                    stats["seeding_time"]
-                                    >= config[site]["seed_time_par"]
-                                    * torrent["size"]
-                                    * 60
+                                if config[site]["free_only"] and (
+                                    not torrent["free"]
+                                    or (
+                                        torrent["free_end"] != None
+                                        and torrent["free_end"]
+                                        - time.mktime(time.localtime())
+                                        <= config["run_interval"]
+                                    )
                                 ):
                                     to_remove = True
-                                    info = "做种时长（弹性）达到要求"
-                            elif stats["seeding_time"] >= config[site]["seed_time_par"]:
-                                to_remove = True
-                                info = "做种时长（固定）达到要求"
-                if to_remove:
-                    client.remove_torrent(torrent, name, info, logger)
-                    time.sleep(5 if config["client"] == "qbittorrent" else 1)
+                                    info = "免费失效"
+                                if stats["active_time"] >= config[site]["life"]:
+                                    to_remove = True
+                                    info = "活动时长超过限制"
+                        else:
+                            if (
+                                config[site]["ignore_hr_seeding"]
+                                or torrent["hr"] == None
+                            ):
+                                hr_time = 0
+                            elif (
+                                config[site]["seed_ratio_hr"] != None
+                                and stats["ratio"] >= config[site]["seed_ratio_hr"]
+                            ):
+                                hr_time = config[site]["seed_delay_hr"]
+                            else:
+                                hr_time = torrent["hr"] + config[site]["seed_delay_hr"]
+                            if stats["seeding_time"] >= hr_time:
+                                if stats["active_time"] >= config[site]["life"]:
+                                    to_remove = True
+                                    info = "活动时长超过限制"
+                                if config[site]["seed_by_size"]:
+                                    if (
+                                        stats["seeding_time"]
+                                        >= config[site]["seed_time_par"]
+                                        * torrent["size"]
+                                        * 60
+                                    ):
+                                        to_remove = True
+                                        info = "做种时长（弹性）达到要求"
+                                elif (
+                                    stats["seeding_time"]
+                                    >= config[site]["seed_time_par"]
+                                ):
+                                    to_remove = True
+                                    info = "做种时长（固定）达到要求"
+                    if to_remove:
+                        client.remove_torrent(torrent, name, info, logger)
+                        time.sleep(5 if config["client"] == "qbittorrent" else 1)
+                except Exception:
+                    print_t(f"删除种子（{name}）可能已失败，尝试删除其他种子…", logger=logger)
             torrent_pool = {
                 name: torrent
                 for name, torrent in torrent_pool.items()
@@ -145,51 +157,52 @@ def task_processor():
             client.flush()
             time.sleep(1)
             for name, torrent in torrent_pool.items():
-                site = torrent["site"]
-                if (
-                    client.task_count < config["task_count_max"]
-                    and not name in client.tasks
-                    and torrent["retry_count"] <= config[site]["retry_count_max"]
-                    and not torrent["downloaded"]
-                    and config[site]["seeder"][0]
-                    <= torrent["seeder"]
-                    <= config[site]["seeder"][1]
-                    and config[site]["leecher"][0]
-                    <= torrent["leecher"]
-                    <= config[site]["leecher"][1]
-                    and config[site]["snatch"][0]
-                    <= torrent["snatch"]
-                    <= config[site]["snatch"][1]
-                    and (
-                        time.mktime(time.localtime()) - torrent["publish_at"]
-                        <= config[site]["publish_within"]
-                    )
-                    and client.total_size + torrent["size"] <= config["space"]
-                    and (
-                        not config[site]["free_only"]
-                        or (
-                            torrent["free"]
-                            and (
-                                torrent["free_end"] == None
-                                or torrent["free_end"] - time.mktime(time.localtime())
-                                >= config[site]["free_time_min"]
+                try:
+                    site = torrent["site"]
+                    if (
+                        client.task_count < config["task_count_max"]
+                        and not name in client.tasks
+                        and torrent["retry_count"] <= config[site]["retry_count_max"]
+                        and not torrent["downloaded"]
+                        and config[site]["seeder"][0]
+                        <= torrent["seeder"]
+                        <= config[site]["seeder"][1]
+                        and config[site]["leecher"][0]
+                        <= torrent["leecher"]
+                        <= config[site]["leecher"][1]
+                        and config[site]["snatch"][0]
+                        <= torrent["snatch"]
+                        <= config[site]["snatch"][1]
+                        and (
+                            time.mktime(time.localtime()) - torrent["publish_at"]
+                            <= config[site]["publish_within"]
+                        )
+                        and client.total_size + torrent["size"] <= config["space"]
+                        and (
+                            not config[site]["free_only"]
+                            or (
+                                torrent["free"]
+                                and (
+                                    torrent["free_end"] == None
+                                    or torrent["free_end"]
+                                    - time.mktime(time.localtime())
+                                    >= config[site]["free_time_min"]
+                                )
                             )
                         )
-                    )
-                    and not (config[site]["exclude_hr"] and torrent["hr"] != None)
-                ):
-                    client.add_torrent(torrent, name, logger)
-                    time.sleep(10 if config["client"] == "qbittorrent" else 1)
+                        and not (config[site]["exclude_hr"] and torrent["hr"] != None)
+                    ):
+                        client.add_torrent(torrent, name, logger)
+                        time.sleep(10 if config["client"] == "qbittorrent" else 1)
+                except Exception:
+                    print_t(f"添加种子（{name}）可能已失败，尝试添加其他种子…", logger=logger)
             lock.release()
             time.sleep(config["run_interval"])
         except Exception:
             if lock.locked():
                 lock.release()
-            try:
-                print_t("出现异常，正在重新连接客户端…", True, logger)
-                client.reconnect()
-            except Exception:
-                pass
+            print_t("出现异常，正在重新连接客户端…", True, logger)
+            client.reconnect()
 
 
 def torrent_fetcher(site):
