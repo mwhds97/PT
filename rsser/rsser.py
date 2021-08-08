@@ -137,7 +137,11 @@ def task_processor():
                         client.remove_torrent(torrent, name, info, logger)
                         time.sleep(5 if config["client"] == "qbittorrent" else 1)
                 except Exception:
-                    print_t(f"删除种子（{name}）可能已失败，尝试删除其他种子…", logger=logger)
+                    print_t(
+                        f'删除种子（{name}）（{torrent["size"]:.2f}GB）可能已失败，尝试删除其他种子…',
+                        logger=logger,
+                    )
+                    time.sleep(5 if config["client"] == "qbittorrent" else 1)
             torrent_pool = {
                 name: torrent
                 for name, torrent in torrent_pool.items()
@@ -195,7 +199,11 @@ def task_processor():
                         client.add_torrent(torrent, name, logger)
                         time.sleep(10 if config["client"] == "qbittorrent" else 1)
                 except Exception:
-                    print_t(f"添加种子（{name}）可能已失败，尝试添加其他种子…", logger=logger)
+                    print_t(
+                        f'添加种子（{name}）（{torrent["size"]:.2f}GB）可能已失败，尝试添加其他种子…',
+                        logger=logger,
+                    )
+                    time.sleep(10 if config["client"] == "qbittorrent" else 1)
             lock.release()
             time.sleep(config["run_interval"])
         except Exception:
