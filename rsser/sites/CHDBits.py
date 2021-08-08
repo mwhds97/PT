@@ -51,35 +51,42 @@ def CHDBits(config):
             if rows == []:
                 raise Exception
             for row in rows[1:]:
-                id = re.search("id=(\d+)", str(row)).group(1)
-                if id in torrents:
-                    web_info = {
-                        "free": False,
-                        "free_end": None,
-                        "hr": None,
-                        "downloaded": False,
-                        "seeder": -1,
-                        "leecher": -1,
-                        "snatch": -1,
-                    }
-                    if re.search('class="pro_\S*free', str(row)) != None:
-                        web_info["free"] = True
-                        free_end = re.search('\(.+<span title="(.+?)".+\)', str(row))
-                        web_info["free_end"] = (
-                            None
-                            if free_end == None
-                            else time.mktime(
-                                time.strptime(free_end.group(1), "%Y-%m-%d %H:%M:%S")
+                cols = row.find_all("td", recursive=False)
+                if len(cols) >= 10:
+                    id = re.search("id=(\d+)", str(cols[1])).group(1)
+                    if id in torrents:
+                        web_info = {
+                            "free": False,
+                            "free_end": None,
+                            "hr": None,
+                            "downloaded": False,
+                            "seeder": -1,
+                            "leecher": -1,
+                            "snatch": -1,
+                        }
+                        if re.search('class="pro_\S*free', str(cols[1])) != None:
+                            web_info["free"] = True
+                            free_end = re.search('<span title="(.+?)"', str(cols[1]))
+                            web_info["free_end"] = (
+                                None
+                                if free_end == None
+                                else time.mktime(
+                                    time.strptime(
+                                        free_end.group(1), "%Y-%m-%d %H:%M:%S"
+                                    )
+                                )
+                                - time.timezone
+                                - config["CHDBits"]["timezone"] * 3600
                             )
-                            - time.timezone
-                            - config["CHDBits"]["timezone"] * 3600
-                        )
-                    hr = re.search("circle-text.+?(\d+)</div>", str(row))
-                    if hr != None:
-                        web_info["hr"] = int(hr.group(1)) * 86400
-                    if re.search("%</td>", str(row)) != None:
-                        web_info["downloaded"] = True
-                    torrents[id] = dict(torrents[id], **web_info)
+                        hr = cols[1].find("div", class_="circle-text")
+                        if hr != None:
+                            web_info["hr"] = int(re.sub("\D", "", hr.text)) * 86400
+                        web_info["seeder"] = int(re.sub("\D", "", cols[5].text))
+                        web_info["leecher"] = int(re.sub("\D", "", cols[6].text))
+                        web_info["snatch"] = int(re.sub("\D", "", cols[7].text))
+                        if re.search("\d", cols[9].text) != None:
+                            web_info["downloaded"] = True
+                        torrents[id] = dict(torrents[id], **web_info)
         else:
             raise Exception
         time.sleep(1)

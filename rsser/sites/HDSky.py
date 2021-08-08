@@ -53,38 +53,43 @@ def HDSky(config):
             if rows == []:
                 raise Exception
             for row in rows[1:]:
-                id = re.search("id=(\d+)", str(row)).group(1)
-                if id in torrents:
-                    web_info = {
-                        "free": False,
-                        "free_end": None,
-                        "hr": None,
-                        "downloaded": False,
-                        "seeder": -1,
-                        "leecher": -1,
-                        "snatch": -1,
-                    }
-                    if re.search('class="pro_\S*free', str(row)) != None:
-                        if re.search("\[.+<b>.+\]", str(row)) == None:
-                            web_info["free"] = True
-                        else:
-                            free_end = re.search(
-                                '\[.+<span title="(.+?)".+\]', str(row)
-                            )
-                            if free_end != None:
+                cols = row.find_all("td", recursive=False)
+                if len(cols) >= 10:
+                    id = re.search("id=(\d+)", str(cols[1])).group(1)
+                    if id in torrents:
+                        web_info = {
+                            "free": False,
+                            "free_end": None,
+                            "hr": None,
+                            "downloaded": False,
+                            "seeder": -1,
+                            "leecher": -1,
+                            "snatch": -1,
+                        }
+                        if re.search('class="pro_\S*free', str(cols[1])) != None:
+                            if re.search("\[.+<b>.+\]", str(cols[1])) == None:
                                 web_info["free"] = True
-                                web_info["free_end"] = (
-                                    time.mktime(
-                                        time.strptime(
-                                            free_end.group(1), "%Y-%m-%d %H:%M:%S"
-                                        )
-                                    )
-                                    - time.timezone
-                                    - config["HDSky"]["timezone"] * 3600
+                            else:
+                                free_end = re.search(
+                                    '<span title="(.+?)"', str(cols[1])
                                 )
-                    if re.search('<div class="\w', str(row)) != None:
-                        web_info["downloaded"] = True
-                    torrents[id] = dict(torrents[id], **web_info)
+                                if free_end != None:
+                                    web_info["free"] = True
+                                    web_info["free_end"] = (
+                                        time.mktime(
+                                            time.strptime(
+                                                free_end.group(1), "%Y-%m-%d %H:%M:%S"
+                                            )
+                                        )
+                                        - time.timezone
+                                        - config["HDSky"]["timezone"] * 3600
+                                    )
+                        if re.search('<div class="\w', str(cols[1])) != None:
+                            web_info["downloaded"] = True
+                        web_info["seeder"] = int(re.sub("\D", "", cols[5].text))
+                        web_info["leecher"] = int(re.sub("\D", "", cols[6].text))
+                        web_info["snatch"] = int(re.sub("\D", "", cols[7].text))
+                        torrents[id] = dict(torrents[id], **web_info)
         else:
             raise Exception
         time.sleep(1)
