@@ -36,7 +36,7 @@ CHDBits:
   free_time_min: 21000
   exclude_hr: false
   ignore_hr_seeding: false
-  ignore_hr_escape: true
+  ignore_hr_leeching: true
   size: [10, 100]
   seeder: [0, 5]
   leecher: [0, 5000]
@@ -73,7 +73,7 @@ HDSky:
   free_time_min: 21000
   exclude_hr: false
   ignore_hr_seeding: false
-  ignore_hr_escape: true
+  ignore_hr_leeching: true
   size: [10, 100]
   seeder: [0, 5]
   leecher: [0, 5000]
@@ -106,7 +106,7 @@ U2:
   free_time_min: 21000
   exclude_hr: false
   ignore_hr_seeding: false
-  ignore_hr_escape: true
+  ignore_hr_leeching: true
   size: [10, 100]
   seeder: [0, 5]
   leecher: [0, 5000]

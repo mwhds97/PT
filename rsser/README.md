@@ -65,11 +65,11 @@ sort_by: #给种子信息排序的关键字，以下关键字可自由组合（�
   retry_count_max: 2 #添加任务失败时重试的最大次数
   regexp: '' #用于根据标题筛选种子的正则表达式
   publish_within: 660 #发布时间在该值（单位：秒）之前的种子将被忽略（考虑到程序延迟，建议略大于期望值）
-  free_only: true #若该值为 true，则非免费的种子将被忽略，下载中的免费到期的种子将被移除（是否规避 H&R 将由 ignore_hr_escape 的值决定）
+  free_only: true #若该值为 true，则非免费的种子将被忽略，下载中的免费到期的种子将被移除（是否规避 H&R 将由 ignore_hr_leeching 的值决定）
   free_time_min: 21000 #仅当 free_only 的值为 true 时有效，免费时长小于该值（单位：秒）的种子将被忽略（考虑到程序延迟，建议略小于期望值）
   exclude_hr: false #若该值为 true，则带有 H&R 要求的种子将被忽略
   ignore_hr_seeding: false #若该值为 true，则做种中的种子的 H&R 要求将被忽略
-  ignore_hr_escape: true #若该值为 true，则下载中的种子的 H&R 要求将被忽略
+  ignore_hr_leeching: true #若该值为 true，则下载中的种子的 H&R 要求将被忽略
   size: [10, 100] #体积不在该范围（单位：GB）内的种子将被忽略
   seeder: [0, 5] #做种人数不在该范围内的种子将被忽略
   leecher: [0, 5000] #下载人数不在该范围内的种子将被忽略
@@ -82,7 +82,7 @@ sort_by: #给种子信息排序的关键字，以下关键字可自由组合（�
   #当 seed_by_size 的值为 false 时，做种时间（单位：秒）= 该值（单位：秒）
   seed_delay_hr: 1800 #满足 H&R 要求后继续做种的时间（单位：秒），防止因未及时汇报或服务器问题触发 H&R
   seed_ratio_hr: null #若站点的 H&R 规则允许达到一定分享率后停止做种，则可将该值设定为对应分享率
-  life: 259200 #活动时间超过该值的任务将被删除（是否规避 H&R 将由 ignore_hr_escape 的值决定）
+  life: 259200 #活动时间超过该值的任务将被删除（是否规避 H&R 将由 ignore_hr_leeching 或 ignore_hr_seeding 的值决定）
   priority: 1 #种子信息排序所需的站点优先级，该值越小则站点优先级越高
   timezone: +8 #站点的时区，一般设置为 +8 即可
 站点2:

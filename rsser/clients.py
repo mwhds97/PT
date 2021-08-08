@@ -106,10 +106,9 @@ class deluge:
                 torrent["retry_count"] += 1
                 raise e
 
-    def remove_torrent(self, name, info, logger):
+    def remove_torrent(self, torrent, name, info, logger):
         self.flush()
-        pattern = "\[(\w+)\]"
-        text = f'删除种子（{self.tasks[name]["size"] / 1073741824:.2f}GB）（{re.search(pattern, name).group(1)}）\
+        text = f'删除种子（{torrent["size"]:.2f}GB）（{torrent["site"]}）\
 ，原因：{info}\
 ，总体积：{self.total_size - self.tasks[name]["size"] / 1073741824 + 0:.2f}GB\
 ，任务数：{self.task_count - 1}'
@@ -233,10 +232,9 @@ class qbittorrent:
             torrent["retry_count"] += 1
             raise e
 
-    def remove_torrent(self, name, info, logger):
+    def remove_torrent(self, torrent, name, info, logger):
         self.flush()
-        pattern = "\[(\w+)\]"
-        text = f'删除种子（{self.tasks[name]["size"] / 1073741824:.2f}GB）（{re.search(pattern, name).group(1)}）\
+        text = f'删除种子（{torrent["size"]:.2f}GB）（{torrent["site"]}）\
 ，原因：{info}\
 ，总体积：{self.total_size - self.tasks[name]["size"] / 1073741824 + 0:.2f}GB\
 ，任务数：{self.task_count - 1}'
