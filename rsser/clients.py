@@ -78,9 +78,14 @@ class deluge:
 
     def add_torrent(self, torrent, name, logger):
         self.flush()
+        free_end = (
+            "N/A"
+            if torrent["free_end"] == None
+            else time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(torrent["free_end"]))
+        )
         text = f"""添加种子（{name}）\
 ，免费：{"是" if torrent["free"] else "否"}\
-，到期时间：{"N/A" if not torrent["free"] or torrent["free_end"] == None else time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(torrent["free_end"]))}\
+，到期时间：{free_end}\
 ，H&R：{"无" if torrent["hr"] == None else f'{torrent["hr"] / 3600:.2f}小时'}\
 ，体积：{torrent["size"]:.2f}GB\
 ，总体积：{self.total_size + torrent["size"]:.2f}GB\
@@ -210,9 +215,14 @@ class qbittorrent:
 
     def add_torrent(self, torrent, name, logger):
         self.flush()
+        free_end = (
+            "N/A"
+            if torrent["free_end"] == None
+            else time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(torrent["free_end"]))
+        )
         text = f"""添加种子（{name}）\
 ，免费：{"是" if torrent["free"] else "否"}\
-，到期时间：{"N/A" if not torrent["free"] or torrent["free_end"] == None else time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(torrent["free_end"]))}\
+，到期时间：{free_end}\
 ，H&R：{"无" if torrent["hr"] == None else f'{torrent["hr"] / 3600:.2f}小时'}\
 ，体积：{torrent["size"]:.2f}GB\
 ，总体积：{self.total_size + torrent["size"]:.2f}GB\
