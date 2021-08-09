@@ -8,7 +8,7 @@
 
 - [x] CHDBits
 - [x] HDSky
-- [x] M-Team
+- [x] M-Team（建议关闭 2FA）
 - [x] OpenCD
 - [ ] OurBits（H&R 检测暂未实现）
 - [x] SSD
