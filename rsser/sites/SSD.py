@@ -8,11 +8,11 @@ from bs4 import BeautifulSoup
 from utils import *
 
 
-def CHDBits(config):
+def SSD(config):
     response = requests.get(
-        config["CHDBits"]["rss"],
-        proxies=config["CHDBits"]["proxies"],
-        timeout=config["CHDBits"]["rss_timeout"],
+        config["SSD"]["rss"],
+        proxies=config["SSD"]["proxies"],
+        timeout=config["SSD"]["rss_timeout"],
     )
     if response.status_code == 200:
         feed = feedparser.parse(response.text)
@@ -20,7 +20,7 @@ def CHDBits(config):
         raise Exception
     torrents = {
         re.search("id=(\d+)", entry["link"]).group(1): {
-            "site": "CHDBits",
+            "site": "SSD",
             "title": re.match("(.+)\[.+\]$", entry["title"]).group(1),
             "size": size_G(re.search("\[([\w\.\s]+)\]$", entry["title"]).group(1)),
             "publish_time": time.mktime(entry["published_parsed"]) - time.timezone,
@@ -30,18 +30,18 @@ def CHDBits(config):
     }
     torrents = dict(
         filter(
-            lambda torrent: filter_regexp(torrent[1], config["CHDBits"]["regexp"])
-            and filter_size(torrent[1], config["CHDBits"]["size"]),
+            lambda torrent: filter_regexp(torrent[1], config["SSD"]["regexp"])
+            and filter_size(torrent[1], config["SSD"]["size"]),
             torrents.items(),
         )
     )
-    for web in config["CHDBits"]["web"]:
+    for web in config["SSD"]["web"]:
         response = requests.get(
             web,
-            headers={"user-agent": config["CHDBits"]["user_agent"]},
-            cookies=config["CHDBits"]["cookies"],
-            proxies=config["CHDBits"]["proxies"],
-            timeout=config["CHDBits"]["web_timeout"],
+            headers={"user-agent": config["SSD"]["user_agent"]},
+            cookies=config["SSD"]["cookies"],
+            proxies=config["SSD"]["proxies"],
+            timeout=config["SSD"]["web_timeout"],
         )
         if response.status_code == 200:
             soup = BeautifulSoup(response.text, "lxml")
@@ -74,22 +74,19 @@ def CHDBits(config):
                                     )
                                 )
                                 - time.timezone
-                                - config["CHDBits"]["timezone"] * 3600
+                                - config["SSD"]["timezone"] * 3600
                             )
-                        hr = cols[1].find("div", class_="circle-text")
-                        if hr != None:
-                            web_info["hr"] = int(re.sub("\D", "", hr.text)) * 86400
-                        web_info["seeder"] = int(re.sub("\D", "", cols[5].text))
-                        web_info["leecher"] = int(re.sub("\D", "", cols[6].text))
-                        web_info["snatch"] = int(re.sub("\D", "", cols[7].text))
-                        if re.search("\d", cols[9].text) != None:
+                        if cols[1].find("div", class_="progress_bar") != None:
                             web_info["downloaded"] = True
+                        web_info["seeder"] = int(re.sub("\D", "", cols[6].text))
+                        web_info["leecher"] = int(re.sub("\D", "", cols[7].text))
+                        web_info["snatch"] = int(re.sub("\D", "", cols[8].text))
                         torrents[id] = dict(torrents[id], **web_info)
         else:
             raise Exception
         time.sleep(1)
     return {
-        "[CHDBits]" + id: torrent
+        "[SSD]" + id: torrent
         for id, torrent in torrents.items()
         if "downloaded" in torrent
     }

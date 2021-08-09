@@ -8,11 +8,11 @@ from bs4 import BeautifulSoup
 from utils import *
 
 
-def CHDBits(config):
+def OpenCD(config):
     response = requests.get(
-        config["CHDBits"]["rss"],
-        proxies=config["CHDBits"]["proxies"],
-        timeout=config["CHDBits"]["rss_timeout"],
+        config["OpenCD"]["rss"],
+        proxies=config["OpenCD"]["proxies"],
+        timeout=config["OpenCD"]["rss_timeout"],
     )
     if response.status_code == 200:
         feed = feedparser.parse(response.text)
@@ -20,7 +20,7 @@ def CHDBits(config):
         raise Exception
     torrents = {
         re.search("id=(\d+)", entry["link"]).group(1): {
-            "site": "CHDBits",
+            "site": "OpenCD",
             "title": re.match("(.+)\[.+\]$", entry["title"]).group(1),
             "size": size_G(re.search("\[([\w\.\s]+)\]$", entry["title"]).group(1)),
             "publish_time": time.mktime(entry["published_parsed"]) - time.timezone,
@@ -30,18 +30,18 @@ def CHDBits(config):
     }
     torrents = dict(
         filter(
-            lambda torrent: filter_regexp(torrent[1], config["CHDBits"]["regexp"])
-            and filter_size(torrent[1], config["CHDBits"]["size"]),
+            lambda torrent: filter_regexp(torrent[1], config["OpenCD"]["regexp"])
+            and filter_size(torrent[1], config["OpenCD"]["size"]),
             torrents.items(),
         )
     )
-    for web in config["CHDBits"]["web"]:
+    for web in config["OpenCD"]["web"]:
         response = requests.get(
             web,
-            headers={"user-agent": config["CHDBits"]["user_agent"]},
-            cookies=config["CHDBits"]["cookies"],
-            proxies=config["CHDBits"]["proxies"],
-            timeout=config["CHDBits"]["web_timeout"],
+            headers={"user-agent": config["OpenCD"]["user_agent"]},
+            cookies=config["OpenCD"]["cookies"],
+            proxies=config["OpenCD"]["proxies"],
+            timeout=config["OpenCD"]["web_timeout"],
         )
         if response.status_code == 200:
             soup = BeautifulSoup(response.text, "lxml")
@@ -50,21 +50,21 @@ def CHDBits(config):
                 raise Exception
             for row in rows[1:]:
                 cols = row.find_all("td", recursive=False)
-                if len(cols) >= 10:
-                    id = re.search("id=(\d+)", str(cols[1])).group(1)
+                if len(cols) >= 11:
+                    id = re.search("id=(\d+)", str(cols[2])).group(1)
                     if id in torrents:
                         web_info = {
                             "free": False,
                             "free_end": None,
-                            "hr": None,
+                            "hr": 259200,
                             "downloaded": False,
                             "seeder": -1,
                             "leecher": -1,
                             "snatch": -1,
                         }
-                        if re.search('class="pro_\S*free', str(cols[1])) != None:
+                        if re.search('class="pro_\S*free', str(cols[2])) != None:
                             web_info["free"] = True
-                            free_end = re.search('<span title="(.+?)"', str(cols[1]))
+                            free_end = re.search('<span title="(.+?)"', str(cols[2]))
                             web_info["free_end"] = (
                                 None
                                 if free_end == None
@@ -74,22 +74,19 @@ def CHDBits(config):
                                     )
                                 )
                                 - time.timezone
-                                - config["CHDBits"]["timezone"] * 3600
+                                - config["OpenCD"]["timezone"] * 3600
                             )
-                        hr = cols[1].find("div", class_="circle-text")
-                        if hr != None:
-                            web_info["hr"] = int(re.sub("\D", "", hr.text)) * 86400
-                        web_info["seeder"] = int(re.sub("\D", "", cols[5].text))
-                        web_info["leecher"] = int(re.sub("\D", "", cols[6].text))
-                        web_info["snatch"] = int(re.sub("\D", "", cols[7].text))
-                        if re.search("\d", cols[9].text) != None:
-                            web_info["downloaded"] = True
+                        if cols[2].find("div", class_="progress") != None:
+                            web_info["downloaded"] == True
+                        web_info["seeder"] = int(re.sub("\D", "", cols[7].text))
+                        web_info["leecher"] = int(re.sub("\D", "", cols[8].text))
+                        web_info["snatch"] = int(re.sub("\D", "", cols[9].text))
                         torrents[id] = dict(torrents[id], **web_info)
         else:
             raise Exception
         time.sleep(1)
     return {
-        "[CHDBits]" + id: torrent
+        "[OpenCD]" + id: torrent
         for id, torrent in torrents.items()
         if "downloaded" in torrent
     }

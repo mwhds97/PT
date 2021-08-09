@@ -21,19 +21,17 @@ def HDSky(config):
     torrents = {
         re.search("id=(\d+)", entry["link"]).group(1): {
             "site": "HDSky",
-            "title": entry["title"],
+            "title": re.match("(.+)\[.+\]$", entry["title"]).group(1),
             "size": size_G(re.search("\[([\w\.\s]+)\]$", entry["title"]).group(1)),
-            "publish_at": time.mktime(entry["published_parsed"]) - time.timezone,
+            "publish_time": time.mktime(entry["published_parsed"]) - time.timezone,
             "link": entry["links"][1]["href"],
         }
         for entry in feed["entries"]
     }
     torrents = dict(
         filter(
-            lambda torrent: config["HDSky"]["size"][0]
-            <= torrent[1]["size"]
-            <= config["HDSky"]["size"][1]
-            and re.search(config["HDSky"]["regexp"], torrent[1]["title"]) != None,
+            lambda torrent: filter_regexp(torrent[1], config["HDSky"]["regexp"])
+            and filter_size(torrent[1], config["HDSky"]["size"]),
             torrents.items(),
         )
     )

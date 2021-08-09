@@ -30,14 +30,18 @@ CHDBits:
   fetch_interval: 300
   retry_interval: 30
   retry_count_max: 2
-  regexp: '(-|@)(CHD(?!Bits)|OneHD)|(@CHDBits)'
+  regexp:
+  - '-CHD(?!Bits)'
+  - '@CHD'
+  - '(-|@)OneHD'
   publish_within: 660
   free_only: true
   free_time_min: 21000
   exclude_hr: false
   ignore_hr_seeding: false
   ignore_hr_leeching: true
-  size: [10, 100]
+  size:
+  - [10, 100]
   seeder: [0, 5]
   leecher: [0, 5000]
   snatch: [0, 5]
@@ -67,14 +71,17 @@ HDSky:
   fetch_interval: 300
   retry_interval: 30
   retry_count_max: 2
-  regexp: '(-|@)(HDS)|WOWOW|NHK|TVAsahi'
+  regexp:
+  - '(-|@)HDS'
+  - 'WOWOW|NHK|TVAsahi'
   publish_within: 660
   free_only: true
   free_time_min: 21000
   exclude_hr: false
   ignore_hr_seeding: false
   ignore_hr_leeching: true
-  size: [10, 100]
+  size:
+  - [10, 100]
   seeder: [0, 5]
   leecher: [0, 5000]
   snatch: [0, 5]
@@ -85,6 +92,190 @@ HDSky:
   seed_ratio_hr: null
   life: 259200
   priority: 2
+  timezone: +8
+MTeam:
+  rss: 'https://kp.m-team.cc/torrentrss.php?rows=50&isize=1&https=1&linktype=dl&passkey='
+  rss_timeout: 15
+  web:
+  - 'https://kp.m-team.cc/torrents.php?sort=4&type=desc'
+  - 'https://kp.m-team.cc/adult.php?sort=4&type=desc'
+  - 'https://kp.m-team.cc/music.php?sort=4&type=desc'
+  web_timeout: 15
+  cookies:
+    tp: ''
+  user_agent: 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36'
+  proxies: {}
+  path: ''
+  fetch_interval: 300
+  retry_interval: 30
+  retry_count_max: 2
+  regexp:
+  - '.*'
+  publish_within: 660
+  free_only: true
+  free_time_min: 21000
+  exclude_hr: false
+  ignore_hr_seeding: false
+  ignore_hr_leeching: true
+  size:
+  - [10, 100]
+  seeder: [0, 5]
+  leecher: [0, 5000]
+  snatch: [0, 5]
+  extra_options: {}
+  seed_by_size: true
+  seed_time_par: 1.0
+  seed_delay_hr: 1800
+  seed_ratio_hr: null
+  life: 259200
+  priority: 3
+  timezone: +8
+OpenCD:
+  rss: 'https://open.cd/torrentrss.php?rows=50&isize=1&linktype=dl&passkey='
+  rss_timeout: 15
+  web:
+  - 'https://open.cd/torrents.php?sort=4&type=desc'
+  web_timeout: 15
+  cookies:
+    c_secure_login: ''
+    c_secure_pass: ''
+    c_secure_ssl: ''
+    c_secure_tracker_ssl: ''
+    c_secure_uid: ''
+  user_agent: 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36'
+  proxies: {}
+  path: ''
+  fetch_interval: 60
+  retry_interval: 10
+  retry_count_max: 2
+  regexp:
+  - '.*'
+  publish_within: 660
+  free_only: true
+  free_time_min: 21000
+  exclude_hr: false
+  ignore_hr_seeding: false
+  ignore_hr_leeching: true
+  size:
+  - [0, 100]
+  seeder: [0, 5]
+  leecher: [0, 5000]
+  snatch: [0, 5]
+  extra_options: {}
+  seed_by_size: true
+  seed_time_par: 1.0
+  seed_delay_hr: 1800
+  seed_ratio_hr: null
+  life: 259200
+  priority: 4
+  timezone: +8
+OurBits:
+  rss: 'https://ourbits.club/torrentrss.php?rows=50&isize=1&https=1&linktype=dl&passkey='
+  rss_timeout: 15
+  web:
+  - 'https://ourbits.club/torrents.php?sort=4&type=desc'
+  web_timeout: 15
+  cookies:
+    ourbits_jwt: ''
+  user_agent: 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36'
+  proxies: {}
+  path: ''
+  fetch_interval: 300
+  retry_interval: 30
+  retry_count_max: 2
+  regexp:
+  - '(-|@)(Our|iLove|PbK|FLTTH)'
+  publish_within: 660
+  free_only: true
+  free_time_min: 21000
+  exclude_hr: false
+  ignore_hr_seeding: false
+  ignore_hr_leeching: true
+  size:
+  - [10, 100]
+  seeder: [0, 5]
+  leecher: [0, 5000]
+  snatch: [0, 5]
+  extra_options: {}
+  seed_by_size: true
+  seed_time_par: 1.0
+  seed_delay_hr: 1800
+  seed_ratio_hr: 1.0
+  life: 259200
+  priority: 5
+  timezone: +8
+SSD:
+  rss: 'https://springsunday.net/torrentrss.php?rows=50&isize=1&https=1&linktype=dl&passkey='
+  rss_timeout: 15
+  web:
+  - 'https://springsunday.net/torrents.php?sort=4&type=desc'
+  web_timeout: 15
+  cookies:
+    SPRINGID: ''
+  user_agent: 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36'
+  proxies: {}
+  path: ''
+  fetch_interval: 300
+  retry_interval: 30
+  retry_count_max: 2
+  regexp:
+  - '(-|@)CMCT'
+  publish_within: 660
+  free_only: true
+  free_time_min: 21000
+  exclude_hr: false
+  ignore_hr_seeding: false
+  ignore_hr_leeching: true
+  size:
+  - [10, 100]
+  seeder: [0, 5]
+  leecher: [0, 5000]
+  snatch: [0, 5]
+  extra_options: {}
+  seed_by_size: true
+  seed_time_par: 1.0
+  seed_delay_hr: 1800
+  seed_ratio_hr: null
+  life: 259200
+  priority: 6
+  timezone: +8
+TTG:
+  rss: 'https://totheglory.im/putrss.php?ssl=yes&par='
+  rss_timeout: 15
+  web:
+  - 'https://totheglory.im/browse.php?c=M&sort=4&type=desc'
+  - 'https://totheglory.im/browse.php?c=G&sort=4&type=desc'
+  web_timeout: 15
+  cookies:
+    laccess: ''
+    pass: ''
+    uid: ''
+  user_agent: 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36'
+  proxies: {}
+  path: ''
+  fetch_interval: 300
+  retry_interval: 30
+  retry_count_max: 2
+  regexp:
+  - '(-|@)(WiKi|NGB|DoA|ARiN)'
+  publish_within: 660
+  free_only: true
+  free_time_min: 21000
+  exclude_hr: false
+  ignore_hr_seeding: false
+  ignore_hr_leeching: true
+  size:
+  - [10, 100]
+  seeder: [0, 5]
+  leecher: [0, 5000]
+  snatch: [0, 5]
+  extra_options: {}
+  seed_by_size: true
+  seed_time_par: 1.0
+  seed_delay_hr: 1800
+  seed_ratio_hr: 1.0
+  life: 259200
+  priority: 7
   timezone: +8
 U2:
   rss: 'https://u2.dmhy.org/torrentrss.php?rows=50&isize=1&trackerssl=1&linktype=dl&passkey='
@@ -100,14 +291,16 @@ U2:
   fetch_interval: 300
   retry_interval: 30
   retry_count_max: 2
-  regexp: '.*'
+  regexp:
+  - '.*'
   publish_within: 660
   free_only: true
   free_time_min: 21000
   exclude_hr: false
   ignore_hr_seeding: false
   ignore_hr_leeching: true
-  size: [10, 100]
+  size:
+  - [10, 100]
   seeder: [0, 5]
   leecher: [0, 5000]
   snatch: [0, 5]
@@ -117,5 +310,5 @@ U2:
   seed_delay_hr: 1800
   seed_ratio_hr: null
   life: 259200
-  priority: 3
+  priority: 8
   timezone: +8

@@ -8,11 +8,11 @@ from bs4 import BeautifulSoup
 from utils import *
 
 
-def CHDBits(config):
+def OurBits(config):
     response = requests.get(
-        config["CHDBits"]["rss"],
-        proxies=config["CHDBits"]["proxies"],
-        timeout=config["CHDBits"]["rss_timeout"],
+        config["OurBits"]["rss"],
+        proxies=config["OurBits"]["proxies"],
+        timeout=config["OurBits"]["rss_timeout"],
     )
     if response.status_code == 200:
         feed = feedparser.parse(response.text)
@@ -20,7 +20,7 @@ def CHDBits(config):
         raise Exception
     torrents = {
         re.search("id=(\d+)", entry["link"]).group(1): {
-            "site": "CHDBits",
+            "site": "OurBits",
             "title": re.match("(.+)\[.+\]$", entry["title"]).group(1),
             "size": size_G(re.search("\[([\w\.\s]+)\]$", entry["title"]).group(1)),
             "publish_time": time.mktime(entry["published_parsed"]) - time.timezone,
@@ -30,18 +30,18 @@ def CHDBits(config):
     }
     torrents = dict(
         filter(
-            lambda torrent: filter_regexp(torrent[1], config["CHDBits"]["regexp"])
-            and filter_size(torrent[1], config["CHDBits"]["size"]),
+            lambda torrent: filter_regexp(torrent[1], config["OurBits"]["regexp"])
+            and filter_size(torrent[1], config["OurBits"]["size"]),
             torrents.items(),
         )
     )
-    for web in config["CHDBits"]["web"]:
+    for web in config["OurBits"]["web"]:
         response = requests.get(
             web,
-            headers={"user-agent": config["CHDBits"]["user_agent"]},
-            cookies=config["CHDBits"]["cookies"],
-            proxies=config["CHDBits"]["proxies"],
-            timeout=config["CHDBits"]["web_timeout"],
+            headers={"user-agent": config["OurBits"]["user_agent"]},
+            cookies=config["OurBits"]["cookies"],
+            proxies=config["OurBits"]["proxies"],
+            timeout=config["OurBits"]["web_timeout"],
         )
         if response.status_code == 200:
             soup = BeautifulSoup(response.text, "lxml")
@@ -74,22 +74,20 @@ def CHDBits(config):
                                     )
                                 )
                                 - time.timezone
-                                - config["CHDBits"]["timezone"] * 3600
+                                - config["OurBits"]["timezone"] * 3600
                             )
-                        hr = cols[1].find("div", class_="circle-text")
-                        if hr != None:
-                            web_info["hr"] = int(re.sub("\D", "", hr.text)) * 86400
+                        # TODO: H&R
+                        if cols[1].find("div", class_="progressBar") != None:
+                            web_info["downloaded"] = True
                         web_info["seeder"] = int(re.sub("\D", "", cols[5].text))
                         web_info["leecher"] = int(re.sub("\D", "", cols[6].text))
                         web_info["snatch"] = int(re.sub("\D", "", cols[7].text))
-                        if re.search("\d", cols[9].text) != None:
-                            web_info["downloaded"] = True
                         torrents[id] = dict(torrents[id], **web_info)
         else:
             raise Exception
         time.sleep(1)
     return {
-        "[CHDBits]" + id: torrent
+        "[OurBits]" + id: torrent
         for id, torrent in torrents.items()
         if "downloaded" in torrent
     }

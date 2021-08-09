@@ -152,9 +152,9 @@ def task_processor():
                 torrent_pool = dict(
                     sorted(
                         torrent_pool.items(),
-                        key=lambda torrent: torrent[1][
-                            key if key != "site" else "priority"
-                        ],
+                        key=lambda torrent: torrent[1][key]
+                        if key != "site"
+                        else config[torrent[1]["site"]]["priority"],
                         reverse=config["sort_by"][key],
                     )
                 )
@@ -178,7 +178,7 @@ def task_processor():
                         <= torrent["snatch"]
                         <= config[site]["snatch"][1]
                         and (
-                            time.mktime(time.localtime()) - torrent["publish_at"]
+                            time.mktime(time.localtime()) - torrent["publish_time"]
                             <= config[site]["publish_within"]
                         )
                         and client.total_size + torrent["size"] <= config["space"]
@@ -197,13 +197,13 @@ def task_processor():
                         and not (config[site]["exclude_hr"] and torrent["hr"] != None)
                     ):
                         client.add_torrent(torrent, name, logger)
-                        time.sleep(10 if config["client"] == "qbittorrent" else 1)
+                        time.sleep(10 if config["client"] == "qbittorrent" else 2)
                 except Exception:
                     print_t(
                         f'添加种子（{name}）（{torrent["size"]:.2f}GB）可能已失败，尝试添加其他种子…',
                         logger=logger,
                     )
-                    time.sleep(10 if config["client"] == "qbittorrent" else 1)
+                    time.sleep(10 if config["client"] == "qbittorrent" else 2)
             lock.release()
             time.sleep(config["run_interval"])
         except Exception:

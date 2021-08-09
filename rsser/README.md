@@ -4,6 +4,17 @@
 
 这个小东西是配合 [Deluge](https://github.com/deluge-torrent/deluge) [qBittorrent](https://github.com/qbittorrent/qBittorrent) 玩一些 PT 站用的
 
+目前支持的站点：
+
+- [x] CHDBits
+- [x] HDSky
+- [x] M-Team
+- [x] OpenCD
+- [ ] OurBits（H&R 检测暂未实现）
+- [x] SSD
+- [x] TTG
+- [x] U2
+
 ---
 
 ### 依赖
@@ -63,14 +74,16 @@ sort_by: #给种子信息排序的关键字，以下关键字可自由组合（�
   fetch_interval: 300 #获取种子信息的时间间隔（单位：秒）
   retry_interval: 30 #获取种子失败时重试的时间间隔（单位：秒）
   retry_count_max: 2 #添加任务失败时重试的最大次数
-  regexp: '' #用于根据标题筛选种子的正则表达式
+  regexp: #用于根据标题筛选种子的正则表达式列表，将保留标题匹配任一表达式的种子
+  - '.*'
   publish_within: 660 #发布时间在该值（单位：秒）之前的种子将被忽略（考虑到程序延迟，建议略大于期望值）
   free_only: true #若该值为 true，则非免费的种子将被忽略，下载中的免费到期的种子将被移除（是否规避 H&R 将由 ignore_hr_leeching 的值决定）
   free_time_min: 21000 #仅当 free_only 的值为 true 时有效，免费时长小于该值（单位：秒）的种子将被忽略（考虑到程序延迟，建议略小于期望值）
   exclude_hr: false #若该值为 true，则带有 H&R 要求的种子将被忽略
   ignore_hr_seeding: false #若该值为 true，则做种中的种子的 H&R 要求将被忽略
   ignore_hr_leeching: true #若该值为 true，则下载中的种子的 H&R 要求将被忽略
-  size: [10, 100] #体积不在该范围（单位：GB）内的种子将被忽略
+  size: #体积不在以下任一范围（单位：GB）内的种子将被忽略
+  - [0, 100]
   seeder: [0, 5] #做种人数不在该范围内的种子将被忽略
   leecher: [0, 5000] #下载人数不在该范围内的种子将被忽略
   snatch: [0, 5] #完成人数不在该范围内的种子将被忽略

@@ -21,7 +21,7 @@ def U2(config):
     torrents = {
         re.search("id=(\d+)", entry["link"]).group(1): {
             "site": "U2",
-            "title": entry["title"],
+            "title": re.match("(.+)\[.+\]$", entry["title"]).group(1),
             "size": size_G(re.search("\[([\w\.\s]+)\]$", entry["title"]).group(1)),
             "link": entry["links"][1]["href"],
         }
@@ -29,10 +29,8 @@ def U2(config):
     }
     torrents = dict(
         filter(
-            lambda torrent: config["U2"]["size"][0]
-            <= torrent[1]["size"]
-            <= config["U2"]["size"][1]
-            and re.search(config["U2"]["regexp"], torrent[1]["title"]) != None,
+            lambda torrent: filter_regexp(torrent[1], config["U2"]["regexp"])
+            and filter_size(torrent[1], config["U2"]["size"]),
             torrents.items(),
         )
     )
@@ -55,7 +53,7 @@ def U2(config):
                     id = re.search("id=(\d+)", str(cols[1])).group(1)
                     if id in torrents:
                         web_info = {
-                            "publish_at": -1,
+                            "publish_time": -1,
                             "free": False,
                             "free_end": None,
                             "hr": None,
@@ -85,7 +83,7 @@ def U2(config):
                                 - time.timezone
                                 - config["U2"]["timezone"] * 3600
                             )
-                        web_info["publish_at"] = (
+                        web_info["publish_time"] = (
                             time.mktime(
                                 time.strptime(
                                     re.search(

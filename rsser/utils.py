@@ -31,6 +31,20 @@ def size_G(size_str):
         return float(size[0]) * 1024
 
 
+def filter_regexp(torrent, patterns):
+    for pattern in patterns:
+        if re.search(pattern, torrent["title"]) != None:
+            return True
+    return False
+
+
+def filter_size(torrent, ranges):
+    for range in ranges:
+        if range[0] <= torrent["size"] <= range[1]:
+            return True
+    return False
+
+
 def yaml_read(file_name):
     try:
         with open(file_name, "r", encoding="utf-8") as file:

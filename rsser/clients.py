@@ -205,8 +205,8 @@ class qbittorrent:
                     "/api/v2/torrents/trackers", {"hash": stats["hash"]}, True
                 )
                 trackers = json.loads(response.text) if response.text != "" else []
-                for i in range(3, len(trackers)):
-                    tracker_status += trackers[i]["msg"]
+                for tracker in trackers[3:]:
+                    tracker_status += tracker["msg"]
             self.tasks[name]["tracker_status"] = tracker_status
         self.total_size = (
             sum([task["size"] for _, task in self.tasks.items()]) / 1073741824
