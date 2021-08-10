@@ -10,13 +10,10 @@ from utils import *
 
 def MTeam(config):
     def epoch(duration):
-        durs = re.search("(?:(\d+)[日|D])*(?:(\d+)[時|H])*(?:(\d+)[分|M])*", duration)
-        if durs != None:
-            durs = durs.groups()
-        day = int(durs[0]) if durs[0] != None else 0
-        hour = int(durs[1]) if durs[1] != None else 0
-        min = int(durs[2]) if durs[2] != None else 0
-        return time.mktime(time.localtime()) + day * 86400 + hour * 3600 + min * 60
+        dur = re.sub("日|D", "*86400+", re.sub("\W", "", duration))
+        dur = re.sub("時|H", "*3600+", dur)
+        dur = re.sub("分|M", "*60+", dur)
+        return time.mktime(time.localtime()) + eval(dur[:-1])
 
     response = requests.get(
         config["MTeam"]["rss"],
