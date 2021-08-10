@@ -83,7 +83,7 @@ class deluge:
             if torrent["free_end"] == None
             else time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(torrent["free_end"]))
         )
-        text = f"""添加种子（{name}）\
+        text = f"""添加种子{name}\
 ，免费：{"是" if torrent["free"] else "否"}\
 ，到期时间：{free_end}\
 ，H&R：{"无" if torrent["hr"] == None else f'{torrent["hr"] / 3600:.2f}小时'}\
@@ -116,7 +116,7 @@ class deluge:
 
     def remove_torrent(self, torrent, name, info, logger):
         self.flush()
-        text = f'删除种子（{name}）\
+        text = f'删除种子{name}\
 ，原因：{info}\
 ，体积：{torrent["size"]:.2f}GB\
 ，总体积：{self.total_size - self.tasks[name]["size"] / 1073741824 + 0:.2f}GB\
@@ -220,7 +220,7 @@ class qbittorrent:
             if torrent["free_end"] == None
             else time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(torrent["free_end"]))
         )
-        text = f"""添加种子（{name}）\
+        text = f"""添加种子{name}\
 ，免费：{"是" if torrent["free"] else "否"}\
 ，到期时间：{free_end}\
 ，H&R：{"无" if torrent["hr"] == None else f'{torrent["hr"] / 3600:.2f}小时'}\
@@ -247,7 +247,7 @@ class qbittorrent:
 
     def remove_torrent(self, torrent, name, info, logger):
         self.flush()
-        text = f'删除种子（{name}）\
+        text = f'删除种子{name}\
 ，原因：{info}\
 ，体积：{torrent["size"]:.2f}GB\
 ，总体积：{self.total_size - self.tasks[name]["size"] / 1073741824 + 0:.2f}GB\

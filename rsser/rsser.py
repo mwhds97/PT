@@ -138,7 +138,7 @@ def task_processor():
                         time.sleep(5 if config["client"] == "qbittorrent" else 1)
                 except Exception:
                     print_t(
-                        f'删除种子（{name}）（{torrent["size"]:.2f}GB）可能已失败，尝试删除其他种子…',
+                        f'删除种子{name}（{torrent["size"]:.2f}GB）可能已失败，尝试删除其他种子…',
                         logger=logger,
                     )
                     time.sleep(5 if config["client"] == "qbittorrent" else 1)
@@ -200,7 +200,7 @@ def task_processor():
                         time.sleep(10 if config["client"] == "qbittorrent" else 2)
                 except Exception:
                     print_t(
-                        f'添加种子（{name}）（{torrent["size"]:.2f}GB）可能已失败，尝试添加其他种子…',
+                        f'添加种子{name}（{torrent["size"]:.2f}GB）可能已失败，尝试添加其他种子…',
                         logger=logger,
                     )
                     time.sleep(10 if config["client"] == "qbittorrent" else 2)
@@ -230,7 +230,7 @@ def torrent_fetcher(site):
             except Exception:
                 if lock.locked():
                     lock.release()
-                print_t(f"[{site}]获取种子信息失败，正在重试…", True, logger)
+                print_t(f"[{site}]获取种子信息失败，正在重试…", logger=logger)
                 time.sleep(config[site]["retry_interval"])
 
     return template
