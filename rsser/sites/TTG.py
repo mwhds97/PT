@@ -86,6 +86,8 @@ def TTG(config):
                                 != None
                                 else 216000
                             )
+                        if cols[1].find("div", class_="process") != None:
+                            web_info["downloaded"] = True
                         web_info["snatch"] = int(re.sub("\D", "", cols[7].text))
                         seeder_leecher = re.sub("[^\d/]", "", cols[8].text).split("/")
                         web_info["seeder"] = int(seeder_leecher[0])
