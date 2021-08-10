@@ -55,12 +55,12 @@ task_count_max: 10 #同时进行的最大任务数量（所有状态的任务都
 run_interval: 30 #执行任务处理（包括添加、移除种子等）流程的时间间隔（单位：秒）
 torrent_pool_size: 1000 #保留信息的种子数量，若获取过的种子总数超过该值，最早获取的种子信息将被删除（找不到种子信息的任务将无法被处理）
 sort_by: #给种子信息排序的关键字，以下关键字可自由组合（若无需排序请设置为 {}），顺序决定优先级，值为 true 或 false 表示升序或降序排序
-  size: true #按种子的体积排序
-  publish_time: true #按种子的发布时间排序
-  seeder: false #按做种人数排序
-  leecher: true #按下载人数排序
-  snatch: false #按完成人数排序
-  site: false #按站点的 priority 设定排序
+  size: true #按种子的体积降序排序
+  publish_time: true #按种子的发布时间降序排序
+  seeder: false #按做种人数升序排序
+  leecher: true #按下载人数降序排序
+  snatch: false #按完成人数升序排序
+  site: false #按站点的 priority 值升序排序
 站点1:
   rss: '' #站点的 RSS 地址，要求包含大小信息，即 isize=1
   rss_timeout: 15 #获取站点 RSS 信息的超时阈值（单位：秒）
