@@ -196,7 +196,10 @@ def task_processor():
                                 )
                             )
                         )
-                        and not (config[site]["exclude_hr"] and torrent["hr"] != None)
+                        and (
+                            torrent["hr"] == None
+                            or torrent["hr"] <= config[site]["hr_time_max"]
+                        )
                     ):
                         client.add_torrent(torrent, name, logger)
                         time.sleep(10 if config["client"] == "qbittorrent" else 2)

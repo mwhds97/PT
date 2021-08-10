@@ -79,7 +79,7 @@ sort_by: #给种子信息排序的关键字，以下关键字可自由组合（�
   publish_within: 660 #发布时间在该值（单位：秒）之前的种子将被忽略（考虑到程序延迟，建议略大于期望值）
   free_only: true #若该值为 true，则非免费的种子将被忽略，下载中的免费到期的种子将被移除（是否规避 H&R 将由 ignore_hr_leeching 的值决定）
   free_time_min: 21000 #仅当 free_only 的值为 true 时有效，免费时长小于该值（单位：秒）的种子将被忽略（考虑到程序延迟，建议略小于期望值）
-  exclude_hr: false #若该值为 true，则带有 H&R 要求的种子将被忽略
+  hr_time_max: 432000 #H&R 要求做种时间超过该值（单位：秒）的种子将被忽略
   ignore_hr_seeding: false #若该值为 true，则做种中的种子的 H&R 要求将被忽略
   ignore_hr_leeching: true #若该值为 true，则下载中的种子的 H&R 要求将被忽略
   size: #体积不在以下任一范围（单位：GB）内的种子将被忽略
