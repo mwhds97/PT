@@ -142,6 +142,8 @@ def task_processor():
                         logger=logger,
                     )
                     time.sleep(5 if config["client"] == "qbittorrent" else 1)
+                    client.flush()
+                    time.sleep(1)
             torrent_pool = {
                 name: torrent
                 for name, torrent in torrent_pool.items()
@@ -204,6 +206,8 @@ def task_processor():
                         logger=logger,
                     )
                     time.sleep(10 if config["client"] == "qbittorrent" else 2)
+                    client.flush()
+                    time.sleep(1)
             lock.release()
             time.sleep(config["run_interval"])
         except Exception:
