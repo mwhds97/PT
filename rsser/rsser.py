@@ -6,6 +6,7 @@ import sys
 import threading
 import time
 from collections import deque
+from copy import deepcopy
 
 from clients import *
 from sites import *
@@ -17,7 +18,8 @@ def uncaught_exception_handler(type, value, traceback):
     lock.acquire()
     yaml_dump(torrent_pool, os.path.join(script_dir, "torrent_pool.yaml"))
     yaml_dump(list(name_queue), os.path.join(script_dir, "name_queue.yaml"))
-    lock.release()
+    if lock.locked():
+        lock.release()
     print_t("正在停止…", logger=logger)
     logger.close()
     sys.exit(0)
@@ -31,7 +33,8 @@ def SIGINT_handler(signum, frame):
     lock.acquire()
     yaml_dump(torrent_pool, os.path.join(script_dir, "torrent_pool.yaml"))
     yaml_dump(list(name_queue), os.path.join(script_dir, "name_queue.yaml"))
-    lock.release()
+    if lock.locked():
+        lock.release()
     print_t("正在停止…", logger=logger)
     logger.close()
     sys.exit(0)
@@ -69,15 +72,18 @@ def task_processor():
     global torrent_pool
     while True:
         try:
+            lock.acquire()
+            pool = deepcopy(torrent_pool)
+            if lock.locked():
+                lock.release()
             client.flush()
             print_t("客户端连接正常，正在等候任务…", True)
             time.sleep(1)
-            lock.acquire()
             for name, stats in client.tasks.items():
                 try:
                     to_remove = False
-                    if name in torrent_pool:
-                        torrent = torrent_pool[name]
+                    if name in pool:
+                        torrent = pool[name]
                         site = torrent["site"]
                         if "registered" in stats["tracker_status"]:
                             to_remove = True
@@ -137,6 +143,7 @@ def task_processor():
                     time.sleep(5 if config["client"] == "qbittorrent" else 1)
                     client.flush()
                     time.sleep(1)
+            lock.acquire()
             torrent_pool = {
                 name: torrent
                 for name, torrent in torrent_pool.items()
@@ -153,9 +160,12 @@ def task_processor():
                         reverse=config["sort_by"][key],
                     )
                 )
+            pool = deepcopy(torrent_pool)
+            if lock.locked():
+                lock.release()
             client.flush()
             time.sleep(1)
-            for name, torrent in torrent_pool.items():
+            for name, torrent in pool.items():
                 try:
                     site = torrent["site"]
                     if (
@@ -201,10 +211,14 @@ def task_processor():
                         f'添加种子{name}（{torrent["size"]:.2f}GB）可能已失败，尝试添加其他种子…',
                         logger=logger,
                     )
+                    lock.acquire()
+                    if name in torrent_pool:
+                        torrent_pool[name]["retry_count"] = torrent["retry_count"]
+                    if lock.locked():
+                        lock.release()
                     time.sleep(10 if config["client"] == "qbittorrent" else 2)
                     client.flush()
                     time.sleep(1)
-            lock.release()
             time.sleep(config["run_interval"])
         except Exception:
             if lock.locked():
@@ -225,7 +239,8 @@ def torrent_fetcher(site):
                     else:
                         torrent_pool[name] = dict(torrent, **{"retry_count": 0})
                         name_queue.append(name)
-                lock.release()
+                if lock.locked():
+                    lock.release()
                 time.sleep(config[site]["fetch_interval"])
             except Exception:
                 if lock.locked():
