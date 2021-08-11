@@ -2,7 +2,7 @@
 
 ### 简介
 
-这个小东西是配合 [Deluge](https://github.com/deluge-torrent/deluge) [qBittorrent](https://github.com/qbittorrent/qBittorrent) （4.3.4 以上版本）玩一些 PT 站用的
+这个小东西是配合 [Deluge](https://github.com/deluge-torrent/deluge)（1.3.x 以上版本）或 [qBittorrent](https://github.com/qbittorrent/qBittorrent) （4.3.4 以上版本）玩一些 PT 站用的
 
 目前支持的站点：
 
