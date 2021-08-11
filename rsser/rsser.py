@@ -100,7 +100,7 @@ def task_processor():
                                     info = "免费失效"
                                 for condition in config[site]["remove_conditions"]:
                                     if "L" in condition["period"] and eval(
-                                        generate_exp(condition)
+                                        generate_exp(condition["exp"])
                                     ):
                                         to_remove = True
                                         info = condition["info"]
@@ -121,7 +121,7 @@ def task_processor():
                             if stats["seeding_time"] >= hr_time:
                                 for condition in config[site]["remove_conditions"]:
                                     if "S" in condition["period"] and eval(
-                                        generate_exp(condition)
+                                        generate_exp(condition["exp"])
                                     ):
                                         to_remove = True
                                         info = condition["info"]
