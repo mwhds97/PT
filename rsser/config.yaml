@@ -35,22 +35,26 @@ CHDBits:
   - '@CHD'
   - '(-|@)OneHD'
   publish_within: 660
-  free_only: true
-  free_time_min: 21000
-  hr_time_max: 432000
-  ignore_hr_seeding: false
-  ignore_hr_leeching: true
   size:
   - [10, 100]
   seeder: [0, 5]
   leecher: [0, 5000]
   snatch: [0, 5]
+  free_only: true
+  free_time_min: 21000
+  hr_time_max: 432000
+  hr_seed_delay: 1800
+  hr_seed_ratio: null
+  ignore_hr_seeding: false
+  ignore_hr_leeching: true
   extra_options: {}
-  seed_by_size: true
-  seed_time_par: 1.0
-  seed_delay_hr: 1800
-  seed_ratio_hr: null
-  life: 259200
+  remove_conditions:
+  - info: '活动时长超过限制'
+    exp: 'active_time >= 259200'
+    period: [L, S]
+  - info: '做种时长达到要求'
+    exp: 'seeding_time >= size / 1073741824 * 1.0 * 60'
+    period: [S]
   priority: 1
   timezone: +8
 HDSky:
@@ -75,22 +79,26 @@ HDSky:
   - '(-|@)HDS'
   - 'WOWOW|NHK|TVAsahi'
   publish_within: 660
-  free_only: true
-  free_time_min: 21000
-  hr_time_max: 432000
-  ignore_hr_seeding: false
-  ignore_hr_leeching: true
   size:
   - [10, 100]
   seeder: [0, 5]
   leecher: [0, 5000]
   snatch: [0, 5]
+  free_only: true
+  free_time_min: 21000
+  hr_time_max: 432000
+  hr_seed_delay: 1800
+  hr_seed_ratio: null
+  ignore_hr_seeding: false
+  ignore_hr_leeching: true
   extra_options: {}
-  seed_by_size: true
-  seed_time_par: 1.0
-  seed_delay_hr: 1800
-  seed_ratio_hr: null
-  life: 259200
+  remove_conditions:
+  - info: '活动时长超过限制'
+    exp: 'active_time >= 259200'
+    period: [L, S]
+  - info: '做种时长达到要求'
+    exp: 'seeding_time >= size / 1073741824 * 1.0 * 60'
+    period: [S]
   priority: 2
   timezone: +8
 MTeam:
@@ -112,22 +120,26 @@ MTeam:
   regexp:
   - '.*'
   publish_within: 660
-  free_only: true
-  free_time_min: 21000
-  hr_time_max: 432000
-  ignore_hr_seeding: false
-  ignore_hr_leeching: true
   size:
   - [10, 100]
   seeder: [0, 5]
   leecher: [0, 5000]
   snatch: [0, 5]
+  free_only: true
+  free_time_min: 21000
+  hr_time_max: 432000
+  hr_seed_delay: 1800
+  hr_seed_ratio: null
+  ignore_hr_seeding: false
+  ignore_hr_leeching: true
   extra_options: {}
-  seed_by_size: true
-  seed_time_par: 1.0
-  seed_delay_hr: 1800
-  seed_ratio_hr: null
-  life: 259200
+  remove_conditions:
+  - info: '活动时长超过限制'
+    exp: 'active_time >= 259200'
+    period: [L, S]
+  - info: '做种时长达到要求'
+    exp: 'seeding_time >= size / 1073741824 * 1.0 * 60'
+    period: [S]
   priority: 3
   timezone: +8
 OpenCD:
@@ -151,22 +163,26 @@ OpenCD:
   regexp:
   - '.*'
   publish_within: 660
-  free_only: true
-  free_time_min: 21000
-  hr_time_max: 432000
-  ignore_hr_seeding: false
-  ignore_hr_leeching: true
   size:
   - [0, 100]
   seeder: [0, 5]
   leecher: [0, 5000]
   snatch: [0, 5]
+  free_only: true
+  free_time_min: 21000
+  hr_time_max: 432000
+  hr_seed_delay: 1800
+  hr_seed_ratio: null
+  ignore_hr_seeding: false
+  ignore_hr_leeching: true
   extra_options: {}
-  seed_by_size: true
-  seed_time_par: 1.0
-  seed_delay_hr: 1800
-  seed_ratio_hr: null
-  life: 259200
+  remove_conditions:
+  - info: '活动时长超过限制'
+    exp: 'active_time >= 259200'
+    period: [L, S]
+  - info: '做种时长达到要求'
+    exp: 'seeding_time >= size / 1073741824 * 1.0 * 60'
+    period: [S]
   priority: 4
   timezone: +8
 OurBits:
@@ -186,22 +202,26 @@ OurBits:
   regexp:
   - '(-|@)(Our|iLove|PbK|FLTTH)'
   publish_within: 660
-  free_only: true
-  free_time_min: 21000
-  hr_time_max: 432000
-  ignore_hr_seeding: false
-  ignore_hr_leeching: true
   size:
   - [10, 100]
   seeder: [0, 5]
   leecher: [0, 5000]
   snatch: [0, 5]
+  free_only: true
+  free_time_min: 21000
+  hr_time_max: 432000
+  hr_seed_delay: 1800
+  hr_seed_ratio: 1.0
+  ignore_hr_seeding: false
+  ignore_hr_leeching: true
   extra_options: {}
-  seed_by_size: true
-  seed_time_par: 1.0
-  seed_delay_hr: 1800
-  seed_ratio_hr: 1.0
-  life: 259200
+  remove_conditions:
+  - info: '活动时长超过限制'
+    exp: 'active_time >= 259200'
+    period: [L, S]
+  - info: '做种时长达到要求'
+    exp: 'seeding_time >= size / 1073741824 * 1.0 * 60'
+    period: [S]
   priority: 5
   timezone: +8
 SSD:
@@ -221,22 +241,26 @@ SSD:
   regexp:
   - '(-|@)CMCT'
   publish_within: 660
-  free_only: true
-  free_time_min: 21000
-  hr_time_max: 432000
-  ignore_hr_seeding: false
-  ignore_hr_leeching: true
   size:
   - [10, 100]
   seeder: [0, 5]
   leecher: [0, 5000]
   snatch: [0, 5]
+  free_only: true
+  free_time_min: 21000
+  hr_time_max: 432000
+  hr_seed_delay: 1800
+  hr_seed_ratio: null
+  ignore_hr_seeding: false
+  ignore_hr_leeching: true
   extra_options: {}
-  seed_by_size: true
-  seed_time_par: 1.0
-  seed_delay_hr: 1800
-  seed_ratio_hr: null
-  life: 259200
+  remove_conditions:
+  - info: '活动时长超过限制'
+    exp: 'active_time >= 259200'
+    period: [L, S]
+  - info: '做种时长达到要求'
+    exp: 'seeding_time >= size / 1073741824 * 1.0 * 60'
+    period: [S]
   priority: 6
   timezone: +8
 TTG:
@@ -259,22 +283,26 @@ TTG:
   regexp:
   - '(-|@)(WiKi|NGB|DoA|ARiN)'
   publish_within: 660
-  free_only: true
-  free_time_min: 21000
-  hr_time_max: 432000
-  ignore_hr_seeding: false
-  ignore_hr_leeching: true
   size:
   - [10, 100]
   seeder: [0, 5]
   leecher: [0, 5000]
   snatch: [0, 5]
+  free_only: true
+  free_time_min: 21000
+  hr_time_max: 432000
+  hr_seed_delay: 1800
+  hr_seed_ratio: 1.0
+  ignore_hr_seeding: false
+  ignore_hr_leeching: true
   extra_options: {}
-  seed_by_size: true
-  seed_time_par: 1.0
-  seed_delay_hr: 1800
-  seed_ratio_hr: 1.0
-  life: 259200
+  remove_conditions:
+  - info: '活动时长超过限制'
+    exp: 'active_time >= 259200'
+    period: [L, S]
+  - info: '做种时长达到要求'
+    exp: 'seeding_time >= size / 1073741824 * 1.0 * 60'
+    period: [S]
   priority: 7
   timezone: +8
 U2:
@@ -294,21 +322,25 @@ U2:
   regexp:
   - '.*'
   publish_within: 660
-  free_only: true
-  free_time_min: 21000
-  hr_time_max: 432000
-  ignore_hr_seeding: false
-  ignore_hr_leeching: true
   size:
   - [10, 100]
   seeder: [0, 5]
   leecher: [0, 5000]
   snatch: [0, 5]
+  free_only: true
+  free_time_min: 21000
+  hr_time_max: 432000
+  hr_seed_delay: 1800
+  hr_seed_ratio: null
+  ignore_hr_seeding: false
+  ignore_hr_leeching: true
   extra_options: {}
-  seed_by_size: true
-  seed_time_par: 1.0
-  seed_delay_hr: 1800
-  seed_ratio_hr: null
-  life: 259200
+  remove_conditions:
+  - info: '活动时长超过限制'
+    exp: 'active_time >= 259200'
+    period: [L, S]
+  - info: '做种时长达到要求'
+    exp: 'seeding_time >= size / 1073741824 * 1.0 * 60'
+    period: [S]
   priority: 8
   timezone: +8

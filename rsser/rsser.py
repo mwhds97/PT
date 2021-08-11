@@ -98,9 +98,13 @@ def task_processor():
                                 ):
                                     to_remove = True
                                     info = "免费失效"
-                                if stats["active_time"] >= config[site]["life"]:
-                                    to_remove = True
-                                    info = "活动时长超过限制"
+                                for condition in config[site]["remove_conditions"]:
+                                    if "L" in condition["period"] and eval(
+                                        generate_exp(condition)
+                                    ):
+                                        to_remove = True
+                                        info = condition["info"]
+                                        break
                         else:
                             if (
                                 config[site]["ignore_hr_seeding"]
@@ -108,31 +112,20 @@ def task_processor():
                             ):
                                 hr_time = 0
                             elif (
-                                config[site]["seed_ratio_hr"] != None
-                                and stats["ratio"] >= config[site]["seed_ratio_hr"]
+                                config[site]["hr_seed_ratio"] != None
+                                and stats["ratio"] >= config[site]["hr_seed_ratio"]
                             ):
-                                hr_time = config[site]["seed_delay_hr"]
+                                hr_time = config[site]["hr_seed_delay"]
                             else:
-                                hr_time = torrent["hr"] + config[site]["seed_delay_hr"]
+                                hr_time = torrent["hr"] + config[site]["hr_seed_delay"]
                             if stats["seeding_time"] >= hr_time:
-                                if stats["active_time"] >= config[site]["life"]:
-                                    to_remove = True
-                                    info = "活动时长超过限制"
-                                if config[site]["seed_by_size"]:
-                                    if (
-                                        stats["seeding_time"]
-                                        >= config[site]["seed_time_par"]
-                                        * torrent["size"]
-                                        * 60
+                                for condition in config[site]["remove_conditions"]:
+                                    if "S" in condition["period"] and eval(
+                                        generate_exp(condition)
                                     ):
                                         to_remove = True
-                                        info = "做种时长（弹性）达到要求"
-                                elif (
-                                    stats["seeding_time"]
-                                    >= config[site]["seed_time_par"]
-                                ):
-                                    to_remove = True
-                                    info = "做种时长（固定）达到要求"
+                                        info = condition["info"]
+                                        break
                     if to_remove:
                         client.remove_torrent(torrent, name, info, logger)
                         time.sleep(5 if config["client"] == "qbittorrent" else 1)

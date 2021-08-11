@@ -45,6 +45,26 @@ def filter_size(torrent, ranges):
     return False
 
 
+def generate_exp(exp):
+    fields = [
+        "size",
+        "active_time",
+        "seeding_time",
+        "seeder",
+        "leecher",
+        "progress",
+        "ratio",
+        "uploaded",
+        "downloaded",
+        "upload_speed",
+        "download_speed",
+        "eta",
+    ]
+    for field in fields:
+        exp = re.sub(field, f'stats["{field}"]', exp)
+    return exp
+
+
 def yaml_read(file_name):
     try:
         with open(file_name, "r", encoding="utf-8") as file:
