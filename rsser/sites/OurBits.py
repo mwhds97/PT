@@ -76,7 +76,13 @@ def OurBits(config):
                                 - time.timezone
                                 - config["OurBits"]["timezone"] * 3600
                             )
-                        # TODO: H&R
+                        if (
+                            cols[1].find("img", class_="hitandrun") != None
+                            and time.mktime(time.localtime())
+                            - torrents[id]["publish_time"]
+                            <= 2592000
+                        ):
+                            web_info["hr"] = 172800
                         if cols[1].find("div", class_="progressBar") != None:
                             web_info["downloaded"] = True
                         web_info["seeder"] = int(re.sub("\D", "", cols[5].text))

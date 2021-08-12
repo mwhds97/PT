@@ -82,7 +82,7 @@ def HDSky(config):
                                         - time.timezone
                                         - config["HDSky"]["timezone"] * 3600
                                     )
-                        if re.search('<div class="\w', str(cols[1])) != None:
+                        if re.search('<div class="progress.*', str(cols[1])) != None:
                             web_info["downloaded"] = True
                         web_info["seeder"] = int(re.sub("\D", "", cols[5].text))
                         web_info["leecher"] = int(re.sub("\D", "", cols[6].text))

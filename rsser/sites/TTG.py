@@ -64,7 +64,7 @@ def TTG(config):
                             "leecher": -1,
                             "snatch": -1,
                         }
-                        if re.search('<img.+alt="free', str(cols[1])) != None:
+                        if cols[1].find("img", alt="free") != None:
                             web_info["free"] = True
                             free_end = re.search(
                                 "javascript:alert.+(\d{4}年\d{2}月\d{2}日\d{2}点\d{2}分)",
@@ -79,7 +79,7 @@ def TTG(config):
                                 - time.timezone
                                 - config["TTG"]["timezone"] * 3600
                             )
-                        if re.search('<img.+title="Hit and Run', str(cols[1])) != None:
+                        if cols[1].find("img", title="Hit and Run") != None:
                             web_info["hr"] = (
                                 86400
                                 if re.search("第\d+[集话話周週]|EP?\d+(?!-)", str(cols[1]))

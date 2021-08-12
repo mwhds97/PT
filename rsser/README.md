@@ -10,7 +10,7 @@
 - [x] HDSky
 - [x] M-Team（建议关闭 2FA）
 - [x] OpenCD
-- [ ] OurBits（H&R 检测暂未实现）
+- [x] OurBits（Cookies 有效期一个月）
 - [x] SSD
 - [x] TTG
 - [x] U2
