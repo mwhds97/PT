@@ -13,8 +13,7 @@ from sites import *
 from utils import *
 
 
-def uncaught_exception_handler(type, value, traceback):
-    print_t("发生未知错误，正在保存种子数据…", logger=logger)
+def terminate():
     lock.acquire()
     yaml_dump(torrent_pool, os.path.join(script_dir, "torrent_pool.yaml"))
     yaml_dump(list(name_queue), os.path.join(script_dir, "name_queue.yaml"))
@@ -25,24 +24,18 @@ def uncaught_exception_handler(type, value, traceback):
     sys.exit(0)
 
 
-sys.excepthook = uncaught_exception_handler
+def uncaught_exception_handler(type, value, traceback):
+    print_t("发生未知错误，正在保存种子数据…", logger=logger)
+    terminate()
 
 
 def SIGINT_handler(signum, frame):
     print_t("正在保存种子数据…", logger=logger)
-    lock.acquire()
-    yaml_dump(torrent_pool, os.path.join(script_dir, "torrent_pool.yaml"))
-    yaml_dump(list(name_queue), os.path.join(script_dir, "name_queue.yaml"))
-    if lock.locked():
-        lock.release()
-    print_t("正在停止…", logger=logger)
-    logger.close()
-    sys.exit(0)
+    terminate()
 
 
+sys.excepthook = uncaught_exception_handler
 signal.signal(signal.SIGINT, SIGINT_handler)
-
-
 script_dir = os.path.dirname(__file__)
 config = yaml_read(os.path.join(script_dir, "config.yaml"))
 torrent_pool = yaml_read(os.path.join(script_dir, "torrent_pool.yaml"))
