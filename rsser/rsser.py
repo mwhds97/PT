@@ -72,7 +72,8 @@ def task_processor():
             client.flush()
             print_t("客户端连接正常，正在等候任务…", True)
             time.sleep(1)
-            for name, stats in client.tasks.items():
+            tasks = deepcopy(client.tasks)
+            for name, stats in tasks.items():
                 try:
                     to_remove = False
                     if name in pool:
@@ -128,6 +129,8 @@ def task_processor():
                     if to_remove:
                         client.remove_torrent(torrent, name, info, logger)
                         time.sleep(5 if config["client"] == "qbittorrent" else 1)
+                        client.flush()
+                        time.sleep(1)
                 except Exception:
                     print_t(
                         f'删除种子{name}（{torrent["size"]:.2f}GB）可能已失败，尝试删除其他种子…',
@@ -156,8 +159,6 @@ def task_processor():
             pool = deepcopy(torrent_pool)
             if lock.locked():
                 lock.release()
-            client.flush()
-            time.sleep(1)
             for name, torrent in pool.items():
                 try:
                     site = torrent["site"]
@@ -199,6 +200,8 @@ def task_processor():
                     ):
                         client.add_torrent(torrent, name, logger)
                         time.sleep(10 if config["client"] == "qbittorrent" else 2)
+                        client.flush()
+                        time.sleep(1)
                 except Exception:
                     print_t(
                         f'添加种子{name}（{torrent["size"]:.2f}GB）可能已失败，尝试添加其他种子…',

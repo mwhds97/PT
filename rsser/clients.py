@@ -93,7 +93,6 @@ class deluge:
         self.task_count = len(self.tasks)
 
     def add_torrent(self, torrent, name, logger):
-        self.flush()
         free_end = (
             "N/A"
             if torrent["free_end"] == None
@@ -131,7 +130,6 @@ class deluge:
                 raise e
 
     def remove_torrent(self, torrent, name, info, logger):
-        self.flush()
         text = f'删除种子{name}\
 ，原因：{info}\
 ，体积：{torrent["size"]:.2f}GB\
@@ -246,7 +244,6 @@ class qbittorrent:
         self.task_count = len(self.tasks)
 
     def add_torrent(self, torrent, name, logger):
-        self.flush()
         free_end = (
             "N/A"
             if torrent["free_end"] == None
@@ -278,7 +275,6 @@ class qbittorrent:
             raise e
 
     def remove_torrent(self, torrent, name, info, logger):
-        self.flush()
         text = f'删除种子{name}\
 ，原因：{info}\
 ，体积：{torrent["size"]:.2f}GB\
