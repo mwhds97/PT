@@ -281,7 +281,7 @@ TTG:
   retry_interval: 30
   retry_count_max: 2
   regexp:
-  - '(-|@)(WiKi|NGB|DoA|ARiN)'
+  - '(-|@)(TTG|WiKi|NGB|DoA|ARiN)'
   publish_within: 660
   size:
   - [10, 100]
