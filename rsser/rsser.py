@@ -39,8 +39,19 @@ signal.signal(signal.SIGINT, SIGINT_handler)
 script_dir = os.path.dirname(__file__)
 config = yaml_read(os.path.join(script_dir, "config.yaml"))
 torrent_pool = yaml_read(os.path.join(script_dir, "torrent_pool.yaml"))
+torrent_pool = {
+    name: torrent
+    for name, torrent in torrent_pool.items()
+    if torrent["site"] in list(config.keys())[12:]
+}
+name_list = yaml_read(os.path.join(script_dir, "name_queue.yaml"))
+name_list = [
+    name
+    for name in name_list
+    if re.match("\[(\w+?)\]", name).group(1) in list(config.keys())[12:]
+]
 name_queue = deque(maxlen=config["torrent_pool_size"])
-name_queue.extend(yaml_read(os.path.join(script_dir, "name_queue.yaml")))
+name_queue.extend(name_list)
 os.makedirs(os.path.join(script_dir, "logs"), exist_ok=True)
 logger = open(
     os.path.join(
