@@ -65,14 +65,30 @@ def task_processor():
     global torrent_pool
     while True:
         try:
-            lock.acquire()
-            pool = deepcopy(torrent_pool)
-            if lock.locked():
-                lock.release()
             client.flush()
             print_t("客户端连接正常，正在等候任务…", True)
             time.sleep(1)
             tasks = deepcopy(client.tasks)
+            lock.acquire()
+            torrent_pool = {
+                name: torrent
+                for name, torrent in torrent_pool.items()
+                if name in name_queue
+            }
+            sort_keys = reversed(list(config["sort_by"].keys()))
+            for key in sort_keys:
+                torrent_pool = dict(
+                    sorted(
+                        torrent_pool.items(),
+                        key=lambda torrent: torrent[1][key]
+                        if key != "site"
+                        else config[torrent[1]["site"]]["priority"],
+                        reverse=config["sort_by"][key],
+                    )
+                )
+            pool = deepcopy(torrent_pool)
+            if lock.locked():
+                lock.release()
             for name, stats in tasks.items():
                 try:
                     to_remove = False
@@ -139,26 +155,6 @@ def task_processor():
                     time.sleep(5 if config["client"] == "qbittorrent" else 1)
                     client.flush()
                     time.sleep(1)
-            lock.acquire()
-            torrent_pool = {
-                name: torrent
-                for name, torrent in torrent_pool.items()
-                if name in name_queue
-            }
-            sort_keys = reversed(list(config["sort_by"].keys()))
-            for key in sort_keys:
-                torrent_pool = dict(
-                    sorted(
-                        torrent_pool.items(),
-                        key=lambda torrent: torrent[1][key]
-                        if key != "site"
-                        else config[torrent[1]["site"]]["priority"],
-                        reverse=config["sort_by"][key],
-                    )
-                )
-            pool = deepcopy(torrent_pool)
-            if lock.locked():
-                lock.release()
             for name, torrent in pool.items():
                 try:
                     site = torrent["site"]
