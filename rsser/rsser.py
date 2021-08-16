@@ -114,7 +114,7 @@ def task_processor():
                                 config[site]["ignore_hr_leeching"]
                                 or torrent["hr"] == None
                             ):
-                                if config[site]["free_only"] and (
+                                if config[site]["free_end_escape"] and (
                                     not torrent["free"]
                                     or (
                                         torrent["free_end"] != None

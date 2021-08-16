@@ -42,6 +42,7 @@ CHDBits:
   snatch: [0, 5]
   free_only: true
   free_time_min: 21000
+  free_end_escape: true
   hr_time_max: 432000
   hr_seed_delay: 1800
   hr_seed_ratio: null
@@ -86,6 +87,7 @@ HDSky:
   snatch: [0, 5]
   free_only: true
   free_time_min: 21000
+  free_end_escape: true
   hr_time_max: 432000
   hr_seed_delay: 1800
   hr_seed_ratio: null
@@ -127,6 +129,7 @@ MTeam:
   snatch: [0, 5]
   free_only: true
   free_time_min: 21000
+  free_end_escape: true
   hr_time_max: 432000
   hr_seed_delay: 1800
   hr_seed_ratio: null
@@ -170,6 +173,7 @@ OpenCD:
   snatch: [0, 5]
   free_only: true
   free_time_min: 21000
+  free_end_escape: true
   hr_time_max: 432000
   hr_seed_delay: 1800
   hr_seed_ratio: null
@@ -209,6 +213,7 @@ OurBits:
   snatch: [0, 5]
   free_only: true
   free_time_min: 21000
+  free_end_escape: true
   hr_time_max: 432000
   hr_seed_delay: 1800
   hr_seed_ratio: 1.0
@@ -248,6 +253,7 @@ SSD:
   snatch: [0, 5]
   free_only: true
   free_time_min: 21000
+  free_end_escape: true
   hr_time_max: 432000
   hr_seed_delay: 1800
   hr_seed_ratio: null
@@ -290,6 +296,7 @@ TTG:
   snatch: [0, 5]
   free_only: true
   free_time_min: 21000
+  free_end_escape: true
   hr_time_max: 432000
   hr_seed_delay: 1800
   hr_seed_ratio: 1.0
@@ -329,6 +336,7 @@ U2:
   snatch: [0, 5]
   free_only: true
   free_time_min: 21000
+  free_end_escape: true
   hr_time_max: 432000
   hr_seed_delay: 1800
   hr_seed_ratio: null

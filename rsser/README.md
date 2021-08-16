@@ -47,7 +47,7 @@ host: '' #Deluge daemon 或者 qBittorrent Web UI 地址，必须包含端口
 user: '' #Deluge daemon 或者 qBittorrent Web UI 用户名
 pass: '' #Deluge daemon 或者 qBittorrent Web UI 密码
 headers: {} #用于访问 qBittorrent Web UI 的 request headers
-#如果 Web UI 设置中的“启用 Host header 属性验证”被勾选，则该值必须包含 'Host': '设定域名（若为 * 则可取任意值）:本地监听端口（Web UI）'
+#如果 Web UI 设置中的“启用 Host header 属性验证”被勾选，该值必须包含 'Host': '设定域名（若为 * 可取任意值）:本地监听端口（Web UI）'
 timeout: 15 #连接客户端超时的阈值（单位：秒）
 reconnect_interval: 10 #重新连接客户端的时间间隔（单位：秒）
 space: 1024 #总空间大小（单位：GB），任务的总体积不会超过该值
@@ -82,13 +82,14 @@ sort_by: #给种子信息排序的关键字，以下关键字可自由组合（�
   seeder: [0, 5] #做种人数不在该范围内的种子将被忽略
   leecher: [0, 5000] #下载人数不在该范围内的种子将被忽略
   snatch: [0, 5] #完成人数不在该范围内的种子将被忽略
-  free_only: true #若该值为 true，则非免费的种子将被忽略，下载中的免费到期的种子将被移除（是否规避 H&R 将由 ignore_hr_leeching 的值决定）
+  free_only: true #若该值为 true，非免费的种子将被忽略
   free_time_min: 21000 #仅当 free_only 的值为 true 时有效，免费时长小于该值（单位：秒）的种子将被忽略（考虑到程序延迟，建议略小于期望值）
+  free_end_escape: true #若该值为 true，下载中的免费到期的种子将被移除（是否规避 H&R 将由 ignore_hr_leeching 的值决定）
   hr_time_max: 432000 #H&R 要求做种时间超过该值（单位：秒）的种子将被忽略
   hr_seed_delay: 1800 #满足 H&R 要求后继续做种的时间（单位：秒），防止因未及时汇报或服务器问题触发 H&R
-  hr_seed_ratio: null #若站点的 H&R 规则允许达到一定分享率后停止做种，则可将该值设定为对应分享率
-  ignore_hr_seeding: false #若该值为 true，则做种中的种子的 H&R 要求将被忽略
-  ignore_hr_leeching: true #若该值为 true，则下载中的种子的 H&R 要求将被忽略
+  hr_seed_ratio: null #若站点的 H&R 规则允许达到一定分享率后停止做种，可将该值设定为对应分享率
+  ignore_hr_seeding: false #若该值为 true，做种中的种子的 H&R 要求将被忽略
+  ignore_hr_leeching: true #若该值为 true，下载中的种子的 H&R 要求将被忽略
   extra_options: {} #任务的其他设置（例如限速、分类等），参见 Deluge 源代码和 qBittorrent API 文档
   #若使用 qBittorrent，请用 'true' 'false' 替代布尔值
   remove_conditions: #满足以下任一条件的种子将被移除（若无需删种请设置为 []）
@@ -104,7 +105,7 @@ sort_by: #给种子信息排序的关键字，以下关键字可自由组合（�
   #可用字段：size active_time seeding_time seeder leecher progress ratio uploaded downloaded upload_speed download_speed eta
   #时间单位：秒，体积单位：B，速率单位：B/s，进度范围：0-1（qBittorrent）或 0-100（Deluge）
   #period 为条件的适用阶段，L 表示下载阶段，S 表示做种阶段
-  priority: 1 #用于种子信息排序的站点优先级，该值越小则站点优先级越高
+  priority: 1 #用于种子信息排序的站点优先级，该值越小，站点优先级越高
   timezone: +8 #站点的时区，一般设置为 +8 即可
 站点2:
   ...
