@@ -27,13 +27,6 @@ def U2(config):
         }
         for entry in feed["entries"]
     }
-    torrents = dict(
-        filter(
-            lambda torrent: filter_regexp(torrent[1], config["U2"]["regexp"])
-            and filter_size(torrent[1], config["U2"]["size"]),
-            torrents.items(),
-        )
-    )
     for web in config["U2"]["web"]:
         response = requests.get(
             web,

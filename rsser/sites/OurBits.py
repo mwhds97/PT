@@ -28,13 +28,6 @@ def OurBits(config):
         }
         for entry in feed["entries"]
     }
-    torrents = dict(
-        filter(
-            lambda torrent: filter_regexp(torrent[1], config["OurBits"]["regexp"])
-            and filter_size(torrent[1], config["OurBits"]["size"]),
-            torrents.items(),
-        )
-    )
     for web in config["OurBits"]["web"]:
         response = requests.get(
             web,

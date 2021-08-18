@@ -28,13 +28,6 @@ def HDChina(config):
         }
         for entry in feed["entries"]
     }
-    torrents = dict(
-        filter(
-            lambda torrent: filter_regexp(torrent[1], config["HDChina"]["regexp"])
-            and filter_size(torrent[1], config["HDChina"]["size"]),
-            torrents.items(),
-        )
-    )
     for web in config["HDChina"]["web"]:
         response = requests.get(
             web,

@@ -28,13 +28,6 @@ def TTG(config):
             "publish_time": time.mktime(entry["published_parsed"]) - time.timezone,
             "link": entry["links"][1]["href"],
         }
-    torrents = dict(
-        filter(
-            lambda torrent: filter_regexp(torrent[1], config["TTG"]["regexp"])
-            and filter_size(torrent[1], config["TTG"]["size"]),
-            torrents.items(),
-        )
-    )
     for web in config["TTG"]["web"]:
         response = requests.get(
             web,

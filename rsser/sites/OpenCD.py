@@ -28,13 +28,6 @@ def OpenCD(config):
         }
         for entry in feed["entries"]
     }
-    torrents = dict(
-        filter(
-            lambda torrent: filter_regexp(torrent[1], config["OpenCD"]["regexp"])
-            and filter_size(torrent[1], config["OpenCD"]["size"]),
-            torrents.items(),
-        )
-    )
     for web in config["OpenCD"]["web"]:
         response = requests.get(
             web,

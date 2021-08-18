@@ -31,20 +31,6 @@ def size_G(size_str):
         return float(size[0]) * 1024
 
 
-def filter_regexp(torrent, patterns):
-    for pattern in patterns:
-        if re.search(pattern, torrent["title"]) != None:
-            return True
-    return False
-
-
-def filter_size(torrent, ranges):
-    for range in ranges:
-        if range[0] <= torrent["size"] <= range[1]:
-            return True
-    return False
-
-
 def generate_exp(exp):
     fields = [
         "size",
@@ -63,6 +49,31 @@ def generate_exp(exp):
     for field in fields:
         exp = re.sub(field, f'stats["{field}"]', exp)
     return exp
+
+
+def match_regexp(torrent, patterns):
+    for pattern in patterns:
+        if re.search(pattern, torrent["title"]) != None:
+            return True
+    return False
+
+
+def match_size(torrent, ranges):
+    for range in ranges:
+        if range[0] <= torrent["size"] <= range[1]:
+            return True
+    return False
+
+
+def match_project(torrent, projects):
+    for name, project in projects.items():
+        if (
+            torrent["site"] in project["site"]
+            and match_size(torrent, project["size"])
+            and match_regexp(torrent, project["regexp"])
+        ):
+            return name
+    return None
 
 
 def yaml_read(file_name):

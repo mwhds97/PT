@@ -1,354 +1,238 @@
-client: 'deluge'
-host: '127.0.0.1:58846'
-user: 'localclient'
-pass: 'deluge'
-headers: {}
-timeout: 15
-reconnect_interval: 10
-space: 1024
-task_count_max: 10
-run_interval: 30
 torrent_pool_size: 1000
 sort_by:
   size: true
   publish_time: true
-CHDBits:
-  rss: 'https://chdbits.co/torrentrss.php?rows=50&isize=1&linktype=dl&passkey='
-  rss_timeout: 15
-  web:
-  - 'https://chdbits.co/torrents.php?sort=4&type=desc'
-  web_timeout: 15
-  cookies:
-    c_secure_login: ''
-    c_secure_pass: ''
-    c_secure_ssl: ''
-    c_secure_tracker_ssl: ''
-    c_secure_uid: ''
-  user_agent: 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36'
-  proxies: {}
-  path: ''
-  fetch_interval: 300
-  retry_interval: 30
-  retry_count_max: 2
-  regexp:
-  - '-CHD(?!Bits)'
-  - '@CHD'
-  - '(-|@)OneHD'
-  publish_within: 660
-  size:
-  - [10, 100]
-  seeder: [0, 5]
-  leecher: [0, 5000]
-  snatch: [0, 5]
-  free_only: true
-  free_time_min: 21000
-  free_end_escape: true
-  hr_time_max: 432000
-  hr_seed_delay: 1800
-  hr_seed_ratio: null
-  ignore_hr_seeding: false
-  ignore_hr_leeching: true
-  extra_options: {}
-  remove_conditions:
-  - info: '活动时长超过限制'
-    exp: 'active_time >= 259200'
-    period: [L, S]
-  - info: '做种时长达到要求'
-    exp: 'seeding_time >= size / 1073741824 * 1.0 * 60'
-    period: [S]
-  priority: 1
-  timezone: +8
-HDSky:
-  rss: 'https://hdsky.me/torrentrss.php?rows=50&isize=1&linktype=dl&passkey='
-  rss_timeout: 15
-  web:
-  - 'https://hdsky.me/torrents.php?sort=4&type=desc'
-  web_timeout: 15
-  cookies:
-    c_secure_login: ''
-    c_secure_pass: ''
-    c_secure_ssl: ''
-    c_secure_tracker_ssl: ''
-    c_secure_uid: ''
-  user_agent: 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36'
-  proxies: {}
-  path: ''
-  fetch_interval: 300
-  retry_interval: 30
-  retry_count_max: 2
-  regexp:
-  - '(-|@)HDS'
-  - 'WOWOW|NHK|TVAsahi'
-  publish_within: 660
-  size:
-  - [10, 100]
-  seeder: [0, 5]
-  leecher: [0, 5000]
-  snatch: [0, 5]
-  free_only: true
-  free_time_min: 21000
-  free_end_escape: true
-  hr_time_max: 432000
-  hr_seed_delay: 1800
-  hr_seed_ratio: null
-  ignore_hr_seeding: false
-  ignore_hr_leeching: true
-  extra_options: {}
-  remove_conditions:
-  - info: '活动时长超过限制'
-    exp: 'active_time >= 259200'
-    period: [L, S]
-  - info: '做种时长达到要求'
-    exp: 'seeding_time >= size / 1073741824 * 1.0 * 60'
-    period: [S]
-  priority: 2
-  timezone: +8
-MTeam:
-  rss: 'https://kp.m-team.cc/torrentrss.php?rows=50&isize=1&https=1&linktype=dl&passkey='
-  rss_timeout: 15
-  web:
-  - 'https://kp.m-team.cc/torrents.php?sort=4&type=desc'
-  - 'https://kp.m-team.cc/adult.php?sort=4&type=desc'
-  - 'https://kp.m-team.cc/music.php?sort=4&type=desc'
-  web_timeout: 15
-  cookies:
-    tp: ''
-  user_agent: 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36'
-  proxies: {}
-  path: ''
-  fetch_interval: 300
-  retry_interval: 30
-  retry_count_max: 2
-  regexp:
-  - '.*'
-  publish_within: 660
-  size:
-  - [10, 100]
-  seeder: [0, 5]
-  leecher: [0, 5000]
-  snatch: [0, 5]
-  free_only: true
-  free_time_min: 21000
-  free_end_escape: true
-  hr_time_max: 432000
-  hr_seed_delay: 1800
-  hr_seed_ratio: null
-  ignore_hr_seeding: false
-  ignore_hr_leeching: true
-  extra_options: {}
-  remove_conditions:
-  - info: '活动时长超过限制'
-    exp: 'active_time >= 259200'
-    period: [L, S]
-  - info: '做种时长达到要求'
-    exp: 'seeding_time >= size / 1073741824 * 1.0 * 60'
-    period: [S]
-  priority: 3
-  timezone: +8
-OpenCD:
-  rss: 'https://open.cd/torrentrss.php?rows=50&isize=1&linktype=dl&passkey='
-  rss_timeout: 15
-  web:
-  - 'https://open.cd/torrents.php?sort=4&type=desc'
-  web_timeout: 15
-  cookies:
-    c_secure_login: ''
-    c_secure_pass: ''
-    c_secure_ssl: ''
-    c_secure_tracker_ssl: ''
-    c_secure_uid: ''
-  user_agent: 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36'
-  proxies: {}
-  path: ''
-  fetch_interval: 60
-  retry_interval: 10
-  retry_count_max: 2
-  regexp:
-  - '.*'
-  publish_within: 660
-  size:
-  - [0, 100]
-  seeder: [0, 5]
-  leecher: [0, 5000]
-  snatch: [0, 5]
-  free_only: true
-  free_time_min: 21000
-  free_end_escape: true
-  hr_time_max: 432000
-  hr_seed_delay: 1800
-  hr_seed_ratio: null
-  ignore_hr_seeding: false
-  ignore_hr_leeching: true
-  extra_options: {}
-  remove_conditions:
-  - info: '活动时长超过限制'
-    exp: 'active_time >= 259200'
-    period: [L, S]
-  - info: '做种时长达到要求'
-    exp: 'seeding_time >= size / 1073741824 * 1.0 * 60'
-    period: [S]
-  priority: 4
-  timezone: +8
-OurBits:
-  rss: 'https://ourbits.club/torrentrss.php?rows=50&isize=1&https=1&linktype=dl&passkey='
-  rss_timeout: 15
-  web:
-  - 'https://ourbits.club/torrents.php?sort=4&type=desc'
-  web_timeout: 15
-  cookies:
-    ourbits_jwt: ''
-  user_agent: 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36'
-  proxies: {}
-  path: ''
-  fetch_interval: 300
-  retry_interval: 30
-  retry_count_max: 2
-  regexp:
-  - '(-|@)(Our|iLove|PbK|FLTTH)'
-  publish_within: 660
-  size:
-  - [10, 100]
-  seeder: [0, 5]
-  leecher: [0, 5000]
-  snatch: [0, 5]
-  free_only: true
-  free_time_min: 21000
-  free_end_escape: true
-  hr_time_max: 432000
-  hr_seed_delay: 1800
-  hr_seed_ratio: 1.0
-  ignore_hr_seeding: false
-  ignore_hr_leeching: true
-  extra_options: {}
-  remove_conditions:
-  - info: '活动时长超过限制'
-    exp: 'active_time >= 259200'
-    period: [L, S]
-  - info: '做种时长达到要求'
-    exp: 'seeding_time >= size / 1073741824 * 1.0 * 60'
-    period: [S]
-  priority: 5
-  timezone: +8
-SSD:
-  rss: 'https://springsunday.net/torrentrss.php?rows=50&isize=1&https=1&linktype=dl&passkey='
-  rss_timeout: 15
-  web:
-  - 'https://springsunday.net/torrents.php?sort=4&type=desc'
-  web_timeout: 15
-  cookies:
-    SPRINGID: ''
-  user_agent: 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36'
-  proxies: {}
-  path: ''
-  fetch_interval: 300
-  retry_interval: 30
-  retry_count_max: 2
-  regexp:
-  - '(-|@)CMCT'
-  publish_within: 660
-  size:
-  - [10, 100]
-  seeder: [0, 5]
-  leecher: [0, 5000]
-  snatch: [0, 5]
-  free_only: true
-  free_time_min: 21000
-  free_end_escape: true
-  hr_time_max: 432000
-  hr_seed_delay: 1800
-  hr_seed_ratio: null
-  ignore_hr_seeding: false
-  ignore_hr_leeching: true
-  extra_options: {}
-  remove_conditions:
-  - info: '活动时长超过限制'
-    exp: 'active_time >= 259200'
-    period: [L, S]
-  - info: '做种时长达到要求'
-    exp: 'seeding_time >= size / 1073741824 * 1.0 * 60'
-    period: [S]
-  priority: 6
-  timezone: +8
-TTG:
-  rss: 'https://totheglory.im/putrss.php?ssl=yes&par='
-  rss_timeout: 15
-  web:
-  - 'https://totheglory.im/browse.php?c=M&sort=4&type=desc'
-  - 'https://totheglory.im/browse.php?c=G&sort=4&type=desc'
-  web_timeout: 15
-  cookies:
-    laccess: ''
-    pass: ''
-    uid: ''
-  user_agent: 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36'
-  proxies: {}
-  path: ''
-  fetch_interval: 300
-  retry_interval: 30
-  retry_count_max: 2
-  regexp:
-  - '(-|@)(TTG|WiKi|NGB|DoA|ARiN)'
-  publish_within: 660
-  size:
-  - [10, 100]
-  seeder: [0, 5]
-  leecher: [0, 5000]
-  snatch: [0, 5]
-  free_only: true
-  free_time_min: 21000
-  free_end_escape: true
-  hr_time_max: 432000
-  hr_seed_delay: 1800
-  hr_seed_ratio: 1.0
-  ignore_hr_seeding: false
-  ignore_hr_leeching: true
-  extra_options: {}
-  remove_conditions:
-  - info: '活动时长超过限制'
-    exp: 'active_time >= 259200'
-    period: [L, S]
-  - info: '做种时长达到要求'
-    exp: 'seeding_time >= size / 1073741824 * 1.0 * 60'
-    period: [S]
-  priority: 7
-  timezone: +8
-U2:
-  rss: 'https://u2.dmhy.org/torrentrss.php?rows=50&isize=1&trackerssl=1&linktype=dl&passkey='
-  rss_timeout: 15
-  web:
-  - 'https://u2.dmhy.org/torrents.php?sort=4&type=desc'
-  web_timeout: 15
-  cookies:
-    nexusphp_u2: ''
-  user_agent: 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36'
-  proxies: {}
-  path: ''
-  fetch_interval: 300
-  retry_interval: 30
-  retry_count_max: 2
-  regexp:
-  - '.*'
-  publish_within: 660
-  size:
-  - [10, 100]
-  seeder: [0, 5]
-  leecher: [0, 5000]
-  snatch: [0, 5]
-  free_only: true
-  free_time_min: 21000
-  free_end_escape: true
-  hr_time_max: 432000
-  hr_seed_delay: 1800
-  hr_seed_ratio: null
-  ignore_hr_seeding: false
-  ignore_hr_leeching: true
-  extra_options: {}
-  remove_conditions:
-  - info: '活动时长超过限制'
-    exp: 'active_time >= 259200'
-    period: [L, S]
-  - info: '做种时长达到要求'
-    exp: 'seeding_time >= size / 1073741824 * 1.0 * 60'
-    period: [S]
-  priority: 8
-  timezone: +8
+snippets:
+  CLT_DEFAULT:
+    timeout: 15
+    reconnect_interval: 10
+    run_interval: 30
+    task_count_max: 10
+  SITE_DEFAULT:
+    rss_timeout: 15
+    web_timeout: 15
+    user_agent: 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36'
+    proxies: {}
+    fetch_interval: 300
+    retry_interval: 30
+    timezone: +8
+  PRJ_DEFAULT:
+    size:
+    - [0, 100]
+    publish_within: 660
+    seeder: [0, 5]
+    leecher: [0, 5000]
+    snatch: [0, 5]
+    free_only: true
+    free_time_min: 21000
+    free_end_escape: true
+    hr_time_max: 432000
+    hr_seed_delay: 1800
+    hr_seed_ratio: null
+    ignore_hr_seeding: false
+    ignore_hr_leeching: true
+    retry_count_max: 2
+    extra_options: {}
+    remove_conditions:
+    - info: '活动时长超过限制'
+      exp: 'active_time >= 259200'
+      period: [L, S]
+    - info: '做种时长达到要求'
+      exp: 'seeding_time >= size / 1073741824 * 1.0 * 60'
+      period: [S]
+clients:
+  de1:
+    snippets:
+    - CLT_DEFAULT
+    type: deluge
+    host: '127.0.0.1:58846'
+    user: 'localclient'
+    pass: 'deluge'
+    space: 1024
+  qb1:
+    snippets:
+    - CLT_DEFAULT
+    type: qbittorrent
+    host: 'http://127.0.0.1:8080'
+    user: 'admin'
+    pass: 'admin'
+    headers: {}
+    space: 1024
+sites:
+  CHDBits:
+    snippets:
+    - SITE_DEFAULT
+    rss: 'https://chdbits.co/torrentrss.php?rows=50&isize=1&linktype=dl&passkey='
+    web:
+    - 'https://chdbits.co/torrents.php?sort=4&type=desc'
+    cookies:
+      c_secure_login: '...'
+      c_secure_pass: '...'
+      c_secure_ssl: '...'
+      c_secure_tracker_ssl: '...'
+      c_secure_uid: '...'
+    priority: 4
+  HDSky:
+    snippets:
+    - SITE_DEFAULT
+    rss: 'https://hdsky.me/torrentrss.php?rows=50&isize=1&linktype=dl&passkey='
+    web:
+    - 'https://hdsky.me/torrents.php?sort=4&type=desc'
+    cookies:
+      c_secure_login: '...'
+      c_secure_pass: '...'
+      c_secure_ssl: '...'
+      c_secure_tracker_ssl: '...'
+      c_secure_uid: '...'
+    priority: 5
+  MTeam:
+    snippets:
+    - SITE_DEFAULT
+    rss: 'https://kp.m-team.cc/torrentrss.php?rows=50&isize=1&https=1&linktype=dl&passkey='
+    web:
+    - 'https://kp.m-team.cc/torrents.php?sort=4&type=desc'
+    - 'https://kp.m-team.cc/adult.php?sort=4&type=desc'
+    - 'https://kp.m-team.cc/music.php?sort=4&type=desc'
+    cookies:
+      tp: '...'
+    priority: 2
+  OpenCD:
+    snippets:
+    - SITE_DEFAULT
+    rss: 'https://open.cd/torrentrss.php?rows=50&isize=1&linktype=dl&passkey='
+    web:
+    - 'https://open.cd/torrents.php?sort=4&type=desc'
+    cookies:
+      c_secure_login: '...'
+      c_secure_pass: '...'
+      c_secure_ssl: '...'
+      c_secure_tracker_ssl: '...'
+      c_secure_uid: '...'
+    fetch_interval: 60
+    retry_interval: 10
+    priority: 8
+  OurBits:
+    snippets:
+    - SITE_DEFAULT
+    rss: 'https://ourbits.club/torrentrss.php?rows=50&isize=1&https=1&linktype=dl&passkey='
+    web:
+    - 'https://ourbits.club/torrents.php?sort=4&type=desc'
+    cookies:
+      ourbits_jwt: '...'
+    priority: 7
+  SSD:
+    snippets:
+    - SITE_DEFAULT
+    rss: 'https://springsunday.net/torrentrss.php?rows=50&isize=1&https=1&linktype=dl&passkey='
+    web:
+    - 'https://springsunday.net/torrents.php?sort=4&type=desc'
+    cookies:
+      SPRINGID: '...'
+    priority: 6
+  TTG:
+    snippets:
+    - SITE_DEFAULT
+    rss: 'https://totheglory.im/putrss.php?ssl=yes&par='
+    web:
+    - 'https://totheglory.im/browse.php?c=M&sort=4&type=desc'
+    - 'https://totheglory.im/browse.php?c=G&sort=4&type=desc'
+    cookies:
+      laccess: '...'
+      pass: '...'
+      uid: '...'
+    priority: 3
+  U2:
+    snippets:
+    - SITE_DEFAULT
+    rss: 'https://u2.dmhy.org/torrentrss.php?rows=50&isize=1&trackerssl=1&linktype=dl&passkey='
+    web:
+    - 'https://u2.dmhy.org/torrents.php?sort=4&type=desc'
+    cookies:
+      nexusphp_u2: '...'
+    priority: 1
+projects:
+  U2_new:
+    snippets:
+    - PRJ_DEFAULT
+    client: de1
+    path: '/mnt/U2'
+    site:
+    - U2
+    regexp:
+    - '.*'
+    extra_options: {'max_upload_speed': 52428800}
+  MT_new:
+    snippets:
+    - PRJ_DEFAULT
+    client: de1
+    path: '/mnt/MT'
+    site:
+    - MTeam
+    regexp:
+    - '.*'
+  TTG_new:
+    snippets:
+    - PRJ_DEFAULT
+    client: qb1
+    path: 'C:\TTG'
+    site:
+    - TTG
+    regexp:
+    - '(-|@)(TTG|WiKi|NGB|DoA|ARiN)'
+    hr_seed_ratio: 1.0
+  CHD_new:
+    snippets:
+    - PRJ_DEFAULT
+    client: de1
+    path: '/mnt/CHD'
+    site:
+    - CHDBits
+    regexp:
+    - '-CHD(?!Bits)'
+    - '@CHD'
+    - '(-|@)OneHD'
+  HDS_new:
+    snippets:
+    - PRJ_DEFAULT
+    client: de1
+    path: '/mnt/HDS'
+    site:
+    - HDSky
+    regexp:
+    - '(-|@)HDS'
+    - 'WOWOW|NHK|TVAsahi'
+  SSD_new:
+    snippets:
+    - PRJ_DEFAULT
+    client: de1
+    path: '/mnt/SSD'
+    site:
+    - SSD
+    regexp:
+    - '(-|@)CMCT'
+  OB_new:
+    snippets:
+    - PRJ_DEFAULT
+    client: de1
+    path: '/mnt/OB'
+    site:
+    - OurBits
+    regexp:
+    - '(-|@)(Our|iLove|PbK|FLTTH)'
+    hr_seed_ratio: 1.0
+  OCD_new:
+    snippets:
+    - PRJ_DEFAULT
+    client: de1
+    path: '/mnt/OCD'
+    site:
+    - OpenCD
+    regexp:
+    - '.*'
+    remove_conditions:
+    - info: '活动时长超过限制'
+      exp: 'active_time >= 259200'
+      period: [L, S]
+    - info: '做种时长达到要求'
+      exp: 'True'
+      period: [S]

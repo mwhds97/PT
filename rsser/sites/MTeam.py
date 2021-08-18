@@ -34,13 +34,6 @@ def MTeam(config):
         }
         for entry in feed["entries"]
     }
-    torrents = dict(
-        filter(
-            lambda torrent: filter_regexp(torrent[1], config["MTeam"]["regexp"])
-            and filter_size(torrent[1], config["MTeam"]["size"]),
-            torrents.items(),
-        )
-    )
     for web in config["MTeam"]["web"]:
         response = requests.get(
             web,

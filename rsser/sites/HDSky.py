@@ -28,13 +28,6 @@ def HDSky(config):
         }
         for entry in feed["entries"]
     }
-    torrents = dict(
-        filter(
-            lambda torrent: filter_regexp(torrent[1], config["HDSky"]["regexp"])
-            and filter_size(torrent[1], config["HDSky"]["size"]),
-            torrents.items(),
-        )
-    )
     for web in config["HDSky"]["web"]:
         response = requests.get(
             web,
