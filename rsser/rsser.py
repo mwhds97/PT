@@ -236,7 +236,10 @@ def task_processor(client):
                             ):
                                 continue
                             project = config["projects"][torrent["project"]]
-                            if "registered" in stats["tracker_status"]:
+                            if (
+                                re.search("registered|回收", stats["tracker_status"])
+                                != None
+                            ):
                                 to_remove = True
                                 info = "种子被撤除"
                             elif stats["seeding_time"] == 0:
