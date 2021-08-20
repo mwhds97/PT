@@ -325,7 +325,7 @@ def task_processor(client):
                             < config["clients"][client.name]["task_count_max"]
                             and client.total_size + torrent["size"]
                             <= config["clients"][client.name]["space"]
-                            and torrent["retry_count"] <= project["retry_count_max"]
+                            and torrent["retry_count"] < project["retry_count_max"]
                             and project["seeder"][0]
                             <= torrent["seeder"]
                             <= project["seeder"][1]
@@ -356,6 +356,11 @@ def task_processor(client):
                                 or torrent["hr"] <= project["hr_time_max"]
                             )
                         ):
+                            lock.acquire(timeout=10)
+                            if name in torrent_pool:
+                                torrent_pool[name]["retry_count"] += 1
+                            if lock.locked():
+                                lock.release()
                             client.add_torrent(torrent, name, logger)
                             time.sleep(
                                 10
@@ -370,11 +375,6 @@ def task_processor(client):
                             f'[{client.name}] 添加种子 {name}（{torrent["size"]:.2f}GB）可能已失败，尝试添加其他种子…',
                             logger=logger,
                         )
-                        lock.acquire(timeout=10)
-                        if name in torrent_pool:
-                            torrent_pool[name]["retry_count"] = torrent["retry_count"]
-                        if lock.locked():
-                            lock.release()
                         time.sleep(
                             10
                             if config["clients"][client.name]["type"] == "qbittorrent"
@@ -410,7 +410,7 @@ def torrent_fetcher(site):
                         torrent_pool[name] = dict(
                             torrent,
                             **{
-                                "retry_count": 0,
+                                "retry_count": -1,
                                 "project": project,
                             },
                         )

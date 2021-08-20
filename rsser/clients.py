@@ -1,5 +1,4 @@
 import json
-import re
 import time
 
 import requests
@@ -106,31 +105,22 @@ class deluge:
  体积：{torrent["size"]:.2f}GB\
  总体积：{self.total_size + torrent["size"]:.2f}GB\
  任务数：{self.task_count + 1}"""
-        try:
-            self.client.call(
-                "core.add_torrent_url",
-                torrent["link"],
-                dict(
-                    {
-                        "name": name,
-                        "download_location": self.config["projects"][
-                            torrent["project"]
-                        ]["path"],
-                        "add_paused": False,
-                    },
-                    **self.config["projects"][torrent["project"]]["extra_options"],
-                ),
-            )
-            print_t(text, logger=logger)
-        except Exception as e:
-            hash = re.match("Torrent already in session \((\w{40})\)", str(e))
-            if hash != None:
-                self.client.call(
-                    "core.set_torrent_options", hash.group(1), {"name": name}
-                )
-            elif re.match("Torrent already being added", str(e)) == None:
-                torrent["retry_count"] += 1
-                raise e
+        self.client.call(
+            "core.add_torrent_url",
+            torrent["link"],
+            dict(
+                {
+                    "name": name,
+                    "download_location": self.config["projects"][torrent["project"]][
+                        "path"
+                    ],
+                    "add_paused": False,
+                    "auto_managed": False,
+                },
+                **self.config["projects"][torrent["project"]]["extra_options"],
+            ),
+        )
+        print_t(text, logger=logger)
 
     def remove_torrent(self, torrent, name, info, logger):
         text = f'[{self.name}] 删除种子 {name}\
@@ -263,23 +253,19 @@ class qbittorrent:
  体积：{torrent["size"]:.2f}GB\
  总体积：{self.total_size + torrent["size"]:.2f}GB\
  任务数：{self.task_count + 1}"""
-        try:
-            self.get_response(
-                "/api/v2/torrents/add",
-                dict(
-                    {
-                        "urls": torrent["link"],
-                        "savepath": self.config["projects"][torrent["project"]]["path"],
-                        "rename": name,
-                        "paused": "false",
-                    },
-                    **self.config["projects"][torrent["project"]]["extra_options"],
-                ),
-            )
-            print_t(text, logger=logger)
-        except Exception as e:
-            torrent["retry_count"] += 1
-            raise e
+        self.get_response(
+            "/api/v2/torrents/add",
+            dict(
+                {
+                    "urls": torrent["link"],
+                    "savepath": self.config["projects"][torrent["project"]]["path"],
+                    "rename": name,
+                    "paused": "false",
+                },
+                **self.config["projects"][torrent["project"]]["extra_options"],
+            ),
+        )
+        print_t(text, logger=logger)
 
     def remove_torrent(self, torrent, name, info, logger):
         text = f'[{self.name}] 删除种子 {name}\
