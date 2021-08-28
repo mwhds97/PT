@@ -26,6 +26,7 @@ snippets:
     free_only: true
     free_time_min: 21000
     free_end_escape: true
+    escape_trigger_time: 60
     hr_time_max: 432000
     hr_seed_delay: 1800
     hr_seed_ratio: null

@@ -159,6 +159,7 @@ try:
             "free_only",
             "free_time_min",
             "free_end_escape",
+            "escape_trigger_time",
             "hr_time_max",
             "hr_seed_delay",
             "hr_seed_ratio",
@@ -253,9 +254,7 @@ def task_processor(client):
                                             torrent["free_end"] != None
                                             and torrent["free_end"]
                                             - time.mktime(time.localtime())
-                                            <= config["clients"][client.name][
-                                                "run_interval"
-                                            ]
+                                            < project["escape_trigger_time"]
                                         )
                                     ):
                                         to_remove = True

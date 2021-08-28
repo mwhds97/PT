@@ -147,6 +147,9 @@ projects: #任务计划列表（字典）
     free_end_escape: true
     #若该值为 true，下载中的免费到期的种子将被移除
     #是否规避 H&R 将由 ignore_hr_leeching 的值决定
+    escape_trigger_time: 60
+    #若 free_end_escape 的值为 true，检测到种子的免费剩余时长小于该值（单位：秒）时触发移除操作
+    #该值应不小于对应客户端 run_interval 的值
     hr_time_max: 432000 #H&R 要求做种时间超过该值（单位：秒）的种子不会被添加至客户端
     hr_seed_delay: 1800 #满足 H&R 要求后继续做种的时间（单位：秒），防止因未及时汇报等问题触发 H&R
     hr_seed_ratio: null #若站点的 H&R 规则允许达到一定分享率后停止做种，可将该值设定为对应分享率
