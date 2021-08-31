@@ -260,7 +260,7 @@ def task_processor(client):
                                         to_remove = True
                                         info = "免费失效"
                                     for condition in project["remove_conditions"]:
-                                        if "L" in condition["period"] and eval(
+                                        if condition["period"] in ["L", "B"] and eval(
                                             generate_exp(condition["exp"])
                                         ):
                                             to_remove = True
@@ -281,7 +281,7 @@ def task_processor(client):
                                     hr_time = torrent["hr"] + project["hr_seed_delay"]
                                 if stats["seeding_time"] >= hr_time:
                                     for condition in project["remove_conditions"]:
-                                        if "S" in condition["period"] and eval(
+                                        if condition["period"] in ["S", "B"] and eval(
                                             generate_exp(condition["exp"])
                                         ):
                                             to_remove = True

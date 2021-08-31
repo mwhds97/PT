@@ -162,16 +162,16 @@ projects: #任务计划列表（字典）
     remove_conditions: #满足以下任一条件的种子将被移除
     - info: '活动时长超过限制'
       exp: 'active_time >= 259200'
-      period: [L, S]
+      period: B
     - info: '做种时长达到要求'
       exp: 'seeding_time >= size / 1073741824 * 1.0 * 60'
-      period: [S]
+      period: S
     - info: '做种和下载人数未达要求'
       exp: 'seeder > 10 and leecher < 20'
-      period: [S]
+      period: S
     #可用字段：size active_time seeding_time seeder leecher progress ratio uploaded downloaded upload_speed download_speed eta
     #时间单位：秒，体积单位：B，速率单位：B/s，进度范围：0-1（qBittorrent）或 0-100（Deluge）
-    #period 为条件的适用阶段，L 表示下载阶段，S 表示做种阶段
+    #period 为条件的适用阶段，L 表示下载阶段，S 表示做种阶段，B 表示所有阶段
     #若无需删种请设置为 []
   ...
 ```

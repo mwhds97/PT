@@ -37,10 +37,10 @@ snippets:
     remove_conditions:
     - info: '活动时长超过限制'
       exp: 'active_time >= 259200'
-      period: [L, S]
+      period: B
     - info: '做种时长达到要求'
       exp: 'seeding_time >= size / 1073741824 * 1.0 * 60'
-      period: [S]
+      period: S
 clients:
   de1:
     snippets:
@@ -221,6 +221,7 @@ projects:
     regexp:
     - '(-|@)(Our|iLove|PbK|FLTTH)'
     hr_seed_ratio: 1.0
+    extra_options: {'max_upload_speed': 52428800}
   OCD_new:
     snippets:
     - PRJ_DEFAULT
@@ -230,10 +231,3 @@ projects:
     - OpenCD
     regexp:
     - '.*'
-    remove_conditions:
-    - info: '活动时长超过限制'
-      exp: 'active_time >= 259200'
-      period: [L, S]
-    - info: '做种时长达到要求'
-      exp: 'True'
-      period: [S]
