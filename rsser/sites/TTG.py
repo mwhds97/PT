@@ -57,7 +57,7 @@ def TTG(config):
                             "leecher": -1,
                             "snatch": -1,
                         }
-                        if cols[1].find("img", alt="free") != None:
+                        if cols[1].find("img", alt="free") is not None:
                             web_info["free"] = True
                             free_end = re.search(
                                 "javascript:alert.+(\d{4}年\d{2}月\d{2}日\d{2}点\d{2}分)",
@@ -65,27 +65,27 @@ def TTG(config):
                             )
                             web_info["free_end"] = (
                                 None
-                                if free_end == None
+                                if free_end is None
                                 else time.mktime(
                                     time.strptime(free_end.group(1), "%Y年%m月%d日%H点%M分")
                                 )
                                 - time.timezone
                                 - config["TTG"]["timezone"] * 3600
                             )
-                        if cols[1].find("img", title="Hit and Run") != None:
+                        if cols[1].find("img", title="Hit and Run") is not None:
                             web_info["hr"] = (
                                 86400
                                 if re.search("第\d+[集话話周週]|EP?\d+(?!-)", str(cols[1]))
-                                != None
+                                is not None
                                 else 216000
                             )
-                        if cols[1].find("div", class_="process") != None:
+                        if cols[1].find("div", class_="process") is not None:
                             web_info["downloaded"] = True
                         web_info["snatch"] = int(re.sub("\D", "", cols[7].text))
                         seeder_leecher = re.sub("[^\d/]", "", cols[8].text).split("/")
                         web_info["seeder"] = int(seeder_leecher[0])
                         web_info["leecher"] = int(seeder_leecher[1])
-                        torrents[id] = dict(torrents[id], **web_info)
+                        torrents[id] = {**torrents[id], **web_info}
         else:
             raise Exception
         time.sleep(1)

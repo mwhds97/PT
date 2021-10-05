@@ -56,18 +56,18 @@ def U2(config):
                             "snatch": -1,
                         }
                         if (
-                            re.search('class="pro_\S*free', str(cols[1])) != None
+                            re.search('class="pro_\S*free', str(cols[1])) is not None
                             or re.search(
                                 'class="pro_custom.+class="arrowdown.+0\.00X',
                                 str(cols[1]),
                             )
-                            != None
+                            is not None
                         ):
                             web_info["free"] = True
                             free_end = re.search('<time title="(.+?)"', str(cols[1]))
                             web_info["free_end"] = (
                                 None
-                                if free_end == None
+                                if free_end is None
                                 else time.mktime(
                                     time.strptime(
                                         free_end.group(1), "%Y-%m-%d %H:%M:%S"
@@ -91,9 +91,9 @@ def U2(config):
                         web_info["seeder"] = int(re.sub("\D", "", cols[5].text))
                         web_info["leecher"] = int(re.sub("\D", "", cols[6].text))
                         web_info["snatch"] = int(re.sub("\D", "", cols[7].text))
-                        if re.search("snatchhlc", str(cols[7])) != None:
+                        if re.search("snatchhlc", str(cols[7])) is not None:
                             web_info["downloaded"] = True
-                        torrents[id] = dict(torrents[id], **web_info)
+                        torrents[id] = {**torrents[id], **web_info}
         else:
             raise Exception
         time.sleep(1)

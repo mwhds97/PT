@@ -61,21 +61,21 @@ def MTeam(config):
                             "leecher": -1,
                             "snatch": -1,
                         }
-                        if re.search('class="pro_\S*free', str(cols[1])) != None:
+                        if re.search('class="pro_\S*free', str(cols[1])) is not None:
                             free_duration = re.search(
                                 "<span.+(?:限時：|will end in)(.+?)</span>", str(cols[1])
                             )
-                            if free_duration == None:
+                            if free_duration is None:
                                 web_info["free"] = True
-                            elif not "<" in free_duration.group(1):
+                            elif "<" not in free_duration.group(1):
                                 web_info["free"] = True
                                 web_info["free_end"] = epoch(free_duration.group(1))
                         web_info["seeder"] = int(re.sub("\D", "", cols[5].text))
                         web_info["leecher"] = int(re.sub("\D", "", cols[6].text))
                         web_info["snatch"] = int(re.sub("\D", "", cols[7].text))
-                        if re.search("\d", cols[8].text) != None:
+                        if re.search("\d", cols[8].text) is not None:
                             web_info["downloaded"] = True
-                        torrents[id] = dict(torrents[id], **web_info)
+                        torrents[id] = {**torrents[id], **web_info}
         else:
             raise Exception
         time.sleep(1)

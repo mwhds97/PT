@@ -10,7 +10,7 @@ def print_t(text, nowrap=False, logger=None):
         f"{full_text: <75}",
         end="" if nowrap else "\n",
     )
-    if logger != None:
+    if logger is not None:
         log_text = (
             time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + " " + text + "\n"
         )
@@ -19,7 +19,7 @@ def print_t(text, nowrap=False, logger=None):
 
 def size_G(size_str):
     size = re.match("(\d+(?:\.\d+)?)[\n\s]*([KMGT])?i?B", size_str).groups()
-    if size[1] == None:
+    if size[1] is None:
         return float(size[0]) / 1073741824
     elif size[1] == "K":
         return float(size[0]) / 1048576
@@ -48,12 +48,12 @@ def generate_exp(exp):
     ]
     for field in fields:
         exp = re.sub(field, f'stats["{field}"]', exp)
-    return exp
+    return f"({exp})"
 
 
 def match_regexp(torrent, patterns):
     for pattern in patterns:
-        if re.search(pattern, torrent["title"]) != None:
+        if re.search(pattern, torrent["title"]) is not None:
             return True
     return False
 
@@ -68,7 +68,7 @@ def match_size(torrent, ranges):
 def match_project(torrent, projects):
     for name, project in projects.items():
         if (
-            torrent["site"] in project["site"]
+            torrent["site"] in project["sites"]
             and match_size(torrent, project["size"])
             and match_regexp(torrent, project["regexp"])
         ):

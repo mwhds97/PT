@@ -57,14 +57,14 @@ def HDSky(config):
                             "leecher": -1,
                             "snatch": -1,
                         }
-                        if re.search('class="pro_\S*free', str(cols[1])) != None:
-                            if re.search("\[.+<b>.+\]", str(cols[1])) == None:
+                        if re.search('class="pro_\S*free', str(cols[1])) is not None:
+                            if re.search("\[.+<b>.+\]", str(cols[1])) is None:
                                 web_info["free"] = True
                             else:
                                 free_end = re.search(
                                     '<span title="(.+?)"', str(cols[1])
                                 )
-                                if free_end != None:
+                                if free_end is not None:
                                     web_info["free"] = True
                                     web_info["free_end"] = (
                                         time.mktime(
@@ -75,12 +75,15 @@ def HDSky(config):
                                         - time.timezone
                                         - config["HDSky"]["timezone"] * 3600
                                     )
-                        if re.search('<div class="progress.*', str(cols[1])) != None:
+                        if (
+                            re.search('<div class="progress.*', str(cols[1]))
+                            is not None
+                        ):
                             web_info["downloaded"] = True
                         web_info["seeder"] = int(re.sub("\D", "", cols[5].text))
                         web_info["leecher"] = int(re.sub("\D", "", cols[6].text))
                         web_info["snatch"] = int(re.sub("\D", "", cols[7].text))
-                        torrents[id] = dict(torrents[id], **web_info)
+                        torrents[id] = {**torrents[id], **web_info}
         else:
             raise Exception
         time.sleep(1)

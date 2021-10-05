@@ -55,12 +55,12 @@ def OpenCD(config):
                             "leecher": -1,
                             "snatch": -1,
                         }
-                        if re.search('class="pro_\S*free', str(cols[2])) != None:
+                        if re.search('class="pro_\S*free', str(cols[2])) is not None:
                             web_info["free"] = True
                             free_end = re.search('<span title="(.+?)"', str(cols[2]))
                             web_info["free_end"] = (
                                 None
-                                if free_end == None
+                                if free_end is None
                                 else time.mktime(
                                     time.strptime(
                                         free_end.group(1), "%Y-%m-%d %H:%M:%S"
@@ -69,12 +69,12 @@ def OpenCD(config):
                                 - time.timezone
                                 - config["OpenCD"]["timezone"] * 3600
                             )
-                        if cols[2].find("div", class_="progress") != None:
+                        if cols[2].find("div", class_="progress") is not None:
                             web_info["downloaded"] == True
                         web_info["seeder"] = int(re.sub("\D", "", cols[7].text))
                         web_info["leecher"] = int(re.sub("\D", "", cols[8].text))
                         web_info["snatch"] = int(re.sub("\D", "", cols[9].text))
-                        torrents[id] = dict(torrents[id], **web_info)
+                        torrents[id] = {**torrents[id], **web_info}
         else:
             raise Exception
         time.sleep(1)

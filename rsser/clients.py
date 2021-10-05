@@ -79,12 +79,12 @@ class deluge:
             ],
         )
         self.tasks = {
-            stats["name"]: dict(
-                {"hash": hash},
+            stats["name"]: {
+                "hash": hash,
                 **{
                     key_map[key]: value for key, value in stats.items() if key != "name"
                 },
-            )
+            }
             for hash, stats in self.tasks.items()
         }
         self.total_size = (
@@ -95,30 +95,28 @@ class deluge:
     def add_torrent(self, torrent, name, logger):
         free_end = (
             "N/A"
-            if torrent["free_end"] == None
+            if torrent["free_end"] is None
             else time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(torrent["free_end"]))
         )
         text = f"""[{self.name}] 添加种子 {name}\
  免费：{"是" if torrent["free"] else "否"}\
  到期时间：{free_end}\
- H&R：{"无" if torrent["hr"] == None else f'{torrent["hr"] / 3600:.2f}小时'}\
+ H&R：{"无" if torrent["hr"] is None else f'{torrent["hr"] / 3600:.2f}小时'}\
  体积：{torrent["size"]:.2f}GB\
  总体积：{self.total_size + torrent["size"]:.2f}GB\
  任务数：{self.task_count + 1}"""
         self.client.call(
             "core.add_torrent_url",
             torrent["link"],
-            dict(
-                {
-                    "name": name,
-                    "download_location": self.config["projects"][torrent["project"]][
-                        "path"
-                    ],
-                    "add_paused": False,
-                    "auto_managed": False,
-                },
+            {
+                "name": name,
+                "download_location": self.config["projects"][torrent["project"]][
+                    "path"
+                ],
+                "add_paused": False,
+                "auto_managed": False,
                 **self.config["projects"][torrent["project"]]["extra_options"],
-            ),
+            },
         )
         print_t(text, logger=logger)
 
@@ -145,13 +143,11 @@ class qbittorrent:
         try:
             response = requests.post(
                 url=self.config["clients"][self.name]["host"] + api,
-                headers=dict(
-                    {
-                        "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
-                        "Cookie": self.cookies,
-                    },
+                headers={
+                    "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
+                    "Cookie": self.cookies,
                     **self.config["clients"][self.name]["headers"],
-                ),
+                },
                 data=data,
                 timeout=self.config["clients"][self.name]["timeout"],
             )
@@ -243,27 +239,25 @@ class qbittorrent:
     def add_torrent(self, torrent, name, logger):
         free_end = (
             "N/A"
-            if torrent["free_end"] == None
+            if torrent["free_end"] is None
             else time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(torrent["free_end"]))
         )
         text = f"""[{self.name}] 添加种子 {name}\
  免费：{"是" if torrent["free"] else "否"}\
  到期时间：{free_end}\
- H&R：{"无" if torrent["hr"] == None else f'{torrent["hr"] / 3600:.2f}小时'}\
+ H&R：{"无" if torrent["hr"] is None else f'{torrent["hr"] / 3600:.2f}小时'}\
  体积：{torrent["size"]:.2f}GB\
  总体积：{self.total_size + torrent["size"]:.2f}GB\
  任务数：{self.task_count + 1}"""
         self.get_response(
             "/api/v2/torrents/add",
-            dict(
-                {
-                    "urls": torrent["link"],
-                    "savepath": self.config["projects"][torrent["project"]]["path"],
-                    "rename": name,
-                    "paused": "false",
-                },
+            {
+                "urls": torrent["link"],
+                "savepath": self.config["projects"][torrent["project"]]["path"],
+                "rename": name,
+                "paused": "false",
                 **self.config["projects"][torrent["project"]]["extra_options"],
-            ),
+            },
         )
         print_t(text, logger=logger)
 

@@ -55,12 +55,12 @@ def OurBits(config):
                             "leecher": -1,
                             "snatch": -1,
                         }
-                        if re.search('class="pro_\S*free', str(cols[1])) != None:
+                        if re.search('class="pro_\S*free', str(cols[1])) is not None:
                             web_info["free"] = True
                             free_end = re.search('<span title="(.+?)"', str(cols[1]))
                             web_info["free_end"] = (
                                 None
-                                if free_end == None
+                                if free_end is None
                                 else time.mktime(
                                     time.strptime(
                                         free_end.group(1), "%Y-%m-%d %H:%M:%S"
@@ -70,18 +70,18 @@ def OurBits(config):
                                 - config["OurBits"]["timezone"] * 3600
                             )
                         if (
-                            cols[1].find("img", class_="hitandrun") != None
+                            cols[1].find("img", class_="hitandrun") is not None
                             and time.mktime(time.localtime())
                             - torrents[id]["publish_time"]
                             <= 2592000
                         ):
                             web_info["hr"] = 172800
-                        if cols[1].find("div", class_="progressBar") != None:
+                        if cols[1].find("div", class_="progressBar") is not None:
                             web_info["downloaded"] = True
                         web_info["seeder"] = int(re.sub("\D", "", cols[5].text))
                         web_info["leecher"] = int(re.sub("\D", "", cols[6].text))
                         web_info["snatch"] = int(re.sub("\D", "", cols[7].text))
-                        torrents[id] = dict(torrents[id], **web_info)
+                        torrents[id] = {**torrents[id], **web_info}
         else:
             raise Exception
         time.sleep(1)

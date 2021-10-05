@@ -80,9 +80,10 @@ try:
     err_info = "客户端配置有误"
     for name, client in config["clients"].items():
         for snippet in client["snippets"]:
-            config["clients"][name] = dict(
-                config["snippets"][snippet], **config["clients"][name]
-            )
+            config["clients"][name] = {
+                **config["snippets"][snippet],
+                **config["clients"][name],
+            }
         del config["clients"][name]["snippets"]
         if not (
             (
@@ -121,9 +122,10 @@ try:
     err_info = "站点配置有误"
     for name, site in config["sites"].items():
         for snippet in site["snippets"]:
-            config["sites"][name] = dict(
-                config["snippets"][snippet], **config["sites"][name]
-            )
+            config["sites"][name] = {
+                **config["snippets"][snippet],
+                **config["sites"][name],
+            }
         del config["sites"][name]["snippets"]
         if set(config["sites"][name].keys()) != {
             "rss",
@@ -142,13 +144,14 @@ try:
     err_info = "任务计划配置有误"
     for name, project in config["projects"].items():
         for snippet in project["snippets"]:
-            config["projects"][name] = dict(
-                config["snippets"][snippet], **config["projects"][name]
-            )
+            config["projects"][name] = {
+                **config["snippets"][snippet],
+                **config["projects"][name],
+            }
         del config["projects"][name]["snippets"]
         if set(config["projects"][name].keys()) != {
             "client",
-            "site",
+            "sites",
             "path",
             "regexp",
             "publish_within",
@@ -174,7 +177,7 @@ try:
     err_info = "任务计划缺失对应站点配置"
     active_sites = set()
     for _, project in config["projects"].items():
-        for site in project["site"]:
+        for site in project["sites"]:
             active_sites.add(site)
     if not active_sites <= set(config["sites"].keys()):
         raise Exception
@@ -192,12 +195,12 @@ torrent_pool = yaml_read(os.path.join(script_dir, "torrent_pool.yaml"))
 invalid_torrents = [
     name
     for name, torrent in torrent_pool.items()
-    if not "project" in torrent
-    or not torrent["project"] in config["projects"]
-    or not torrent["site"] in config["projects"][torrent["project"]]["site"]
+    if "project" not in torrent
+    or torrent["project"] not in config["projects"]
+    or torrent["site"] not in config["projects"][torrent["project"]]["sites"]
 ]
 name_list = yaml_read(os.path.join(script_dir, "name_queue.yaml"))
-name_list = [name for name in name_list if not name in invalid_torrents]
+name_list = [name for name in name_list if name not in invalid_torrents]
 name_queue = deque(maxlen=config["torrent_pool_size"])
 name_queue.extend(name_list)
 torrent_pool = {
@@ -239,19 +242,19 @@ def task_processor(client):
                             project = config["projects"][torrent["project"]]
                             if (
                                 re.search("registered|回收", stats["tracker_status"])
-                                != None
+                                is not None
                             ):
                                 to_remove = True
                                 info = "种子被撤除"
                             elif stats["seeding_time"] == 0:
                                 if (
                                     project["ignore_hr_leeching"]
-                                    or torrent["hr"] == None
+                                    or torrent["hr"] is None
                                 ):
                                     if project["free_end_escape"] and (
                                         not torrent["free"]
                                         or (
-                                            torrent["free_end"] != None
+                                            torrent["free_end"] is not None
                                             and torrent["free_end"]
                                             - time.mktime(time.localtime())
                                             < project["escape_trigger_time"]
@@ -269,11 +272,11 @@ def task_processor(client):
                             else:
                                 if (
                                     project["ignore_hr_seeding"]
-                                    or torrent["hr"] == None
+                                    or torrent["hr"] is None
                                 ):
                                     hr_time = 0
                                 elif (
-                                    project["hr_seed_ratio"] != None
+                                    project["hr_seed_ratio"] is not None
                                     and stats["ratio"] >= project["hr_seed_ratio"]
                                 ):
                                     hr_time = project["hr_seed_delay"]
@@ -289,12 +292,7 @@ def task_processor(client):
                                             break
                         if to_remove:
                             client.remove_torrent(torrent, name, info, logger)
-                            time.sleep(
-                                5
-                                if config["clients"][client.name]["type"]
-                                == "qbittorrent"
-                                else 1
-                            )
+                            time.sleep(5)
                             client.flush()
                             time.sleep(1)
                     except Exception:
@@ -302,11 +300,7 @@ def task_processor(client):
                             f'[{client.name}] 删除种子 {name}（{torrent["size"]:.2f}GB）可能已失败，尝试删除其他种子…',
                             logger=logger,
                         )
-                        time.sleep(
-                            5
-                            if config["clients"][client.name]["type"] == "qbittorrent"
-                            else 1
-                        )
+                        time.sleep(5)
                         client.flush()
                         time.sleep(1)
                 for name, torrent in pool.items():
@@ -318,7 +312,7 @@ def task_processor(client):
                             continue
                         project = config["projects"][torrent["project"]]
                         if (
-                            not name in client.tasks
+                            name not in client.tasks
                             and not torrent["downloaded"]
                             and client.task_count
                             < config["clients"][client.name]["task_count_max"]
@@ -343,7 +337,7 @@ def task_processor(client):
                                 or (
                                     torrent["free"]
                                     and (
-                                        torrent["free_end"] == None
+                                        torrent["free_end"] is None
                                         or torrent["free_end"]
                                         - time.mktime(time.localtime())
                                         >= project["free_time_min"]
@@ -351,7 +345,7 @@ def task_processor(client):
                                 )
                             )
                             and (
-                                torrent["hr"] == None
+                                torrent["hr"] is None
                                 or torrent["hr"] <= project["hr_time_max"]
                             )
                         ):
@@ -361,12 +355,7 @@ def task_processor(client):
                             if lock.locked():
                                 lock.release()
                             client.add_torrent(torrent, name, logger)
-                            time.sleep(
-                                10
-                                if config["clients"][client.name]["type"]
-                                == "qbittorrent"
-                                else 2
-                            )
+                            time.sleep(10)
                             client.flush()
                             time.sleep(1)
                     except Exception:
@@ -374,11 +363,7 @@ def task_processor(client):
                             f'[{client.name}] 添加种子 {name}（{torrent["size"]:.2f}GB）可能已失败，尝试添加其他种子…',
                             logger=logger,
                         )
-                        time.sleep(
-                            10
-                            if config["clients"][client.name]["type"] == "qbittorrent"
-                            else 2
-                        )
+                        time.sleep(10)
                         client.flush()
                         time.sleep(1)
                 time.sleep(config["clients"][client.name]["run_interval"])
@@ -404,15 +389,13 @@ def torrent_fetcher(site):
                 for name, torrent in torrents.items():
                     project = match_project(torrent, config["projects"])
                     if name in torrent_pool:
-                        torrent_pool[name] = dict(torrent_pool[name], **torrent)
-                    elif project != None:
-                        torrent_pool[name] = dict(
-                            torrent,
-                            **{
-                                "retry_count": -1,
-                                "project": project,
-                            },
-                        )
+                        torrent_pool[name] = {**torrent_pool[name], **torrent}
+                    elif project is not None:
+                        torrent_pool[name] = {
+                            **torrent,
+                            "retry_count": -1,
+                            "project": project,
+                        }
                         name_queue.append(name)
                 torrent_pool = {
                     name: torrent

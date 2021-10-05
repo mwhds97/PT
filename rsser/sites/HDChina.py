@@ -62,12 +62,12 @@ def HDChina(config):
                             "leecher": -1,
                             "snatch": -1,
                         }
-                        if cols[1].find("div", class_="progress") != None:
+                        if cols[1].find("div", class_="progress") is not None:
                             web_info["downloaded"] == True
                         web_info["seeder"] = int(re.sub("\D", "", cols[5].text))
                         web_info["leecher"] = int(re.sub("\D", "", cols[6].text))
                         web_info["snatch"] = int(re.sub("\D", "", cols[7].text))
-                        torrents[id] = dict(torrents[id], **web_info)
+                        torrents[id] = {**torrents[id], **web_info}
         else:
             raise Exception
         time.sleep(1)
@@ -89,13 +89,13 @@ def HDChina(config):
             for id, state in pro_info["message"].items():
                 if (
                     id in torrents
-                    and re.search('class="pro_\S*free', state["sp_state"]) != None
+                    and re.search('class="pro_\S*free', state["sp_state"]) is not None
                 ):
                     torrents[id]["free"] = True
                     free_end = re.search('<span title="(.+?)"', state["timeout"])
                     torrents[id]["free_end"] = (
                         None
-                        if free_end == None
+                        if free_end is None
                         else time.mktime(
                             time.strptime(free_end.group(1), "%Y-%m-%d %H:%M:%S")
                         )

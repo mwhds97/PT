@@ -157,7 +157,7 @@ projects:
     - PRJ_DEFAULT
     client: de1
     path: '/mnt/U2'
-    site:
+    sites:
     - U2
     regexp:
     - '.*'
@@ -167,7 +167,7 @@ projects:
     - PRJ_DEFAULT
     client: de1
     path: '/mnt/MT'
-    site:
+    sites:
     - MTeam
     regexp:
     - '.*'
@@ -176,7 +176,7 @@ projects:
     - PRJ_DEFAULT
     client: qb1
     path: 'C:\TTG'
-    site:
+    sites:
     - TTG
     regexp:
     - '(-|@)(TTG|WiKi|NGB|DoA|ARiN)'
@@ -186,7 +186,7 @@ projects:
     - PRJ_DEFAULT
     client: de1
     path: '/mnt/CHD'
-    site:
+    sites:
     - CHDBits
     regexp:
     - '-CHD(?!Bits)'
@@ -197,7 +197,7 @@ projects:
     - PRJ_DEFAULT
     client: de1
     path: '/mnt/HDS'
-    site:
+    sites:
     - HDSky
     regexp:
     - '(-|@)HDS'
@@ -207,7 +207,7 @@ projects:
     - PRJ_DEFAULT
     client: de1
     path: '/mnt/SSD'
-    site:
+    sites:
     - SSD
     regexp:
     - '(-|@)CMCT'
@@ -216,7 +216,7 @@ projects:
     - PRJ_DEFAULT
     client: de1
     path: '/mnt/OB'
-    site:
+    sites:
     - OurBits
     regexp:
     - '(-|@)(Our|iLove|PbK|FLTTH)'
@@ -227,7 +227,7 @@ projects:
     - PRJ_DEFAULT
     client: de1
     path: '/mnt/OCD'
-    site:
+    sites:
     - OpenCD
     regexp:
     - '.*'
