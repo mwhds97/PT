@@ -241,7 +241,7 @@ def task_processor(client):
                                 continue
                             project = config["projects"][torrent["project"]]
                             if (
-                                re.search("registered|回收", stats["tracker_status"])
+                                re.search(r"registered|回收", stats["tracker_status"])
                                 is not None
                             ):
                                 to_remove = True

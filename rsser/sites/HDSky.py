@@ -19,10 +19,10 @@ def HDSky(config):
     else:
         raise Exception
     torrents = {
-        re.search("id=(\d+)", entry["link"]).group(1): {
+        re.search(r"id=(\d+)", entry["link"]).group(1): {
             "site": "HDSky",
-            "title": re.match("(.+)\[.+\]$", entry["title"]).group(1),
-            "size": size_G(re.search("\[([\w\.\s]+)\]$", entry["title"]).group(1)),
+            "title": re.match(r"(.+)\[.+\]$", entry["title"]).group(1),
+            "size": size_G(re.search(r"\[([\w\.\s]+)\]$", entry["title"]).group(1)),
             "publish_time": time.mktime(entry["published_parsed"]) - time.timezone,
             "link": entry["links"][1]["href"],
         }
@@ -46,7 +46,7 @@ def HDSky(config):
             for row in rows[1:]:
                 cols = row.find_all("td", recursive=False)
                 if len(cols) >= 10:
-                    id = re.search("id=(\d+)", str(cols[1])).group(1)
+                    id = re.search(r"id=(\d+)", str(cols[1])).group(1)
                     if id in torrents:
                         web_info = {
                             "free": False,
@@ -57,12 +57,12 @@ def HDSky(config):
                             "leecher": -1,
                             "snatch": -1,
                         }
-                        if re.search('class="pro_\S*free', str(cols[1])) is not None:
-                            if re.search("\[.+<b>.+\]", str(cols[1])) is None:
+                        if re.search(r'class="pro_\S*free', str(cols[1])) is not None:
+                            if re.search(r"\[.+<b>.+\]", str(cols[1])) is None:
                                 web_info["free"] = True
                             else:
                                 free_end = re.search(
-                                    '<span title="(.+?)"', str(cols[1])
+                                    r'<span title="(.+?)"', str(cols[1])
                                 )
                                 if free_end is not None:
                                     web_info["free"] = True
@@ -76,7 +76,7 @@ def HDSky(config):
                                         - config["HDSky"]["timezone"] * 3600
                                     )
                         if (
-                            re.search('<div class="progress.*', str(cols[1]))
+                            re.search(r'<div class="progress.*', str(cols[1]))
                             is not None
                         ):
                             web_info["downloaded"] = True

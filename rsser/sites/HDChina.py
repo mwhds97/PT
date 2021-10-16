@@ -20,10 +20,10 @@ def HDChina(config):
     else:
         raise Exception
     torrents = {
-        re.search("id=(\d+)", entry["link"]).group(1): {
+        re.search(r"id=(\d+)", entry["link"]).group(1): {
             "site": "HDChina",
-            "title": re.match("(.+)\[.+\]$", entry["title"]).group(1),
-            "size": size_G(re.search("\[([\w\.\s]+)\]$", entry["title"]).group(1)),
+            "title": re.match(r"(.+)\[.+\]$", entry["title"]).group(1),
+            "size": size_G(re.search(r"\[([\w\.\s]+)\]$", entry["title"]).group(1)),
             "publish_time": time.mktime(entry["published_parsed"]) - time.timezone,
             "link": entry["links"][1]["href"],
         }
@@ -50,7 +50,7 @@ def HDChina(config):
             for row in rows[1:]:
                 cols = row.find_all("td", recursive=False)
                 if len(cols) >= 9:
-                    id = re.search("id=(\d+)", str(cols[1])).group(1)
+                    id = re.search(r"id=(\d+)", str(cols[1])).group(1)
                     ids.append(("ids[]", id))
                     if id in torrents:
                         web_info = {
@@ -89,10 +89,10 @@ def HDChina(config):
             for id, state in pro_info["message"].items():
                 if (
                     id in torrents
-                    and re.search('class="pro_\S*free', state["sp_state"]) is not None
+                    and re.search(r'class="pro_\S*free', state["sp_state"]) is not None
                 ):
                     torrents[id]["free"] = True
-                    free_end = re.search('<span title="(.+?)"', state["timeout"])
+                    free_end = re.search(r'<span title="(.+?)"', state["timeout"])
                     torrents[id]["free_end"] = (
                         None
                         if free_end is None

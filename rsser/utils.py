@@ -18,7 +18,7 @@ def print_t(text, nowrap=False, logger=None):
 
 
 def size_G(size_str):
-    size = re.match("(\d+(?:\.\d+)?)[\n\s]*([KMGT])?i?B", size_str).groups()
+    size = re.match(r"(\d+(?:\.\d+)?)[\n\s]*([KMGT])?i?B", size_str).groups()
     if size[1] is None:
         return float(size[0]) / 1073741824
     elif size[1] == "K":

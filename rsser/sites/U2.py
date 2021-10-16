@@ -19,10 +19,10 @@ def U2(config):
     else:
         raise Exception
     torrents = {
-        re.search("id=(\d+)", entry["link"]).group(1): {
+        re.search(r"id=(\d+)", entry["link"]).group(1): {
             "site": "U2",
-            "title": re.match("(.+)\[.+\]$", entry["title"]).group(1),
-            "size": size_G(re.search("\[([\w\.\s]+)\]$", entry["title"]).group(1)),
+            "title": re.match(r"(.+)\[.+\]$", entry["title"]).group(1),
+            "size": size_G(re.search(r"\[([\w\.\s]+)\]$", entry["title"]).group(1)),
             "link": entry["links"][1]["href"],
         }
         for entry in feed["entries"]
@@ -43,7 +43,7 @@ def U2(config):
             for row in rows[1:]:
                 cols = row.find_all("td", recursive=False)
                 if len(cols) >= 8:
-                    id = re.search("id=(\d+)", str(cols[1])).group(1)
+                    id = re.search(r"id=(\d+)", str(cols[1])).group(1)
                     if id in torrents:
                         web_info = {
                             "publish_time": -1,
@@ -56,15 +56,15 @@ def U2(config):
                             "snatch": -1,
                         }
                         if (
-                            re.search('class="pro_\S*free', str(cols[1])) is not None
+                            re.search(r'class="pro_\S*free', str(cols[1])) is not None
                             or re.search(
-                                'class="pro_custom.+class="arrowdown.+0\.00X',
+                                r'class="pro_custom.+class="arrowdown.+0\.00X',
                                 str(cols[1]),
                             )
                             is not None
                         ):
                             web_info["free"] = True
-                            free_end = re.search('<time title="(.+?)"', str(cols[1]))
+                            free_end = re.search(r'<time title="(.+?)"', str(cols[1]))
                             web_info["free_end"] = (
                                 None
                                 if free_end is None
@@ -80,7 +80,7 @@ def U2(config):
                             time.mktime(
                                 time.strptime(
                                     re.search(
-                                        '<time title="(.+?)"', str(cols[3])
+                                        r'<time title="(.+?)"', str(cols[3])
                                     ).group(1),
                                     "%Y-%m-%d %H:%M:%S",
                                 )
@@ -91,7 +91,7 @@ def U2(config):
                         web_info["seeder"] = int(re.sub("\D", "", cols[5].text))
                         web_info["leecher"] = int(re.sub("\D", "", cols[6].text))
                         web_info["snatch"] = int(re.sub("\D", "", cols[7].text))
-                        if re.search("snatchhlc", str(cols[7])) is not None:
+                        if re.search(r"snatchhlc", str(cols[7])) is not None:
                             web_info["downloaded"] = True
                         torrents[id] = {**torrents[id], **web_info}
         else:

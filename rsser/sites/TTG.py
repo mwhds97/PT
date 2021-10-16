@@ -20,8 +20,8 @@ def TTG(config):
         raise Exception
     torrents = {}
     for entry in feed["entries"]:
-        title_size = re.match("(.+) (\d+(?:\.\d+)? \w+?)$", entry["title"]).groups()
-        torrents[re.search("id=(\d+)", entry["link"]).group(1)] = {
+        title_size = re.match(r"(.+) (\d+(?:\.\d+)? \w+?)$", entry["title"]).groups()
+        torrents[re.search(r"id=(\d+)", entry["link"]).group(1)] = {
             "site": "TTG",
             "title": title_size[0],
             "size": size_G(title_size[1]),
@@ -46,7 +46,7 @@ def TTG(config):
             for row in rows[1:]:
                 cols = row.find_all("td", recursive=False)
                 if len(cols) >= 10:
-                    id = re.search('tid="(\d+)"', str(cols[1])).group(1)
+                    id = re.search(r'tid="(\d+)"', str(cols[1])).group(1)
                     if id in torrents:
                         web_info = {
                             "free": False,
@@ -60,7 +60,7 @@ def TTG(config):
                         if cols[1].find("img", alt="free") is not None:
                             web_info["free"] = True
                             free_end = re.search(
-                                "javascript:alert.+(\d{4}年\d{2}月\d{2}日\d{2}点\d{2}分)",
+                                r"javascript:alert.+(\d{4}年\d{2}月\d{2}日\d{2}点\d{2}分)",
                                 str(cols[1]),
                             )
                             web_info["free_end"] = (
@@ -75,7 +75,7 @@ def TTG(config):
                         if cols[1].find("img", title="Hit and Run") is not None:
                             web_info["hr"] = (
                                 86400
-                                if re.search("第\d+[集话話周週]|EP?\d+(?!-)", str(cols[1]))
+                                if re.search(r"第\d+[集话話周週]|EP?\d+(?!-)", str(cols[1]))
                                 is not None
                                 else 216000
                             )

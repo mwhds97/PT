@@ -25,10 +25,10 @@ def MTeam(config):
     else:
         raise Exception
     torrents = {
-        re.search("id=(\d+)", entry["link"]).group(1): {
+        re.search(r"id=(\d+)", entry["link"]).group(1): {
             "site": "MTeam",
-            "title": re.match("(.+)\[.+\]$", entry["title"]).group(1),
-            "size": size_G(re.search("\[([\w\.\s]+)\]$", entry["title"]).group(1)),
+            "title": re.match(r"(.+)\[.+\]$", entry["title"]).group(1),
+            "size": size_G(re.search(r"\[([\w\.\s]+)\]$", entry["title"]).group(1)),
             "publish_time": time.mktime(entry["published_parsed"]) - time.timezone,
             "link": entry["links"][1]["href"],
         }
@@ -50,7 +50,7 @@ def MTeam(config):
             for row in rows[1:]:
                 cols = row.find_all("td", recursive=False)
                 if len(cols) >= 10:
-                    id = re.search("id=(\d+)", str(cols[1])).group(1)
+                    id = re.search(r"id=(\d+)", str(cols[1])).group(1)
                     if id in torrents:
                         web_info = {
                             "free": False,
@@ -61,9 +61,9 @@ def MTeam(config):
                             "leecher": -1,
                             "snatch": -1,
                         }
-                        if re.search('class="pro_\S*free', str(cols[1])) is not None:
+                        if re.search(r'class="pro_\S*free', str(cols[1])) is not None:
                             free_duration = re.search(
-                                "<span.+(?:限時：|will end in)(.+?)</span>", str(cols[1])
+                                r"<span.+(?:限時：|will end in)(.+?)</span>", str(cols[1])
                             )
                             if free_duration is None:
                                 web_info["free"] = True
@@ -73,7 +73,7 @@ def MTeam(config):
                         web_info["seeder"] = int(re.sub("\D", "", cols[5].text))
                         web_info["leecher"] = int(re.sub("\D", "", cols[6].text))
                         web_info["snatch"] = int(re.sub("\D", "", cols[7].text))
-                        if re.search("\d", cols[8].text) is not None:
+                        if re.search(r"\d", cols[8].text) is not None:
                             web_info["downloaded"] = True
                         torrents[id] = {**torrents[id], **web_info}
         else:
