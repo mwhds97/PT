@@ -86,6 +86,18 @@ def HDChina(config):
             pro_info = json.loads(response.text)
             if pro_info["status"] != 200 or pro_info["message"] == {}:
                 raise Exception
+            sp_states = set(
+                state["sp_state"] for _, state in pro_info["message"].items()
+            )
+            if len(sp_states) == 1 and "" not in sp_states:
+                if (
+                    re.match(
+                        r' <img class="pro_free" src="pic/trans.gif" alt="Free"',
+                        min(sp_states),
+                    )
+                    is None
+                ):
+                    raise Exception
             for id, state in pro_info["message"].items():
                 if (
                     id in torrents
