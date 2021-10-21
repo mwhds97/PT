@@ -71,7 +71,7 @@ def HDChina(config):
         else:
             raise Exception
         time.sleep(1)
-        response = session.post(
+        """ response = session.post(
             url="https://hdchina.org/ajax_promotion.php",
             headers={
                 "User-Agent": config["HDChina"]["user_agent"],
@@ -116,7 +116,7 @@ def HDChina(config):
                     )
         else:
             raise Exception
-        time.sleep(1)
+        time.sleep(1) """
     session.close()
     return {
         "[HDChina]" + id: torrent
