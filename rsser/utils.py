@@ -95,3 +95,16 @@ def yaml_dump(data, file_name):
             encoding="utf-8",
             sort_keys=False,
         )
+
+
+def compare_version(ver_a, ver_b):
+    ver_a = [int(n) for n in re.sub(r"[^\d\.]", "", ver_a).split(".") if n != ""]
+    ver_b = [int(n) for n in re.sub(r"[^\d\.]", "", ver_b).split(".") if n != ""]
+    for i in range(min(len(ver_a), len(ver_b))):
+        if ver_a[i] > ver_b[i]:
+            return True
+        if ver_a[i] < ver_b[i]:
+            return False
+    if len(ver_a) >= len(ver_b):
+        return True
+    return False

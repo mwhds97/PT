@@ -135,6 +135,7 @@ class qbittorrent:
         self.name = name
         self.config = config
         self.new_client()
+        self.ver = self.get_response("/api/v2/app/webapiVersion").text
 
     def __del__(self):
         self.get_response("/api/v2/auth/logout", nobreak=True)
@@ -145,10 +146,10 @@ class qbittorrent:
                 url=self.config["clients"][self.name]["host"] + api,
                 headers={
                     "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
-                    "Cookie": self.cookies,
                     **self.config["clients"][self.name]["headers"],
                 },
                 data=data,
+                cookies=self.cookies,
                 timeout=self.config["clients"][self.name]["timeout"],
             )
             if response.status_code != 200:
@@ -168,7 +169,11 @@ class qbittorrent:
                 "password": self.config["clients"][self.name]["pass"],
             },
         )
-        self.cookies = response.headers["set-cookie"]
+        self.cookies = {
+            "SID": part.replace("SID=", "")
+            for part in response.headers["set-cookie"].split(";")
+            if "SID=" in part
+        }
 
     def reconnect(self):
         self.get_response("/api/v2/auth/logout", nobreak=True)
@@ -231,6 +236,16 @@ class qbittorrent:
                 for tracker in trackers[3:]:
                     tracker_status += tracker["msg"]
             self.tasks[name]["tracker_status"] = tracker_status
+        if not compare_version(self.ver, "2.8.1"):
+            for name, stats in self.tasks.items():
+                if "seeding_time" not in stats:
+                    self.tasks[name]["seeding_time"] = 0
+                response = self.get_response(
+                    "/api/v2/torrents/properties", {"hash": stats["hash"]}, True
+                )
+                info = json.loads(response.text) if response.text != "" else {}
+                if "seeding_time" in info:
+                    self.tasks[name]["seeding_time"] = info["seeding_time"]
         self.total_size = (
             sum([task["size"] for _, task in self.tasks.items()]) / 1073741824
         )
