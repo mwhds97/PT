@@ -22,10 +22,10 @@
 ```text
 python >= 3.7.0
 beautifulsoup4 >= 4.9.0
-deluge-client >= 1.9.0
 feedparser >= 6.0.0
 lxml >= 4.6.0
 PyYAML >= 5.4.0
+rencode >= 1.0.5
 requests >= 2.25.0
 ```
 

@@ -1,8 +1,12 @@
 import json
+import socket
+import ssl
+import struct
 import time
+import zlib
 
+import rencode
 import requests
-from deluge_client import DelugeRPCClient
 
 from utils import *
 
@@ -11,29 +15,123 @@ class deluge:
     def __init__(self, name, config):
         self.name = name
         self.config = config
+        self.context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+        self.context.check_hostname = False
+        self.context.verify_mode = ssl.CERT_NONE
+        self.version = None
         self.new_client()
 
     def __del__(self):
         try:
-            self.client.disconnect()
+            self.socket.close()
+            del self.socket
         except Exception:
             pass
 
-    def new_client(self):
-        self.client = DelugeRPCClient(
-            self.config["clients"][self.name]["host"].split(":")[0],
-            int(self.config["clients"][self.name]["host"].split(":")[1]),
-            self.config["clients"][self.name]["user"],
-            self.config["clients"][self.name]["pass"],
-            True,
-            False,
+    def new_socket(self):
+        self.socket = self.context.wrap_socket(
+            socket.socket(socket.AF_INET, socket.SOCK_STREAM),
         )
-        self.client.timeout = self.config["clients"][self.name]["timeout"]
-        self.client.connect()
+        self.socket.settimeout(self.config["clients"][self.name]["timeout"])
+        self.socket.connect(
+            (
+                self.config["clients"][self.name]["host"].split(":")[0],
+                int(self.config["clients"][self.name]["host"].split(":")[1]),
+            )
+        )
+
+    def get_response(self, version, data=b""):
+        flags = None
+        while True:
+            recv = self.socket.recv(10)
+            data += recv
+            if version[0] == 2:
+                if flags is None:
+                    if len(data) < 5:
+                        continue
+                    header = data[:5]
+                    data = data[5:]
+                    if version[1] == 0:
+                        if header[0] != b"D"[0]:
+                            raise Exception
+                    elif ord(header[:1]) != 1:
+                        raise Exception
+                    if version[1] == 1:
+                        flags = struct.unpack("!I", header[1:])[0]
+                    elif version[1] == 0:
+                        flags = struct.unpack("!i", header[1:])[0]
+                if flags <= len(data):
+                    data = zlib.decompress(data)
+                    break
+            elif version[0] == 1:
+                try:
+                    data = zlib.decompress(data)
+                except zlib.error:
+                    if not recv:
+                        raise Exception
+                    continue
+                break
+        data = list(rencode.loads(data, decode_utf8=True))
+        if data[0] == 1:
+            return data[2]
+        elif data[0] == 2:
+            raise Exception
+
+    def send_call(self, version, method, *args, **kwargs):
+        self.request_id += 1
+        request = zlib.compress(
+            rencode.dumps(((self.request_id, method, args, kwargs),))
+        )
+        if version[0] == 2:
+            if version[1] == 1:
+                self.socket.send(struct.pack("!BI", 1, len(request)))
+            elif version[1] == 0:
+                self.socket.send(b"D" + struct.pack("!i", len(request)))
+            else:
+                raise Exception
+        self.socket.send(request)
+
+    def call(self, method, *args, **kwargs):
+        self.send_call(self.version, method, *args, **kwargs)
+        return self.get_response(self.version)
+
+    def new_client(self):
+        self.new_socket()
+        self.request_id = 1
+        if self.version is None:
+            self.send_call([1, 0], "daemon.info")
+            self.send_call([2, 0], "daemon.info")
+            self.send_call([2, 1], "daemon.info")
+            recv = self.socket.recv(1)
+            if recv[:1] == b"D":
+                self.version = [2, 0]
+                self.get_response(self.version, recv)
+            elif ord(recv[:1]) == 1:
+                self.version = [2, 1]
+                self.get_response(self.version, recv)
+            else:
+                self.version = [1, 0]
+                self.socket.close()
+                del self.socket
+                self.new_socket()
+        if self.version[0] == 2:
+            self.call(
+                "daemon.login",
+                self.config["clients"][self.name]["user"],
+                self.config["clients"][self.name]["pass"],
+                client_version="deluge",
+            )
+        elif self.version[0] == 1:
+            self.call(
+                "daemon.login",
+                self.config["clients"][self.name]["user"],
+                self.config["clients"][self.name]["pass"],
+            )
 
     def reconnect(self):
         try:
-            self.client.disconnect()
+            self.socket.close()
+            del self.socket
         except Exception:
             pass
         time.sleep(self.config["clients"][self.name]["reconnect_interval"])
@@ -58,7 +156,7 @@ class deluge:
             "eta": "eta",
             "tracker_status": "tracker_status",
         }
-        self.tasks = self.client.call(
+        self.tasks = self.call(
             "core.get_torrents_status",
             {},
             [
@@ -105,7 +203,7 @@ class deluge:
  体积：{torrent["size"]:.2f}GB\
  总体积：{self.total_size + torrent["size"]:.2f}GB\
  任务数：{self.task_count + 1}"""
-        self.client.call(
+        self.call(
             "core.add_torrent_url",
             torrent["link"],
             {
@@ -126,7 +224,7 @@ class deluge:
  体积：{torrent["size"]:.2f}GB\
  总体积：{self.total_size - self.tasks[name]["size"] / 1073741824 + 0:.2f}GB\
  任务数：{self.task_count - 1}'
-        self.client.call("core.remove_torrent", self.tasks[name]["hash"], True)
+        self.call("core.remove_torrent", self.tasks[name]["hash"], True)
         print_t(text, logger=logger)
 
 
