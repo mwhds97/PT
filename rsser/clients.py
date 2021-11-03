@@ -51,14 +51,13 @@ class deluge:
                         continue
                     header = data[:5]
                     data = data[5:]
-                    if version[1] == 0:
-                        if header[0] != b"D"[0]:
-                            raise Exception
-                    elif ord(header[:1]) != 1:
-                        raise Exception
                     if version[1] == 1:
+                        if ord(header[:1]) != 1:
+                            raise Exception
                         flags = struct.unpack("!I", header[1:])[0]
                     elif version[1] == 0:
+                        if header[0] != b"D"[0]:
+                            raise Exception
                         flags = struct.unpack("!i", header[1:])[0]
                 if flags <= len(data):
                     data = zlib.decompress(data)
@@ -87,8 +86,6 @@ class deluge:
                 self.socket.send(struct.pack("!BI", 1, len(request)))
             elif version[1] == 0:
                 self.socket.send(b"D" + struct.pack("!i", len(request)))
-            else:
-                raise Exception
         self.socket.send(request)
 
     def call(self, method, *args, **kwargs):
