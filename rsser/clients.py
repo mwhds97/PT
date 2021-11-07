@@ -42,9 +42,16 @@ class deluge:
 
     def get_response(self, version, data=b""):
         flags = None
+        null_count = 0
         while True:
+            if null_count > 10:
+                raise Exception
             recv = self.socket.recv(10)
-            data += recv
+            if len(recv) > 0:
+                data += recv
+                null_count = 0
+            else:
+                null_count += 1
             if version[0] == 2:
                 if flags is None:
                     if len(data) < 5:
@@ -66,7 +73,7 @@ class deluge:
                 try:
                     data = zlib.decompress(data)
                 except zlib.error:
-                    if not recv:
+                    if len(recv) == 0:
                         raise Exception
                     continue
                 break
@@ -76,7 +83,7 @@ class deluge:
         elif data[0] == 2:
             raise Exception
 
-    def send_call(self, version, method, *args, **kwargs):
+    def send_request(self, version, method, *args, **kwargs):
         self.request_id += 1
         request = zlib.compress(
             rencode.dumps(((self.request_id, method, args, kwargs),))
@@ -89,16 +96,16 @@ class deluge:
         self.socket.send(request)
 
     def call(self, method, *args, **kwargs):
-        self.send_call(self.version, method, *args, **kwargs)
+        self.send_request(self.version, method, *args, **kwargs)
         return self.get_response(self.version)
 
     def new_client(self):
         self.new_socket()
-        self.request_id = 1
+        self.request_id = 0
         if self.version is None:
-            self.send_call([1, 0], "daemon.info")
-            self.send_call([2, 0], "daemon.info")
-            self.send_call([2, 1], "daemon.info")
+            self.send_request([1, 0], "daemon.info")
+            self.send_request([2, 0], "daemon.info")
+            self.send_request([2, 1], "daemon.info")
             recv = self.socket.recv(1)
             if recv[:1] == b"D":
                 self.version = [2, 0]
