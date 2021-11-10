@@ -49,7 +49,7 @@ def OpenCD(config):
                         web_info = {
                             "free": False,
                             "free_end": None,
-                            "hr": 259200,
+                            "hr": 129600,
                             "downloaded": False,
                             "seeder": -1,
                             "leecher": -1,

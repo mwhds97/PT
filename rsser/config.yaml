@@ -231,3 +231,10 @@ projects:
     - OpenCD
     regexp:
     - '.*'
+    remove_conditions:
+    - info: '下载时长超过限制'
+      exp: 'active_time >= 259200'
+      period: L
+    - info: '做种时长达到要求'
+      exp: 'seeding_time >= 129600'
+      period: S
