@@ -87,7 +87,8 @@ clients: #客户端列表（字典）
     pass: '...' #qBittorrent Web UI 密码
     headers: {}
     #用于访问 qBittorrent Web UI 的 request headers
-    #如果 Web UI 设置中的“启用 Host header 属性验证”被勾选，该值必须包含 'Host': '设定域名（若为 * 可取任意值）:本地监听端口（Web UI）'
+    #如果 Web UI 设置中的“启用 Host header 属性验证”被勾选，且 Web UI 的本地监听端口和远程访问端口不一致（常见于 NAT 环境）
+    #，该值必须包含 'Host': '设定域名（若为 * 可取任意值）:本地监听端口（Web UI）'
     timeout: 15 #与客户端通信超时的阈值（单位：秒）
     reconnect_interval: 10 #重新连接客户端的时间间隔（单位：秒）
     run_interval: 30 #执行任务处理（包括添加、移除种子）流程的时间间隔（单位：秒）
