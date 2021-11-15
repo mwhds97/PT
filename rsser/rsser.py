@@ -34,9 +34,11 @@ def SIGINT_handler(signum, frame):
     terminate()
 
 
+script_dir = os.path.dirname(
+    sys.executable if getattr(sys, "frozen", False) else __file__
+)
 sys.excepthook = uncaught_exception_handler
 signal.signal(signal.SIGINT, SIGINT_handler)
-script_dir = os.path.dirname(__file__)
 try:
     os.makedirs(os.path.join(script_dir, "logs"), exist_ok=True)
 except Exception:
