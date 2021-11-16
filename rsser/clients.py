@@ -205,8 +205,8 @@ class deluge:
  到期时间：{free_end}\
  H&R：{"无" if torrent["hr"] is None else f'{torrent["hr"] / 3600:.2f}小时'}\
  体积：{torrent["size"]:.2f}GB\
- 总体积：{self.total_size + torrent["size"]:.2f}GB\
- 任务数：{self.task_count + 1}"""
+ 任务数：{self.task_count + 1}\
+ 总体积：{self.total_size + torrent["size"]:.2f}GB"""
         self.call(
             "core.add_torrent_url",
             torrent["link"],
@@ -226,8 +226,10 @@ class deluge:
         text = f'[{self.name}] 删除种子 {name}\
  原因：{info}\
  体积：{torrent["size"]:.2f}GB\
- 总体积：{self.total_size - self.tasks[name]["size"] / 1073741824 + 0:.2f}GB\
- 任务数：{self.task_count - 1}'
+ 上传量：{self.tasks[name]["uploaded"] / 1073741824:.2f}GB\
+ 分享率：{self.tasks[name]["ratio"]:.2f}\
+ 任务数：{self.task_count - 1}\
+ 总体积：{self.total_size - self.tasks[name]["size"] / 1073741824 + 0:.2f}GB'
         self.call("core.remove_torrent", self.tasks[name]["hash"], True)
         print_t(text, logger=logger)
 
@@ -364,8 +366,8 @@ class qbittorrent:
  到期时间：{free_end}\
  H&R：{"无" if torrent["hr"] is None else f'{torrent["hr"] / 3600:.2f}小时'}\
  体积：{torrent["size"]:.2f}GB\
- 总体积：{self.total_size + torrent["size"]:.2f}GB\
- 任务数：{self.task_count + 1}"""
+ 任务数：{self.task_count + 1}\
+ 总体积：{self.total_size + torrent["size"]:.2f}GB"""
         self.get_response(
             "/api/v2/torrents/add",
             {
@@ -382,8 +384,10 @@ class qbittorrent:
         text = f'[{self.name}] 删除种子 {name}\
  原因：{info}\
  体积：{torrent["size"]:.2f}GB\
- 总体积：{self.total_size - self.tasks[name]["size"] / 1073741824 + 0:.2f}GB\
- 任务数：{self.task_count - 1}'
+ 上传量：{self.tasks[name]["uploaded"] / 1073741824:.2f}GB\
+ 分享率：{self.tasks[name]["ratio"]:.2f}\
+ 任务数：{self.task_count - 1}\
+ 总体积：{self.total_size - self.tasks[name]["size"] / 1073741824 + 0:.2f}GB'
         self.get_response(
             "/api/v2/torrents/delete",
             {"hashes": self.tasks[name]["hash"], "deleteFiles": "true"},
