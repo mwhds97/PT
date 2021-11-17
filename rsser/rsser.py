@@ -170,6 +170,7 @@ try:
             "hr_seed_ratio",
             "ignore_hr_seeding",
             "ignore_hr_leeching",
+            "task_count_max",
             "retry_count_max",
             "extra_options",
             "remove_conditions",
@@ -318,6 +319,15 @@ def task_processor(client):
                             and not torrent["downloaded"]
                             and client.task_count
                             < config["clients"][client.name]["task_count_max"]
+                            and len(
+                                [
+                                    title
+                                    for title in client.tasks
+                                    if title in pool
+                                    and pool[title]["project"] == torrent["project"]
+                                ]
+                            )
+                            < project["task_count_max"]
                             and client.total_size + torrent["size"]
                             <= config["clients"][client.name]["space"]
                             and torrent["retry_count"] < project["retry_count_max"]

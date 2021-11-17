@@ -155,6 +155,9 @@ projects: #任务计划列表（字典）
     hr_seed_ratio: null #若站点的 H&R 规则允许达到一定分享率后停止做种，可将该值设定为对应分享率
     ignore_hr_seeding: false #若该值为 true，做种中的种子的 H&R 要求将被忽略
     ignore_hr_leeching: true #若该值为 true，下载中的种子的 H&R 要求将被忽略
+    task_count_max: 10
+    #同时进行的最大任务数量
+    #所有状态的任务都会被计入
     retry_count_max: 2 #添加任务失败时重试的最大次数
     extra_options: {}
     #任务的其他设置（例如限速、分类等），参见 Deluge 源代码和 qBittorrent API 文档

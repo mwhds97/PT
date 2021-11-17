@@ -1,4 +1,4 @@
-torrent_pool_size: 1000
+torrent_pool_size: 5000
 sort_by:
   size: true
   publish_time: true
@@ -17,6 +17,8 @@ snippets:
     retry_interval: 30
     timezone: +8
   PRJ_DEFAULT:
+    regexp:
+    - '.*'
     size:
     - [0, 100]
     publish_within: 660
@@ -32,6 +34,7 @@ snippets:
     hr_seed_ratio: null
     ignore_hr_seeding: false
     ignore_hr_leeching: true
+    task_count_max: 10
     retry_count_max: 2
     extra_options: {}
     remove_conditions:
@@ -159,8 +162,6 @@ projects:
     path: '/mnt/U2'
     sites:
     - U2
-    regexp:
-    - '.*'
     extra_options: {'max_upload_speed': 52428800}
   MT_new:
     snippets:
@@ -169,8 +170,6 @@ projects:
     path: '/mnt/MT'
     sites:
     - MTeam
-    regexp:
-    - '.*'
   TTG_new:
     snippets:
     - PRJ_DEFAULT
@@ -229,8 +228,6 @@ projects:
     path: '/mnt/OCD'
     sites:
     - OpenCD
-    regexp:
-    - '.*'
     remove_conditions:
     - info: '下载时长超过限制'
       exp: 'active_time >= 259200'
