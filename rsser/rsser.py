@@ -14,11 +14,11 @@ from utils import *
 
 
 def terminate():
-    lock.acquire(timeout=10)
+    pool_lock.acquire(timeout=10)
     yaml_dump(torrent_pool, os.path.join(script_dir, "torrent_pool.yaml"))
     yaml_dump(list(name_queue), os.path.join(script_dir, "name_queue.yaml"))
-    if lock.locked():
-        lock.release()
+    if pool_lock.locked():
+        pool_lock.release()
     print_t("正在停止…", logger=logger)
     logger.close()
     sys.exit(0)
@@ -65,6 +65,7 @@ try:
         "sort_by",
         "snippets",
         "clients",
+        "volumes",
         "sites",
         "projects",
     }:
@@ -99,7 +100,6 @@ try:
                     "timeout",
                     "reconnect_interval",
                     "run_interval",
-                    "space",
                     "task_count_max",
                 }
             )
@@ -115,7 +115,6 @@ try:
                     "timeout",
                     "reconnect_interval",
                     "run_interval",
-                    "space",
                     "task_count_max",
                 }
             )
@@ -155,6 +154,7 @@ try:
             "client",
             "sites",
             "path",
+            "volume",
             "regexp",
             "publish_within",
             "size",
@@ -217,7 +217,9 @@ for client in active_clients:
         print_t(f"[{client}] 无法连接客户端，请重试", logger=logger)
         logger.close()
         sys.exit(0)
-lock = threading.Lock()
+tasks_overall = {}
+pool_lock = threading.Lock()
+op_lock = threading.Lock()
 
 
 def task_processor(client):
@@ -227,13 +229,17 @@ def task_processor(client):
                 client.flush()
                 print_t(f"[{client.name}] 客户端连接正常，正在等候任务…", True)
                 time.sleep(1)
+                tasks_overall[client.name] = client.tasks
+                if op_lock.locked():
+                    op_lock.release()
                 tasks = deepcopy(client.tasks)
-                lock.acquire(timeout=10)
+                pool_lock.acquire(timeout=10)
                 pool = deepcopy(torrent_pool)
-                if lock.locked():
-                    lock.release()
+                if pool_lock.locked():
+                    pool_lock.release()
                 for name, stats in tasks.items():
                     try:
+                        op_lock.acquire(timeout=120)
                         to_remove = False
                         if name in pool:
                             torrent = pool[name]
@@ -298,6 +304,9 @@ def task_processor(client):
                             time.sleep(5)
                             client.flush()
                             time.sleep(1)
+                            tasks_overall[client.name] = client.tasks
+                        if op_lock.locked():
+                            op_lock.release()
                     except Exception:
                         print_t(
                             f'[{client.name}] 删除种子 {name}（{torrent["size"]:.2f}GB）可能已失败，尝试删除其他种子…',
@@ -306,6 +315,9 @@ def task_processor(client):
                         time.sleep(5)
                         client.flush()
                         time.sleep(1)
+                        tasks_overall[client.name] = client.tasks
+                        if op_lock.locked():
+                            op_lock.release()
                 for name, torrent in pool.items():
                     try:
                         if (
@@ -314,6 +326,7 @@ def task_processor(client):
                         ):
                             continue
                         project = config["projects"][torrent["project"]]
+                        op_lock.acquire(timeout=120)
                         if (
                             name not in client.tasks
                             and not torrent["downloaded"]
@@ -328,8 +341,28 @@ def task_processor(client):
                                 ]
                             )
                             < project["task_count_max"]
-                            and client.total_size + torrent["size"]
-                            <= config["clients"][client.name]["space"]
+                            and (
+                                set(tasks_overall.keys()) == active_clients
+                                and torrent["size"]
+                                + sum(
+                                    [
+                                        sum(
+                                            [
+                                                task["size"]
+                                                for title, task in task_dict.items()
+                                                if title in pool
+                                                and project["volume"]
+                                                == config["projects"][
+                                                    pool[title]["project"]
+                                                ]["volume"]
+                                            ]
+                                        )
+                                        for task_dict in tasks_overall.values()
+                                    ]
+                                )
+                                / 1073741824
+                                <= config["volumes"][project["volume"]]
+                            )
                             and torrent["retry_count"] < project["retry_count_max"]
                             and project["seeder"][0]
                             <= torrent["seeder"]
@@ -361,15 +394,18 @@ def task_processor(client):
                                 or torrent["hr"] <= project["hr_time_max"]
                             )
                         ):
-                            lock.acquire(timeout=10)
+                            pool_lock.acquire(timeout=10)
                             if name in torrent_pool:
                                 torrent_pool[name]["retry_count"] += 1
-                            if lock.locked():
-                                lock.release()
+                            if pool_lock.locked():
+                                pool_lock.release()
                             client.add_torrent(torrent, name, logger)
                             time.sleep(10)
                             client.flush()
                             time.sleep(1)
+                            tasks_overall[client.name] = client.tasks
+                        if op_lock.locked():
+                            op_lock.release()
                     except Exception:
                         print_t(
                             f'[{client.name}] 添加种子 {name}（{torrent["size"]:.2f}GB）可能已失败，尝试添加其他种子…',
@@ -378,6 +414,9 @@ def task_processor(client):
                         time.sleep(10)
                         client.flush()
                         time.sleep(1)
+                        tasks_overall[client.name] = client.tasks
+                        if op_lock.locked():
+                            op_lock.release()
                 time.sleep(config["clients"][client.name]["run_interval"])
             except Exception:
                 print_t(f"[{client.name}] 出现异常，正在重新连接客户端…", logger=logger)
@@ -397,7 +436,7 @@ def torrent_fetcher(site):
                 time.sleep(config["sites"][site]["retry_interval"])
                 continue
             if torrents != {}:
-                lock.acquire(timeout=10)
+                pool_lock.acquire(timeout=10)
                 for name, torrent in torrents.items():
                     project = match_project(torrent, config["projects"])
                     if name in torrent_pool:
@@ -425,8 +464,8 @@ def torrent_fetcher(site):
                             reverse=config["sort_by"][sort_key],
                         )
                     )
-                if lock.locked():
-                    lock.release()
+                if pool_lock.locked():
+                    pool_lock.release()
             time.sleep(config["sites"][site]["fetch_interval"])
 
     return template

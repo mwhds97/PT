@@ -52,7 +52,6 @@ clients:
     host: '127.0.0.1:58846'
     user: 'localclient'
     pass: 'deluge'
-    space: 1024
   qb1:
     snippets:
     - CLT_DEFAULT
@@ -61,7 +60,9 @@ clients:
     user: 'admin'
     pass: 'admin'
     headers: {}
-    space: 1024
+volumes:
+  disk1: 4396
+  disk2: 2215
 sites:
   CHDBits:
     snippets:
@@ -160,6 +161,7 @@ projects:
     - PRJ_DEFAULT
     client: de1
     path: '/mnt/U2'
+    volume: disk1
     sites:
     - U2
     extra_options: {'max_upload_speed': 52428800}
@@ -168,6 +170,7 @@ projects:
     - PRJ_DEFAULT
     client: de1
     path: '/mnt/MT'
+    volume: disk1
     sites:
     - MTeam
   TTG_new:
@@ -175,6 +178,7 @@ projects:
     - PRJ_DEFAULT
     client: qb1
     path: 'C:\TTG'
+    volume: disk2
     sites:
     - TTG
     regexp:
@@ -185,6 +189,7 @@ projects:
     - PRJ_DEFAULT
     client: de1
     path: '/mnt/CHD'
+    volume: disk1
     sites:
     - CHDBits
     regexp:
@@ -196,6 +201,7 @@ projects:
     - PRJ_DEFAULT
     client: de1
     path: '/mnt/HDS'
+    volume: disk1
     sites:
     - HDSky
     regexp:
@@ -206,6 +212,7 @@ projects:
     - PRJ_DEFAULT
     client: de1
     path: '/mnt/SSD'
+    volume: disk1
     sites:
     - SSD
     regexp:
@@ -215,6 +222,7 @@ projects:
     - PRJ_DEFAULT
     client: de1
     path: '/mnt/OB'
+    volume: disk1
     sites:
     - OurBits
     regexp:
@@ -226,6 +234,7 @@ projects:
     - PRJ_DEFAULT
     client: de1
     path: '/mnt/OCD'
+    volume: disk1
     sites:
     - OpenCD
     remove_conditions:
