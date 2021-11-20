@@ -302,7 +302,6 @@ class qbittorrent:
             "upspeed": "upload_speed",
             "dlspeed": "download_speed",
             "eta": "eta",
-            "tracker": "tracker_status",
         }
         response = self.get_response("/api/v2/torrents/info")
         self.tasks = json.loads(response.text)
@@ -325,31 +324,27 @@ class qbittorrent:
                     "upspeed",
                     "dlspeed",
                     "eta",
-                    "tracker",
                 ]
             }
             for task in self.tasks
         }
         for name, stats in self.tasks.items():
             tracker_status = ""
-            if stats["tracker_status"] == "":
-                response = self.get_response(
-                    "/api/v2/torrents/trackers", {"hash": stats["hash"]}, True
-                )
-                trackers = json.loads(response.text) if response.text != "" else []
-                for tracker in trackers[3:]:
-                    tracker_status += tracker["msg"]
+            response = self.get_response(
+                "/api/v2/torrents/trackers", {"hash": stats["hash"]}, True
+            )
+            trackers = json.loads(response.text) if response.text != "" else []
+            for tracker in trackers[3:]:
+                tracker_status += tracker["msg"]
             self.tasks[name]["tracker_status"] = tracker_status
         if not compare_version(self.ver, "2.8.1"):
             for name, stats in self.tasks.items():
-                if "seeding_time" not in stats:
-                    self.tasks[name]["seeding_time"] = 0
                 response = self.get_response(
-                    "/api/v2/torrents/properties", {"hash": stats["hash"]}, True
+                    "/api/v2/torrents/properties", {"hash": stats["hash"]}
                 )
-                info = json.loads(response.text) if response.text != "" else {}
-                if "seeding_time" in info:
-                    self.tasks[name]["seeding_time"] = info["seeding_time"]
+                self.tasks[name]["seeding_time"] = json.loads(response.text)[
+                    "seeding_time"
+                ]
         self.total_size = (
             sum([task["size"] for _, task in self.tasks.items()]) / 1073741824
         )
