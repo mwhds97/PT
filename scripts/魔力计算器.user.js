@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         魔力计算器
-// @version      2.4
+// @version      2.5
 // @author       mwhds97
 // @include      /^https?:\/\/.*(u2.*dmhy|m-team|hdchina|chdbits|hdsky|ourbits|open.*cd|springsunday).*\/(mpseed|mybonus|torrents|rescue|adult|movie|music)\.php.*$/
 // @grant        GM_setValue
@@ -10,7 +10,7 @@
 (function() {
   'use strict';
 
-  if(typeof (GM_getValue("first")) == "undefined" && /(torrents|adult|movie|music|rescue)\.php/.test(document.URL)) {
+  if(typeof GM_getValue("first") === "undefined" && /(torrents|adult|movie|music|rescue)\.php/.test(document.URL)) {
     alert("请进入魔力页面（U2为做种UCoin日志页面）获取或更新必要参数，否则可能无法正常显示！");
     GM_setValue("first", "blood");
   }
@@ -60,16 +60,16 @@
   }
   function size_G(size_str) {
     var size = /(\d+(?:\.\d+)?)[\n\s]*([KMGT])?i?B/.exec(size_str);
-    if(typeof (size[2]) == "undefined") {
+    if(typeof size[2] === "undefined") {
       return parseFloat(size[1]) / 1073741824;
     }
-    else if(size[2] == "K") {
+    else if(size[2] === "K") {
       return parseFloat(size[1]) / 1048576;
     }
-    else if(size[2] == "M") {
+    else if(size[2] === "M") {
       return parseFloat(size[1]) / 1024;
     }
-    else if(size[2] == "G") {
+    else if(size[2] === "G") {
       return parseFloat(size[1]);
     }
     else {
@@ -79,7 +79,7 @@
   function CountRows(table) {
     var count = 1;
     for(var i = 1; i < table.rows.length; i++) {
-      if(table.rows[i].cells.length == table.rows[0].cells.length) {
+      if(table.rows[i].cells.length === table.rows[0].cells.length) {
         count++;
       }
     }
@@ -231,34 +231,35 @@
             U = 1.0;
             D = 1.0;
           }
-          else if(pro[1] == "FREE") {
+          else if(pro[1] === "FREE") {
             U = 1.0;
             D = 0.0;
           }
-          else if(pro[1] == "2X") {
+          else if(pro[1] === "2X") {
             U = 2.0;
             D = 1.0;
           }
-          else if(pro[1] == "2X Free") {
+          else if(pro[1] === "2X Free") {
             U = 2.0;
             D = 0.0;
           }
-          else if(pro[1] == "50%") {
+          else if(pro[1] === "50%") {
             U = 1.0;
             D = 0.5;
           }
-          else if(pro[1] == "2X 50%") {
+          else if(pro[1] === "2X 50%") {
             U = 2.0;
             D = 0.5;
           }
-          else if(pro[1] == "30%") {
+          else if(pro[1] === "30%") {
             U = 1.0;
             D = 0.3;
           }
           else {
-            var factors = /<b>(\d+(?:\.\d+)?)X<\/b>.*<b>(\d+(?:\.\d+)?)X<\/b>/.exec(table.rows[i].cells[1].innerHTML);
-            U = parseFloat(factors[1]);
-            D = parseFloat(factors[2]);
+            var factor_up = /class="arrowup".+?<b>(\d+(?:\.\d+)?)X<\/b>/.exec(table.rows[i].cells[1].innerHTML);
+            var factor_down = /class="arrowdown".+?<b>(\d+(?:\.\d+)?)X<\/b>/.exec(table.rows[i].cells[1].innerHTML);
+            U = factor_up === null ? 1.0 : parseFloat(factor_up[1]);
+            D = factor_down === null ? 1.0 : parseFloat(factor_down[1]);
           }
           T = (new Date().getTime() - new Date(/title="(.+)"/.exec(table.rows[i].cells[index_T].innerHTML)[1]).getTime()) / 86400000;
           S = size_G(table.rows[i].cells[index_S].innerText);
@@ -349,7 +350,7 @@
   }
   if(/hdchina.*mybonus\.php/.test(document.URL)) {
     params = /T0 = (\d+(?:\.\d+)?)[\s\S]*N0 = (\d+(?:\.\d+)?)[\s\S]*B0 = (\d+(?:\.\d+)?)[\s\S]*L = (\d+(?:\.\d+)?)[\s\S]*M = (\d+(?:\.\d+)?)[\s\S]*{\n(\d+(?:\.\d+)?),\n(\d+(?:\.\d+)?)[\s\S]*(?:A = (\d+(?:\.\d+)?).*A = (?=.*\[.*\[)|A = (\d+(?:\.\d+)?)(?!.*\[.*\[))[\s\S]*\D+(\d+(?:\.\d+)?)M/.exec(document.getElementsByClassName("normal_tab mybonus")[2].innerText);
-    GM_setValue("HDC", {"T0": parseFloat(params[1]), "N0": parseFloat(params[2]), "B0": parseFloat(params[3]), "L": parseFloat(params[4]), "M": parseFloat(params[5]), "Ra": parseFloat(params[6]), "Rb": parseFloat(params[7]), "A0": parseFloat(params[typeof (params[9]) == "undefined" ? 8 : 9]), "Smin": parseFloat(params[10])});
+    GM_setValue("HDC", {"T0": parseFloat(params[1]), "N0": parseFloat(params[2]), "B0": parseFloat(params[3]), "L": parseFloat(params[4]), "M": parseFloat(params[5]), "Ra": parseFloat(params[6]), "Rb": parseFloat(params[7]), "A0": parseFloat(params[typeof params[9] === "undefined" ? 8 : 9]), "Smin": parseFloat(params[10])});
   }
   if(/chdbits.*mybonus\.php/.test(document.URL)) {
     params = /T0 = (\d+(?:\.\d+)?)[\s\S]*N0 = (\d+(?:\.\d+)?)[\s\S]*B0 = (\d+(?:\.\d+)?)[\s\S]*L = (\d+(?:\.\d+)?)[\s\S]*A = (\d+(?:\.\d+)?)/.exec(document.getElementsByClassName("text")[2].innerText);

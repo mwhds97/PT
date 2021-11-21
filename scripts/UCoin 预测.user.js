@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         UCoin 预测
-// @version      1.1
+// @version      1.2
 // @author       mwhds97
 // @include      /^https?:\/\/.*u2.*dmhy.*\/mpseed\.php.*$/
 // @grant        none
@@ -15,10 +15,10 @@
   table.insertRow(index);
   for(var i = 0; i <= lastCell; i++) {
     table.rows[index].insertCell(i);
-    if(i == 0) {
+    if(i === 0) {
       table.rows[index].cells[i].innerText = "预测";
     }
-    else if(i == lastCell) {
+    else if(i === lastCell) {
       table.rows[index].cells[i].innerText = "96";
     }
     else {

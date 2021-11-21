@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         U2娘+
-// @version      2.0
+// @version      2.1
 // @author       mwhds97
 // @include      /^https?:\/\/.*u2.*dmhy.*$/
 // @grant        none
@@ -118,7 +118,7 @@
 
   var shbox = document.getElementsByName("shbox")[0];
   for(var i in shbox.childNodes) {
-    if(shbox.childNodes[i].type == "reset") {
+    if(shbox.childNodes[i].type === "reset") {
       i = parseInt(i);
       break;
     }
