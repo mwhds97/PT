@@ -228,7 +228,6 @@ def task_processor(client):
             try:
                 client.flush()
                 print_t(f"[{client.name}] 客户端连接正常，正在等候任务…", True)
-                time.sleep(1)
                 tasks_overall[client.name] = client.tasks
                 if op_lock.locked():
                     op_lock.release()
@@ -239,6 +238,11 @@ def task_processor(client):
                     pool_lock.release()
                 for name, stats in tasks.items():
                     try:
+                        pool_lock.acquire(timeout=10)
+                        if name in torrent_pool:
+                            torrent_pool[name]["downloaded"] = True
+                        if pool_lock.locked():
+                            pool_lock.release()
                         op_lock.acquire(timeout=120)
                         to_remove = False
                         if name in pool:
@@ -247,6 +251,8 @@ def task_processor(client):
                                 config["projects"][torrent["project"]]["client"]
                                 != client.name
                             ):
+                                if op_lock.locked():
+                                    op_lock.release()
                                 continue
                             project = config["projects"][torrent["project"]]
                             if (
@@ -303,7 +309,6 @@ def task_processor(client):
                             client.remove_torrent(torrent, name, info, logger)
                             time.sleep(5)
                             client.flush()
-                            time.sleep(1)
                             tasks_overall[client.name] = client.tasks
                         if op_lock.locked():
                             op_lock.release()
@@ -314,10 +319,13 @@ def task_processor(client):
                         )
                         time.sleep(5)
                         client.flush()
-                        time.sleep(1)
                         tasks_overall[client.name] = client.tasks
                         if op_lock.locked():
                             op_lock.release()
+                pool_lock.acquire(timeout=10)
+                pool = deepcopy(torrent_pool)
+                if pool_lock.locked():
+                    pool_lock.release()
                 for name, torrent in pool.items():
                     try:
                         if (
@@ -402,7 +410,6 @@ def task_processor(client):
                             client.add_torrent(torrent, name, logger)
                             time.sleep(10)
                             client.flush()
-                            time.sleep(1)
                             tasks_overall[client.name] = client.tasks
                         if op_lock.locked():
                             op_lock.release()
@@ -413,7 +420,6 @@ def task_processor(client):
                         )
                         time.sleep(10)
                         client.flush()
-                        time.sleep(1)
                         tasks_overall[client.name] = client.tasks
                         if op_lock.locked():
                             op_lock.release()
@@ -440,7 +446,18 @@ def torrent_fetcher(site):
                 for name, torrent in torrents.items():
                     project = match_project(torrent, config["projects"])
                     if name in torrent_pool:
-                        torrent_pool[name] = {**torrent_pool[name], **torrent}
+                        torrent_pool[name] = {
+                            **torrent_pool[name],
+                            **{
+                                key: value
+                                for key, value in torrent.items()
+                                if key != "downloaded"
+                            },
+                            **{
+                                "downloaded": torrent_pool[name]["downloaded"]
+                                or torrent["downloaded"]
+                            },
+                        }
                     elif project is not None:
                         torrent_pool[name] = {
                             **torrent,
