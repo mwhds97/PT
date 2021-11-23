@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         魔力计算器
-// @version      2.5
+// @version      2.6
 // @author       mwhds97
 // @include      /^https?:\/\/.*(u2.*dmhy|m-team|hdchina|chdbits|hdsky|ourbits|open.*cd|springsunday).*\/(mpseed|mybonus|torrents|rescue|adult|movie|music)\.php.*$/
 // @grant        GM_setValue
@@ -261,7 +261,7 @@
             U = factor_up === null ? 1.0 : parseFloat(factor_up[1]);
             D = factor_down === null ? 1.0 : parseFloat(factor_down[1]);
           }
-          T = (new Date().getTime() - new Date(/title="(.+)"/.exec(table.rows[i].cells[index_T].innerHTML)[1]).getTime()) / 86400000;
+          T = (new Date().getTime() - new Date(/(\d{4}-\d{2}-\d{2}.*\d{2}:\d{2}:\d{2})/.exec(table.rows[i].cells[index_T].innerHTML)[1]).getTime()) / 86400000;
           S = size_G(table.rows[i].cells[index_S].innerText);
           N = parseFloat(table.rows[i].cells[index_N].innerText.replace(/\D/g, ""));
           UC = calcU(S, T, N + 1, U, D, type);
@@ -279,7 +279,7 @@
         }
         var A0 = GM_getValue("MT").L * Math.tan((GM_getValue("MT").sum - seeding * GM_getValue("MT").d) * Math.PI / (2 * GM_getValue("MT").B0));
         for(i = 1; i < len; i++) {
-          T = (new Date().getTime() - new Date(/title="(.+)"/.exec(table.rows[i].cells[index_T].innerHTML)[1]).getTime()) / 604800000;
+          T = (new Date().getTime() - new Date(/(\d{4}-\d{2}-\d{2}.*\d{2}:\d{2}:\d{2})/.exec(table.rows[i].cells[index_T].innerHTML)[1]).getTime()) / 604800000;
           S = size_G(table.rows[i].cells[index_S].innerText);
           N = parseFloat(table.rows[i].cells[index_N].innerText.replace(/\D/g, ""));
           A = calcA(S, T, N + 1, "MT");
@@ -291,7 +291,7 @@
         break;
       case "HDC":
         for(i = 1; i < len; i++) {
-          T = (new Date().getTime() - new Date(/title="(.+)"/.exec(table.rows[i].cells[index_T].innerHTML)[1]).getTime()) / 604800000;
+          T = (new Date().getTime() - new Date(/(\d{4}-\d{2}-\d{2}.*\d{2}:\d{2}:\d{2})/.exec(table.rows[i].cells[index_T].innerHTML)[1]).getTime()) / 604800000;
           S = size_G(table.rows[i].cells[index_S].innerText);
           N = parseFloat(table.rows[i].cells[index_N].innerText.replace(/\D/g, ""));
           A = calcA_HDC(S, T, N + 1, /(-|@)HD[CW]/.test(table.rows[i].cells[1].innerText));
@@ -304,7 +304,7 @@
         break;
       case "HDS":
         for(i = 1; i < len; i++) {
-          T = (new Date().getTime() - new Date(/title="(.+)"/.exec(table.rows[i].cells[index_T].innerHTML)[1]).getTime()) / 604800000;
+          T = (new Date().getTime() - new Date(/(\d{4}-\d{2}-\d{2}.*\d{2}:\d{2}:\d{2})/.exec(table.rows[i].cells[index_T].innerHTML)[1]).getTime()) / 604800000;
           S = size_G(table.rows[i].cells[index_S].innerText);
           N = parseFloat(table.rows[i].cells[index_N].innerText.replace(/\D/g, ""));
           A = calcA_HDS(S, T, N + 1, /(-|@)HDS/.test(table.rows[i].cells[1].innerText));
@@ -316,7 +316,7 @@
         break;
       case "SSD":
         for(i = 1; i < len; i++) {
-          T = (new Date().getTime() - new Date(/title="(.+)"/.exec(table.rows[i].cells[index_T].innerHTML)[1]).getTime()) / 604800000;
+          T = (new Date().getTime() - new Date(/(\d{4}-\d{2}-\d{2}.*\d{2}:\d{2}:\d{2})/.exec(table.rows[i].cells[index_T].innerHTML)[1]).getTime()) / 604800000;
           S = size_G(table.rows[i].cells[index_S].innerText);
           N = parseFloat(table.rows[i].cells[index_N].innerText.replace(/\D/g, ""));
           A = calcA_SSD(S, 0, N + 1);
@@ -326,7 +326,7 @@
         break;
       default:
         for(i = 1; i < len; i++) {
-          T = (new Date().getTime() - new Date(/title="(.+)"/.exec(table.rows[i].cells[index_T].innerHTML)[1]).getTime()) / 604800000;
+          T = (new Date().getTime() - new Date(/(\d{4}-\d{2}-\d{2}.*\d{2}:\d{2}:\d{2})/.exec(table.rows[i].cells[index_T].innerHTML)[1]).getTime()) / 604800000;
           S = size_G(table.rows[i].cells[index_S].innerText);
           N = parseFloat(table.rows[i].cells[index_N].innerText.replace(/\D/g, ""));
           A = calcA(S, T, N + 1, site);

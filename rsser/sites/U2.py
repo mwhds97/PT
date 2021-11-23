@@ -80,7 +80,8 @@ def U2(config):
                             time.mktime(
                                 time.strptime(
                                     re.search(
-                                        r'<time title="(.+?)"', str(cols[3])
+                                        r"(\d{4}-\d{2}-\d{2}.*\d{2}:\d{2}:\d{2})",
+                                        str(cols[3]),
                                     ).group(1),
                                     "%Y-%m-%d %H:%M:%S",
                                 )
