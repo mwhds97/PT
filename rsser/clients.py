@@ -328,6 +328,8 @@ class qbittorrent:
             }
             for task in self.tasks
         }
+        for name in self.tasks:
+            self.tasks[name]["progress"] *= 100
         for name, stats in self.tasks.items():
             tracker_status = ""
             response = self.get_response(

@@ -37,9 +37,13 @@ snippets:
     task_count_max: 10
     retry_count_max: 2
     extra_options: {}
+  RM_DEFAULT:
     remove_conditions:
+    - info: '种子下载速度过慢'
+      exp: 'active_time >= 86400 and progress < 10'
+      period: L
     - info: '活动时长超过限制'
-      exp: 'active_time >= 259200'
+      exp: 'active_time >= 432000'
       period: B
     - info: '做种时长达到要求'
       exp: 'seeding_time >= size / 1073741824 * 1.0 * 60'
@@ -159,6 +163,7 @@ projects:
   U2_new:
     snippets:
     - PRJ_DEFAULT
+    - RM_DEFAULT
     client: de1
     path: '/mnt/U2'
     volume: disk1
@@ -168,6 +173,7 @@ projects:
   MT_new:
     snippets:
     - PRJ_DEFAULT
+    - RM_DEFAULT
     client: de1
     path: '/mnt/MT'
     volume: disk1
@@ -176,6 +182,7 @@ projects:
   TTG_new:
     snippets:
     - PRJ_DEFAULT
+    - RM_DEFAULT
     client: qb1
     path: 'C:\TTG'
     volume: disk2
@@ -187,6 +194,7 @@ projects:
   CHD_new:
     snippets:
     - PRJ_DEFAULT
+    - RM_DEFAULT
     client: de1
     path: '/mnt/CHD'
     volume: disk1
@@ -196,9 +204,11 @@ projects:
     - '-CHD(?!Bits)'
     - '@CHD'
     - '(-|@)OneHD'
+    ignore_hr_leeching: false
   HDS_new:
     snippets:
     - PRJ_DEFAULT
+    - RM_DEFAULT
     client: de1
     path: '/mnt/HDS'
     volume: disk1
@@ -210,6 +220,7 @@ projects:
   SSD_new:
     snippets:
     - PRJ_DEFAULT
+    - RM_DEFAULT
     client: de1
     path: '/mnt/SSD'
     volume: disk1
@@ -220,6 +231,7 @@ projects:
   OB_new:
     snippets:
     - PRJ_DEFAULT
+    - RM_DEFAULT
     client: de1
     path: '/mnt/OB'
     volume: disk1
@@ -232,15 +244,9 @@ projects:
   OCD_new:
     snippets:
     - PRJ_DEFAULT
+    - RM_DEFAULT
     client: de1
     path: '/mnt/OCD'
     volume: disk1
     sites:
     - OpenCD
-    remove_conditions:
-    - info: '下载时长超过限制'
-      exp: 'active_time >= 259200'
-      period: L
-    - info: '做种时长达到要求'
-      exp: 'seeding_time >= 129600'
-      period: S
