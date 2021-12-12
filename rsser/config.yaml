@@ -3,22 +3,7 @@ sort_by:
   size: true
   publish_time: true
 snippets:
-  CLT_DEFAULT:
-    timeout: 15
-    reconnect_interval: 10
-    run_interval: 30
-    task_count_max: 10
-  SITE_DEFAULT:
-    rss_timeout: 15
-    web_timeout: 15
-    user_agent: 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36'
-    proxies: {}
-    fetch_interval: 300
-    retry_interval: 30
-    timezone: +8
   PRJ_DEFAULT:
-    regexp:
-    - '.*'
     size:
     - [0, 100]
     publish_within: 660
@@ -28,15 +13,10 @@ snippets:
     free_only: true
     free_time_min: 21000
     free_end_escape: true
-    escape_trigger_time: 60
     hr_time_max: 432000
     hr_seed_delay: 1800
-    hr_seed_ratio: null
-    ignore_hr_seeding: false
     ignore_hr_leeching: true
     task_count_max: 10
-    retry_count_max: 2
-    extra_options: {}
   RM_DEFAULT:
     remove_conditions:
     - info: '种子下载速度过慢'
@@ -50,27 +30,22 @@ snippets:
       period: S
 clients:
   de1:
-    snippets:
-    - CLT_DEFAULT
     type: deluge
     host: '127.0.0.1:58846'
     user: 'localclient'
     pass: 'deluge'
+    task_count_max: 10
   qb1:
-    snippets:
-    - CLT_DEFAULT
     type: qbittorrent
     host: 'http://127.0.0.1:8080'
     user: 'admin'
     pass: 'admin'
-    headers: {}
+    task_count_max: 10
 volumes:
   disk1: 4396
   disk2: 2215
 sites:
   CHDBits:
-    snippets:
-    - SITE_DEFAULT
     rss: 'https://chdbits.co/torrentrss.php?rows=50&isize=1&linktype=dl&passkey='
     web:
     - 'https://chdbits.co/torrents.php?sort=4&type=desc'
@@ -82,8 +57,6 @@ sites:
       c_secure_uid: '...'
     priority: 4
   HDSky:
-    snippets:
-    - SITE_DEFAULT
     rss: 'https://hdsky.me/torrentrss.php?rows=50&isize=1&linktype=dl&passkey='
     web:
     - 'https://hdsky.me/torrents.php?sort=4&type=desc'
@@ -95,8 +68,6 @@ sites:
       c_secure_uid: '...'
     priority: 5
   MTeam:
-    snippets:
-    - SITE_DEFAULT
     rss: 'https://kp.m-team.cc/torrentrss.php?rows=50&isize=1&https=1&linktype=dl&passkey='
     web:
     - 'https://kp.m-team.cc/torrents.php?sort=4&type=desc'
@@ -106,8 +77,6 @@ sites:
       tp: '...'
     priority: 2
   OpenCD:
-    snippets:
-    - SITE_DEFAULT
     rss: 'https://open.cd/torrentrss.php?rows=50&isize=1&linktype=dl&passkey='
     web:
     - 'https://open.cd/torrents.php?sort=4&type=desc'
@@ -121,8 +90,6 @@ sites:
     retry_interval: 10
     priority: 8
   OurBits:
-    snippets:
-    - SITE_DEFAULT
     rss: 'https://ourbits.club/torrentrss.php?rows=50&isize=1&https=1&linktype=dl&passkey='
     web:
     - 'https://ourbits.club/torrents.php?sort=4&type=desc'
@@ -130,8 +97,6 @@ sites:
       ourbits_jwt: '...'
     priority: 7
   SSD:
-    snippets:
-    - SITE_DEFAULT
     rss: 'https://springsunday.net/torrentrss.php?rows=50&isize=1&https=1&linktype=dl&passkey='
     web:
     - 'https://springsunday.net/torrents.php?sort=4&type=desc'
@@ -139,8 +104,6 @@ sites:
       SPRINGID: '...'
     priority: 6
   TTG:
-    snippets:
-    - SITE_DEFAULT
     rss: 'https://totheglory.im/putrss.php?ssl=yes&par='
     web:
     - 'https://totheglory.im/browse.php?c=M&sort=4&type=desc'
@@ -151,8 +114,6 @@ sites:
       uid: '...'
     priority: 3
   U2:
-    snippets:
-    - SITE_DEFAULT
     rss: 'https://u2.dmhy.org/torrentrss.php?rows=50&isize=1&trackerssl=1&linktype=dl&passkey='
     web:
     - 'https://u2.dmhy.org/torrents.php?sort=4&type=desc'

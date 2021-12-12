@@ -51,15 +51,16 @@ sort_by: #种子信息排序的关键字，可用以下六种，值表示升序�
   snatch: false #按完成人数升序排序
   site: false #按站点的优先级（priority）升序排序
 #位置越前优先级越高
-#若无需排序请设置为 {}
-snippets: {}
-#可复用的配置片段，用法参见配置示例
-#若无需使用该功能请设置为 {}
+snippets: #可复用的配置片段，用法参见配置示例
+  片段1:
+    参数1: 值
+    ...
+  ...
 clients: #客户端列表（字典）
   客户端1:
-    snippets: []
-    #引用的配置片段列表，位置越前优先级越高
-    #若无需引用请设置为 []
+    snippets: #引用的配置片段列表，位置越前优先级越高
+    - 片段1
+    ...
     type: deluge #客户端的类型
     host: '...'
     #Deluge daemon 地址
@@ -73,9 +74,9 @@ clients: #客户端列表（字典）
     #同时进行的最大任务数量
     #所有状态的任务都会被计入
   客户端2:
-    snippets: []
-    #引用的配置片段列表，位置越前优先级越高
-    #若无需引用请设置为 []
+    snippets: #引用的配置片段列表，位置越前优先级越高
+    - 片段1
+    ...
     type: qbittorrent
     #客户端的类型
     #若要使用 qBittorrent，请在 Web UI 设置中取消勾选“启用跨站请求伪造（CSRF）保护”
@@ -84,11 +85,10 @@ clients: #客户端列表（字典）
     #必须包含端口和协议头
     user: '...' #qBittorrent Web UI 用户名
     pass: '...' #qBittorrent Web UI 密码
-    headers: {}
+    headers: {'属性1': '值', ...}
     #用于访问 qBittorrent Web UI 的 request headers
     #如果 Web UI 设置中的“启用 Host header 属性验证”被勾选，且 Web UI 的本地监听端口和远程访问端口不一致（常见于 NAT 环境）
     #，该值必须包含 'Host': '设定域名（若为 * 可取任意值）:本地监听端口（Web UI）'
-    #若无需指定请设置为 {}
     timeout: 15 #与客户端通信超时的阈值（单位：秒）
     reconnect_interval: 10 #重新连接客户端的时间间隔（单位：秒）
     run_interval: 30 #执行任务处理（包括添加、移除种子）流程的时间间隔（单位：秒）
@@ -101,9 +101,9 @@ volumes: #存储列表（字典）
   ...
 sites: #站点列表（字典）
   站点1: #必须和 sites 目录下的 py 文件名一致
-    snippets: []
-    #引用的配置片段列表，位置越前优先级越高
-    #若无需引用请设置为 []
+    snippets: #引用的配置片段列表，位置越前优先级越高
+    - 片段1
+    ...
     rss: '...'
     #站点的 RSS 地址，要求包含体积信息
     #多数站点传入 isize=1 即可
@@ -113,13 +113,11 @@ sites: #站点列表（字典）
     #建议每个页面都按发布时间降序排列种子
     #多数站点传入 sort=4&type=desc 即可
     web_timeout: 15 #获取站点种子页面信息的超时阈值（单位：秒）
-    cookies: {}
+    cookies: {'属性1': '值', ...}
     #用于访问站点的 cookies
-    #若无需指定请设置为 {}
     user_agent: '...' #用于访问站点的 user-agent
-    proxies: {}
+    proxies: {'属性1': '值', ...}
     #代理设置，例如 {'http': 'http://127.0.0.1:7890', 'https': 'http://127.0.0.1:7890'}
-    #若无需指定请设置为 {}
     fetch_interval: 300 #获取种子信息的时间间隔（单位：秒）
     retry_interval: 30 #获取种子信息失败时重试的时间间隔（单位：秒）
     priority: 1
@@ -129,9 +127,9 @@ sites: #站点列表（字典）
   ...
 projects: #任务计划列表（字典）
   计划1:
-    snippets: []
-    #引用的配置片段列表，位置越前优先级越高
-    #若无需引用请设置为 []
+    snippets: #引用的配置片段列表，位置越前优先级越高
+    - 片段1
+    ...
     client: 客户端1 #执行任务的客户端
     path: '...' #任务的下载路径，不需要转义
     volume: 存储1 #任务所在的存储
@@ -166,7 +164,7 @@ projects: #任务计划列表（字典）
     #同时进行的最大任务数量
     #所有状态的任务都会被计入
     retry_count_max: 2 #添加任务失败时重试的最大次数
-    extra_options: {}
+    extra_options: {'属性1': '值', ...}
     #任务的其他设置（例如限速、分类等），参见 Deluge 源代码和 qBittorrent API 文档
     #若使用 qBittorrent，请用 'true' 'false' 替代布尔值
     remove_conditions: #满足以下任一条件的种子将被移除
@@ -185,7 +183,6 @@ projects: #任务计划列表（字典）
     #可用字段：size active_time seeding_time seeder leecher progress ratio uploaded downloaded upload_speed download_speed eta
     #时间单位：秒，体积单位：B，速率单位：B/s，进度范围：0-100
     #period 为条件的适用阶段，L 表示下载阶段，S 表示做种阶段，B 表示所有阶段
-    #若无需删种请设置为 []
   ...
 ```
 

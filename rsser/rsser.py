@@ -59,7 +59,54 @@ try:
     config = yaml_read(os.path.join(script_dir, "config.yaml"))
     if config == {}:
         raise Exception
+    default_settings = {
+        "top": {"torrent_pool_size": 5000, "sort_by": {}, "snippets": {}},
+        "clients": {
+            "snippets": [],
+            "headers": {},
+            "timeout": 15,
+            "reconnect_interval": 10,
+            "run_interval": 30,
+            "task_count_max": 10000,
+        },
+        "sites": {
+            "snippets": [],
+            "rss_timeout": 15,
+            "web_timeout": 15,
+            "cookies": {},
+            "user_agent": "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36",
+            "proxies": {},
+            "fetch_interval": 300,
+            "retry_interval": 30,
+            "priority": 0,
+            "timezone": +8,
+        },
+        "projects": {
+            "snippets": [],
+            "regexp": [r".*"],
+            "size": [[0, 1048576]],
+            "publish_within": 2592000,
+            "seeder": [0, 100000],
+            "leecher": [0, 100000],
+            "snatch": [0, 100000],
+            "free_only": False,
+            "free_time_min": 0,
+            "free_end_escape": False,
+            "escape_trigger_time": 60,
+            "hr_time_max": 2592000,
+            "hr_seed_delay": 0,
+            "hr_seed_ratio": None,
+            "ignore_hr_seeding": False,
+            "ignore_hr_leeching": False,
+            "task_count_max": 10000,
+            "retry_count_max": 2,
+            "extra_options": {},
+            "remove_conditions": [],
+        },
+    }
     err_info = "顶层键错误"
+    for setting in set(default_settings["top"].keys()) - set(config.keys()):
+        config[setting] = default_settings["top"][setting]
     if set(config.keys()) != {
         "torrent_pool_size",
         "sort_by",
@@ -82,53 +129,47 @@ try:
         raise Exception
     err_info = "客户端配置有误"
     for name, client in config["clients"].items():
-        for snippet in client["snippets"]:
-            config["clients"][name] = {
-                **config["snippets"][snippet],
-                **config["clients"][name],
+        if "snippets" in client:
+            for snippet in client["snippets"]:
+                config["clients"][name] = {
+                    **config["snippets"][snippet],
+                    **config["clients"][name],
+                }
+        for setting in set(default_settings["clients"].keys()) - set(
+            config["clients"][name].keys()
+        ):
+            config["clients"][name][setting] = default_settings["clients"][setting]
+        if (
+            set(config["clients"][name].keys())
+            != {
+                "snippets",
+                "type",
+                "host",
+                "user",
+                "pass",
+                "headers",
+                "timeout",
+                "reconnect_interval",
+                "run_interval",
+                "task_count_max",
             }
-        del config["clients"][name]["snippets"]
-        if not (
-            (
-                config["clients"][name]["type"] == "deluge"
-                and set(config["clients"][name].keys())
-                == {
-                    "type",
-                    "host",
-                    "user",
-                    "pass",
-                    "timeout",
-                    "reconnect_interval",
-                    "run_interval",
-                    "task_count_max",
-                }
-            )
-            or (
-                config["clients"][name]["type"] == "qbittorrent"
-                and set(config["clients"][name].keys())
-                == {
-                    "type",
-                    "host",
-                    "user",
-                    "pass",
-                    "headers",
-                    "timeout",
-                    "reconnect_interval",
-                    "run_interval",
-                    "task_count_max",
-                }
-            )
+            or config["clients"][name]["type"] not in ["deluge", "qbittorrent"]
         ):
             raise Exception
     err_info = "站点配置有误"
     for name, site in config["sites"].items():
-        for snippet in site["snippets"]:
-            config["sites"][name] = {
-                **config["snippets"][snippet],
-                **config["sites"][name],
-            }
-        del config["sites"][name]["snippets"]
+        if "snippets" in site:
+            for snippet in site["snippets"]:
+                config["sites"][name] = {
+                    **config["snippets"][snippet],
+                    **config["sites"][name],
+                }
+        for setting in set(default_settings["sites"].keys()) - set(
+            config["sites"][name].keys()
+        ):
+            config["sites"][name][setting] = default_settings["sites"][setting]
         if set(config["sites"][name].keys()) != {
+            "snippets",
             "rss",
             "rss_timeout",
             "web",
@@ -144,20 +185,25 @@ try:
             raise Exception
     err_info = "任务计划配置有误"
     for name, project in config["projects"].items():
-        for snippet in project["snippets"]:
-            config["projects"][name] = {
-                **config["snippets"][snippet],
-                **config["projects"][name],
-            }
-        del config["projects"][name]["snippets"]
+        if "snippets" in project:
+            for snippet in project["snippets"]:
+                config["projects"][name] = {
+                    **config["snippets"][snippet],
+                    **config["projects"][name],
+                }
+        for setting in set(default_settings["projects"].keys()) - set(
+            config["projects"][name].keys()
+        ):
+            config["projects"][name][setting] = default_settings["projects"][setting]
         if set(config["projects"][name].keys()) != {
+            "snippets",
             "client",
-            "sites",
             "path",
             "volume",
+            "sites",
             "regexp",
-            "publish_within",
             "size",
+            "publish_within",
             "seeder",
             "leecher",
             "snatch",
@@ -176,7 +222,6 @@ try:
             "remove_conditions",
         }:
             raise Exception
-    del config["snippets"]
     err_info = "任务计划缺失对应站点配置"
     active_sites = set()
     for _, project in config["projects"].items():
