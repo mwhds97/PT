@@ -13,32 +13,9 @@ from sites import *
 from utils import *
 
 
-def terminate():
-    pool_lock.acquire(timeout=10)
-    yaml_dump(torrent_pool, os.path.join(script_dir, "torrent_pool.yaml"))
-    yaml_dump(list(name_queue), os.path.join(script_dir, "name_queue.yaml"))
-    if pool_lock.locked():
-        pool_lock.release()
-    print_t("正在停止…", logger=logger)
-    logger.close()
-    sys.exit(0)
-
-
-def uncaught_exception_handler(type, value, traceback):
-    print_t("发生未知错误，正在保存种子数据…", logger=logger)
-    terminate()
-
-
-def SIGINT_handler(signum, frame):
-    print_t("正在保存种子数据…", logger=logger)
-    terminate()
-
-
 script_dir = os.path.dirname(
     sys.executable if getattr(sys, "frozen", False) else __file__
 )
-sys.excepthook = uncaught_exception_handler
-signal.signal(signal.SIGINT, SIGINT_handler)
 try:
     os.makedirs(os.path.join(script_dir, "logs"), exist_ok=True)
 except Exception:
@@ -404,10 +381,10 @@ def task_processor(client):
                                                 task["size"]
                                                 for title, task in task_dict.items()
                                                 if title in pool
-                                                and project["volume"]
-                                                == config["projects"][
+                                                and config["projects"][
                                                     pool[title]["project"]
                                                 ]["volume"]
+                                                == project["volume"]
                                             ]
                                         )
                                         for task_dict in tasks_overall.values()
@@ -533,6 +510,29 @@ def torrent_fetcher(site):
     return template
 
 
+def terminate():
+    pool_lock.acquire(timeout=10)
+    yaml_dump(torrent_pool, os.path.join(script_dir, "torrent_pool.yaml"))
+    yaml_dump(list(name_queue), os.path.join(script_dir, "name_queue.yaml"))
+    if pool_lock.locked():
+        pool_lock.release()
+    print_t("正在停止…", logger=logger)
+    logger.close()
+    sys.exit(0)
+
+
+def uncaught_exception_handler(type, value, traceback):
+    print_t("发生未知错误，正在保存种子数据…", logger=logger)
+    terminate()
+
+
+def SIGINT_handler(signum, frame):
+    print_t("正在保存种子数据…", logger=logger)
+    terminate()
+
+
+sys.excepthook = uncaught_exception_handler
+signal.signal(signal.SIGINT, SIGINT_handler)
 threads = []
 for client in clients:
     threads.append(threading.Thread(target=task_processor(client)))
