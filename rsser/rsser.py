@@ -44,7 +44,8 @@ try:
             "timeout": 15,
             "reconnect_interval": 10,
             "run_interval": 30,
-            "task_count_max": 10000,
+            "task_count_max": float("inf"),
+            "total_size_max": float("inf"),
         },
         "sites": {
             "snippets": [],
@@ -61,21 +62,21 @@ try:
         "projects": {
             "snippets": [],
             "regexp": [r".*"],
-            "size": [[0, 1048576]],
-            "publish_within": 2592000,
-            "seeder": [0, 100000],
-            "leecher": [0, 100000],
-            "snatch": [0, 100000],
+            "size": [[0, float("inf")]],
+            "publish_within": float("inf"),
+            "seeder": [0, float("inf")],
+            "leecher": [0, float("inf")],
+            "snatch": [0, float("inf")],
             "free_only": False,
             "free_time_min": 0,
             "free_end_escape": False,
             "escape_trigger_time": 60,
-            "hr_time_max": 2592000,
+            "hr_time_max": float("inf"),
             "hr_seed_delay": 0,
             "hr_seed_ratio": None,
             "ignore_hr_seeding": False,
             "ignore_hr_leeching": False,
-            "task_count_max": 10000,
+            "task_count_max": float("inf"),
             "retry_count_max": 2,
             "extra_options": {},
             "remove_conditions": [],
@@ -129,6 +130,7 @@ try:
                 "reconnect_interval",
                 "run_interval",
                 "task_count_max",
+                "total_size_max",
             }
             or config["clients"][name]["type"] not in ["deluge", "qbittorrent"]
         ):
@@ -278,7 +280,10 @@ def task_processor(client):
                                 continue
                             project = config["projects"][torrent["project"]]
                             if (
-                                re.search(r"registered|回收", stats["tracker_status"])
+                                re.search(
+                                    r"(?i)not.*reg|not.*auth|delete|remove|dupe|trump|收|除|撤",
+                                    stats["tracker_status"],
+                                )
                                 is not None
                             ):
                                 to_remove = True
@@ -371,6 +376,8 @@ def task_processor(client):
                                 ]
                             )
                             < project["task_count_max"]
+                            and client.total_size + torrent["size"]
+                            <= config["clients"][client.name]["total_size_max"]
                             and (
                                 set(tasks_overall.keys()) == active_clients
                                 and torrent["size"]
