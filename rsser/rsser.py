@@ -47,6 +47,7 @@ try:
             "task_count_max": float("inf"),
             "total_size_max": float("inf"),
         },
+        "volumes": {},
         "sites": {
             "snippets": [],
             "rss_timeout": 15,
@@ -61,6 +62,7 @@ try:
         },
         "projects": {
             "snippets": [],
+            "volume": "__FBCDBESTCD__",
             "regexp": [r".*"],
             "size": [[0, float("inf")]],
             "publish_within": float("inf"),
@@ -85,6 +87,7 @@ try:
     err_info = "顶层键错误"
     for setting in set(default_settings["top"].keys()) - set(config.keys()):
         config[setting] = default_settings["top"][setting]
+    config["volumes"]["__FBCDBESTCD__"] = float("inf")
     if set(config.keys()) != {
         "torrent_pool_size",
         "sort_by",
@@ -106,9 +109,13 @@ try:
     }:
         raise Exception
     err_info = "客户端配置有误"
-    for name, client in config["clients"].items():
-        if "snippets" in client:
-            for snippet in client["snippets"]:
+    for name in config["clients"]:
+        if "snippets" in config["clients"][name]:
+            if not isinstance(config["clients"][name]["snippets"], list):
+                config["clients"][name]["snippets"] = [
+                    config["clients"][name]["snippets"]
+                ]
+            for snippet in config["clients"][name]["snippets"]:
                 config["clients"][name] = {
                     **config["snippets"][snippet],
                     **config["clients"][name],
@@ -136,9 +143,11 @@ try:
         ):
             raise Exception
     err_info = "站点配置有误"
-    for name, site in config["sites"].items():
-        if "snippets" in site:
-            for snippet in site["snippets"]:
+    for name in config["sites"]:
+        if "snippets" in config["sites"][name]:
+            if not isinstance(config["sites"][name]["snippets"], list):
+                config["sites"][name]["snippets"] = [config["sites"][name]["snippets"]]
+            for snippet in config["sites"][name]["snippets"]:
                 config["sites"][name] = {
                     **config["snippets"][snippet],
                     **config["sites"][name],
@@ -147,6 +156,8 @@ try:
             config["sites"][name].keys()
         ):
             config["sites"][name][setting] = default_settings["sites"][setting]
+        if not isinstance(config["sites"][name]["web"], list):
+            config["sites"][name]["web"] = [config["sites"][name]["web"]]
         if set(config["sites"][name].keys()) != {
             "snippets",
             "rss",
@@ -163,9 +174,13 @@ try:
         }:
             raise Exception
     err_info = "任务计划配置有误"
-    for name, project in config["projects"].items():
-        if "snippets" in project:
-            for snippet in project["snippets"]:
+    for name in config["projects"]:
+        if "snippets" in config["projects"][name]:
+            if not isinstance(config["projects"][name]["snippets"], list):
+                config["projects"][name]["snippets"] = [
+                    config["projects"][name]["snippets"]
+                ]
+            for snippet in config["projects"][name]["snippets"]:
                 config["projects"][name] = {
                     **config["snippets"][snippet],
                     **config["projects"][name],
@@ -174,6 +189,16 @@ try:
             config["projects"][name].keys()
         ):
             config["projects"][name][setting] = default_settings["projects"][setting]
+        if not isinstance(config["projects"][name]["sites"], list):
+            config["projects"][name]["sites"] = [config["projects"][name]["sites"]]
+        if not isinstance(config["projects"][name]["regexp"], list):
+            config["projects"][name]["regexp"] = [config["projects"][name]["regexp"]]
+        if not isinstance(config["projects"][name]["size"][0], list):
+            config["projects"][name]["size"] = [config["projects"][name]["size"]]
+        if not isinstance(config["projects"][name]["remove_conditions"], list):
+            config["projects"][name]["remove_conditions"] = [
+                config["projects"][name]["remove_conditions"]
+            ]
         if set(config["projects"][name].keys()) != {
             "snippets",
             "client",
