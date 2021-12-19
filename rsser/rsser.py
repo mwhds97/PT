@@ -277,6 +277,8 @@ def task_processor(client):
             try:
                 client.flush()
                 print_t(f"[{client.name}] 客户端连接正常，正在等候任务…", True)
+                if not op_lock.locked():
+                    op_lock.acquire(timeout=10)
                 tasks_overall[client.name] = client.tasks
                 if op_lock.locked():
                     op_lock.release()
