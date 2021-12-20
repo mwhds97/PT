@@ -1,6 +1,7 @@
-sort_by:
-  size: true
-  publish_time: true
+pool:
+  sort_by:
+    size: true
+    publish_time: true
 snippets:
   PRJ_DEFAULT:
     size:

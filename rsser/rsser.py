@@ -37,7 +37,8 @@ try:
     if config == {}:
         raise Exception
     default_settings = {
-        "top": {"torrent_pool_size": 5000, "sort_by": {}, "snippets": {}},
+        "pool": {"size": 5000, "sort_by": {}, "save_interval": 3600},
+        "snippets": {},
         "clients": {
             "snippets": [],
             "headers": {},
@@ -85,12 +86,11 @@ try:
         },
     }
     err_info = "顶层键错误"
-    for setting in set(default_settings["top"].keys()) - set(config.keys()):
-        config[setting] = default_settings["top"][setting]
+    for setting in {"pool", "snippets", "volumes"} - set(config.keys()):
+        config[setting] = default_settings[setting]
     config["volumes"]["__FBCDBESTCD__"] = float("inf")
     if set(config.keys()) != {
-        "torrent_pool_size",
-        "sort_by",
+        "pool",
         "snippets",
         "clients",
         "volumes",
@@ -98,8 +98,13 @@ try:
         "projects",
     }:
         raise Exception
-    err_info = "排序选项有误"
-    if not set(config["sort_by"].keys()) <= {
+    err_info = "种子池选项有误"
+    for setting in set(default_settings["pool"].keys()) - set(config["pool"].keys()):
+        config["pool"][setting] = default_settings["pool"][setting]
+    if set(config["pool"].keys()) != {"size", "sort_by", "save_interval"}:
+        raise Exception
+    err_info = "种子池排序选项有误"
+    if not set(config["pool"]["sort_by"].keys()) <= {
         "size",
         "publish_time",
         "seeder",
@@ -253,7 +258,7 @@ invalid_torrents = [
 ]
 name_list = yaml_read(os.path.join(script_dir, "name_queue.yaml"))
 name_list = [name for name in name_list if name not in invalid_torrents]
-name_queue = deque(maxlen=config["torrent_pool_size"])
+name_queue = deque(maxlen=config["pool"]["size"])
 name_queue.extend(name_list)
 torrent_pool = {
     name: torrent for name, torrent in torrent_pool.items() if name in name_queue
@@ -277,8 +282,7 @@ def task_processor(client):
             try:
                 client.flush()
                 print_t(f"[{client.name}] 客户端连接正常，正在等候任务…", True)
-                if not op_lock.locked():
-                    op_lock.acquire(timeout=10)
+                op_lock.acquire(timeout=120)
                 tasks_overall[client.name] = client.tasks
                 if op_lock.locked():
                     op_lock.release()
@@ -526,7 +530,7 @@ def torrent_fetcher(site):
                     for name, torrent in torrent_pool.items()
                     if name in name_queue
                 }
-                sort_keys = reversed(list(config["sort_by"].keys()))
+                sort_keys = reversed(list(config["pool"]["sort_by"].keys()))
                 for sort_key in sort_keys:
                     torrent_pool = dict(
                         sorted(
@@ -534,7 +538,7 @@ def torrent_fetcher(site):
                             key=lambda torrent: torrent[1][sort_key]
                             if sort_key != "site"
                             else config["sites"][torrent[1]["site"]]["priority"],
-                            reverse=config["sort_by"][sort_key],
+                            reverse=config["pool"]["sort_by"][sort_key],
                         )
                     )
                 if pool_lock.locked():
@@ -544,24 +548,35 @@ def torrent_fetcher(site):
     return template
 
 
+def pool_saver(loop, interval, block=False):
+    def template():
+        while True:
+            time.sleep(interval)
+            print_t("正在保存种子数据…", logger=logger)
+            pool_lock.acquire(timeout=120)
+            yaml_dump(torrent_pool, os.path.join(script_dir, "torrent_pool.yaml"))
+            yaml_dump(list(name_queue), os.path.join(script_dir, "name_queue.yaml"))
+            if pool_lock.locked() and not block:
+                pool_lock.release()
+            if not loop:
+                break
+
+    return template
+
+
 def terminate():
-    pool_lock.acquire(timeout=10)
-    yaml_dump(torrent_pool, os.path.join(script_dir, "torrent_pool.yaml"))
-    yaml_dump(list(name_queue), os.path.join(script_dir, "name_queue.yaml"))
-    if pool_lock.locked():
-        pool_lock.release()
+    pool_saver(False, 0, True)
     print_t("正在停止…", logger=logger)
     logger.close()
     sys.exit(0)
 
 
 def uncaught_exception_handler(type, value, traceback):
-    print_t("发生未知错误，正在保存种子数据…", logger=logger)
+    print_t("发生未知错误", logger=logger)
     terminate()
 
 
 def SIGINT_handler(signum, frame):
-    print_t("正在保存种子数据…", logger=logger)
     terminate()
 
 
@@ -572,6 +587,9 @@ for client in clients:
     threads.append(threading.Thread(target=task_processor(client)))
 for site in active_sites:
     threads.append(threading.Thread(target=torrent_fetcher(site)))
+threads.append(
+    threading.Thread(target=pool_saver(True, config["pool"]["save_interval"]))
+)
 for thread in threads:
     thread.setDaemon(True)
     thread.start()

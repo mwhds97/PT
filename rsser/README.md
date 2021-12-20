@@ -39,18 +39,20 @@ requests >= 2.25.0
 `config.yaml` [配置示例](https://github.com/mwhds97/PT/blob/master/rsser/config.yaml)
 
 ```yaml
-torrent_pool_size: 1000
-#保留信息的种子数量
-#若纳入过计划的种子总数超过该值，最早的种子信息将被删除
-#找不到种子信息的任务无法被处理
-sort_by: #种子信息排序的关键字，可用以下六种，值表示升序或降序排序
-  size: true #按体积降序排序
-  publish_time: true #按发布时间降序排序
-  seeder: false #按做种人数升序排序
-  leecher: true #按下载人数降序排序
-  snatch: false #按完成人数升序排序
-  site: false #按站点的优先级（priority）升序排序
-#位置越前优先级越高
+pool: #种子池选项
+  size: 1000
+  #种子池的大小
+  #若纳入过计划的种子总数超过该值，最早的种子信息将被删除
+  #找不到种子信息的任务无法被处理
+  sort_by: #种子信息排序的关键字，可用以下六种，值表示升序或降序排序
+    size: true #按体积降序排序
+    publish_time: true #按发布时间降序排序
+    seeder: false #按做种人数升序排序
+    leecher: true #按下载人数降序排序
+    snatch: false #按完成人数升序排序
+    site: false #按站点的优先级（priority）升序排序
+  #位置越前优先级越高
+  save_interval: 3600 #保存种子信息的时间间隔（单位：秒）
 snippets: #可复用的配置片段，用法参见配置示例
   片段1:
     参数1: 值
