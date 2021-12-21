@@ -287,13 +287,13 @@ def task_processor(client):
                 if op_lock.locked():
                     op_lock.release()
                 tasks = deepcopy(client.tasks)
-                pool_lock.acquire(timeout=10)
+                pool_lock.acquire(timeout=30)
                 pool = deepcopy(torrent_pool)
                 if pool_lock.locked():
                     pool_lock.release()
                 for name, stats in tasks.items():
                     try:
-                        pool_lock.acquire(timeout=10)
+                        pool_lock.acquire(timeout=30)
                         if name in torrent_pool:
                             torrent_pool[name]["downloaded"] = True
                         if pool_lock.locked():
@@ -312,7 +312,7 @@ def task_processor(client):
                             project = config["projects"][torrent["project"]]
                             if (
                                 re.search(
-                                    r"(?i)not.*reg|not.*auth|delete|remove|dupe|trump|收|除|撤",
+                                    r"(?i)not.*reg|not.*auth|delete|remove|dupe|trump|rev|nuke|收|除|撤",
                                     stats["tracker_status"],
                                 )
                                 is not None
@@ -380,7 +380,7 @@ def task_processor(client):
                         tasks_overall[client.name] = client.tasks
                         if op_lock.locked():
                             op_lock.release()
-                pool_lock.acquire(timeout=10)
+                pool_lock.acquire(timeout=30)
                 pool = deepcopy(torrent_pool)
                 if pool_lock.locked():
                     pool_lock.release()
@@ -462,7 +462,7 @@ def task_processor(client):
                                 or torrent["hr"] <= project["hr_time_max"]
                             )
                         ):
-                            pool_lock.acquire(timeout=10)
+                            pool_lock.acquire(timeout=30)
                             if name in torrent_pool:
                                 torrent_pool[name]["retry_count"] += 1
                             if pool_lock.locked():
@@ -502,7 +502,7 @@ def torrent_fetcher(site):
                 time.sleep(config["sites"][site]["retry_interval"])
                 continue
             if torrents != {}:
-                pool_lock.acquire(timeout=10)
+                pool_lock.acquire(timeout=30)
                 for name, torrent in torrents.items():
                     project = match_project(torrent, config["projects"])
                     if name in torrent_pool:
