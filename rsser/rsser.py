@@ -565,7 +565,7 @@ def pool_saver(loop, interval, block=False):
 
 
 def terminate():
-    pool_saver(False, 0, True)
+    pool_saver(False, 0, True)()
     print_t("正在停止…", logger=logger)
     logger.close()
     sys.exit(0)
