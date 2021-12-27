@@ -276,6 +276,142 @@ pool_lock = threading.Lock()
 op_lock = threading.Lock()
 
 
+def generate_exp(exp):
+    fields = [
+        "size",
+        "active_time",
+        "seeding_time",
+        "seeder",
+        "leecher",
+        "progress",
+        "ratio",
+        "uploaded",
+        "downloaded",
+        "upload_speed",
+        "download_speed",
+        "eta",
+    ]
+    for field in fields:
+        exp = re.sub(field, f'stats["{field}"]', exp)
+    return f"({exp})"
+
+
+def match_remove_conditions(torrent, stats):
+    project = config["projects"][torrent["project"]]
+    if (
+        re.search(
+            r"(?i)not.*reg|not.*auth|delete|remove|dupe|trump|rev|nuke|收|除|撤",
+            stats["tracker_status"],
+        )
+        is not None
+    ):
+        return "种子被撤除"
+    if stats["seeding_time"] == 0:
+        if project["ignore_hr_leeching"] or torrent["hr"] is None:
+            if project["free_end_escape"]:
+                if not torrent["free"]:
+                    return "免费失效"
+                elif torrent["free_end"] is not None:
+                    if (
+                        torrent["free_end"] - time.mktime(time.localtime())
+                        < project["escape_trigger_time"]
+                    ):
+                        return "免费失效"
+            for condition in project["remove_conditions"]:
+                if condition["period"] in ["L", "B"] and eval(
+                    generate_exp(condition["exp"])
+                ):
+                    return condition["info"]
+    elif stats["seeding_time"] > 0:
+        if project["ignore_hr_seeding"] or torrent["hr"] is None:
+            hr_time = 0
+        elif (
+            project["hr_seed_ratio"] is not None
+            and stats["ratio"] >= project["hr_seed_ratio"]
+        ):
+            hr_time = project["hr_seed_delay"]
+        else:
+            hr_time = torrent["hr"] + project["hr_seed_delay"]
+        if stats["seeding_time"] >= hr_time:
+            for condition in project["remove_conditions"]:
+                if condition["period"] in ["S", "B"] and eval(
+                    generate_exp(condition["exp"])
+                ):
+                    return condition["info"]
+    return None
+
+
+def match_add_conditions(torrent, client, pool):
+    project = config["projects"][torrent["project"]]
+    if torrent["downloaded"]:
+        return False
+    if client.task_count >= config["clients"][client.name]["task_count_max"]:
+        return False
+    if set(tasks_overall.keys()) != active_clients:
+        return False
+    if (
+        len(
+            [
+                title
+                for title in client.tasks
+                if title in pool and pool[title]["project"] == torrent["project"]
+            ]
+        )
+        >= project["task_count_max"]
+    ):
+        return False
+    if (
+        client.total_size + torrent["size"]
+        > config["clients"][client.name]["total_size_max"]
+    ):
+        return False
+    if (
+        torrent["size"]
+        + sum(
+            [
+                sum(
+                    [
+                        task["size"]
+                        for title, task in task_dict.items()
+                        if title in pool
+                        and config["projects"][pool[title]["project"]]["volume"]
+                        == project["volume"]
+                    ]
+                )
+                for task_dict in tasks_overall.values()
+            ]
+        )
+        / 1073741824
+        > config["volumes"][project["volume"]]
+    ):
+        return False
+    if torrent["retry_count"] >= project["retry_count_max"]:
+        return False
+    if not (project["seeder"][0] <= torrent["seeder"] <= project["seeder"][1]):
+        return False
+    if not (project["leecher"][0] <= torrent["leecher"] <= project["leecher"][1]):
+        return False
+    if not (project["snatch"][0] <= torrent["snatch"] <= project["snatch"][1]):
+        return False
+    if (
+        time.mktime(time.localtime()) - torrent["publish_time"]
+        > project["publish_within"]
+    ):
+        return False
+    if project["free_only"]:
+        if not torrent["free"]:
+            return False
+        elif torrent["free_end"] is not None:
+            if (
+                torrent["free_end"] - time.mktime(time.localtime())
+                < project["free_time_min"]
+            ):
+                return False
+    if torrent["hr"] is not None and torrent["hr"] > project["hr_time_max"]:
+        return False
+    return True
+
+
 def task_processor(client):
     def template():
         while True:
@@ -299,7 +435,6 @@ def task_processor(client):
                         if pool_lock.locked():
                             pool_lock.release()
                         op_lock.acquire(timeout=120)
-                        to_remove = False
                         if name in pool:
                             torrent = pool[name]
                             if (
@@ -309,65 +444,12 @@ def task_processor(client):
                                 if op_lock.locked():
                                     op_lock.release()
                                 continue
-                            project = config["projects"][torrent["project"]]
-                            if (
-                                re.search(
-                                    r"(?i)not.*reg|not.*auth|delete|remove|dupe|trump|rev|nuke|收|除|撤",
-                                    stats["tracker_status"],
-                                )
-                                is not None
-                            ):
-                                to_remove = True
-                                info = "种子被撤除"
-                            elif stats["seeding_time"] == 0:
-                                if (
-                                    project["ignore_hr_leeching"]
-                                    or torrent["hr"] is None
-                                ):
-                                    if project["free_end_escape"] and (
-                                        not torrent["free"]
-                                        or (
-                                            torrent["free_end"] is not None
-                                            and torrent["free_end"]
-                                            - time.mktime(time.localtime())
-                                            < project["escape_trigger_time"]
-                                        )
-                                    ):
-                                        to_remove = True
-                                        info = "免费失效"
-                                    for condition in project["remove_conditions"]:
-                                        if condition["period"] in ["L", "B"] and eval(
-                                            generate_exp(condition["exp"])
-                                        ):
-                                            to_remove = True
-                                            info = condition["info"]
-                                            break
-                            else:
-                                if (
-                                    project["ignore_hr_seeding"]
-                                    or torrent["hr"] is None
-                                ):
-                                    hr_time = 0
-                                elif (
-                                    project["hr_seed_ratio"] is not None
-                                    and stats["ratio"] >= project["hr_seed_ratio"]
-                                ):
-                                    hr_time = project["hr_seed_delay"]
-                                else:
-                                    hr_time = torrent["hr"] + project["hr_seed_delay"]
-                                if stats["seeding_time"] >= hr_time:
-                                    for condition in project["remove_conditions"]:
-                                        if condition["period"] in ["S", "B"] and eval(
-                                            generate_exp(condition["exp"])
-                                        ):
-                                            to_remove = True
-                                            info = condition["info"]
-                                            break
-                        if to_remove:
-                            client.remove_torrent(torrent, name, info, logger)
-                            time.sleep(5)
-                            client.flush()
-                            tasks_overall[client.name] = client.tasks
+                            info = match_remove_conditions(torrent, stats)
+                            if info is not None:
+                                client.remove_torrent(torrent, name, info, logger)
+                                time.sleep(5)
+                                client.flush()
+                                tasks_overall[client.name] = client.tasks
                         if op_lock.locked():
                             op_lock.release()
                     except Exception:
@@ -391,76 +473,9 @@ def task_processor(client):
                             != client.name
                         ):
                             continue
-                        project = config["projects"][torrent["project"]]
                         op_lock.acquire(timeout=120)
-                        if (
-                            name not in client.tasks
-                            and not torrent["downloaded"]
-                            and client.task_count
-                            < config["clients"][client.name]["task_count_max"]
-                            and len(
-                                [
-                                    title
-                                    for title in client.tasks
-                                    if title in pool
-                                    and pool[title]["project"] == torrent["project"]
-                                ]
-                            )
-                            < project["task_count_max"]
-                            and client.total_size + torrent["size"]
-                            <= config["clients"][client.name]["total_size_max"]
-                            and (
-                                set(tasks_overall.keys()) == active_clients
-                                and torrent["size"]
-                                + sum(
-                                    [
-                                        sum(
-                                            [
-                                                task["size"]
-                                                for title, task in task_dict.items()
-                                                if title in pool
-                                                and config["projects"][
-                                                    pool[title]["project"]
-                                                ]["volume"]
-                                                == project["volume"]
-                                            ]
-                                        )
-                                        for task_dict in tasks_overall.values()
-                                    ]
-                                )
-                                / 1073741824
-                                <= config["volumes"][project["volume"]]
-                            )
-                            and torrent["retry_count"] < project["retry_count_max"]
-                            and project["seeder"][0]
-                            <= torrent["seeder"]
-                            <= project["seeder"][1]
-                            and project["leecher"][0]
-                            <= torrent["leecher"]
-                            <= project["leecher"][1]
-                            and project["snatch"][0]
-                            <= torrent["snatch"]
-                            <= project["snatch"][1]
-                            and (
-                                time.mktime(time.localtime()) - torrent["publish_time"]
-                                <= project["publish_within"]
-                            )
-                            and (
-                                not project["free_only"]
-                                or (
-                                    torrent["free"]
-                                    and (
-                                        torrent["free_end"] is None
-                                        or torrent["free_end"]
-                                        - time.mktime(time.localtime())
-                                        >= project["free_time_min"]
-                                    )
-                                )
-                            )
-                            and (
-                                torrent["hr"] is None
-                                or torrent["hr"] <= project["hr_time_max"]
-                            )
+                        if name not in client.tasks and match_add_conditions(
+                            torrent, client, pool
                         ):
                             pool_lock.acquire(timeout=30)
                             if name in torrent_pool:
@@ -491,6 +506,24 @@ def task_processor(client):
     return template
 
 
+def match_project(torrent):
+    for name, project in config["projects"].items():
+        if torrent["site"] in project["sites"]:
+            match_regexp = False
+            for pattern in project["regexp"]:
+                if re.search(pattern, torrent["title"]) is not None:
+                    match_regexp = True
+                    break
+            match_size = False
+            for range in project["size"]:
+                if range[0] <= torrent["size"] <= range[1]:
+                    match_size = True
+                    break
+            if match_regexp and match_size:
+                return name
+    return None
+
+
 def torrent_fetcher(site):
     def template():
         global torrent_pool
@@ -504,7 +537,7 @@ def torrent_fetcher(site):
             if torrents != {}:
                 pool_lock.acquire(timeout=30)
                 for name, torrent in torrents.items():
-                    project = match_project(torrent, config["projects"])
+                    project = match_project(torrent)
                     if name in torrent_pool:
                         torrent_pool[name] = {
                             **torrent_pool[name],
