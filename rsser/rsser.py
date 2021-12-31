@@ -414,12 +414,15 @@ def match_add_conditions(torrent, client, pool):
 
 def task_processor(client):
     def template():
+        halted = False
         while True:
             try:
                 client.flush()
                 print_t(f"[{client.name}] 客户端连接正常，正在等候任务…", True)
-                op_lock.acquire(timeout=120)
+                if not halted:
+                    op_lock.acquire(timeout=120)
                 tasks_overall[client.name] = client.tasks
+                halted = False
                 if op_lock.locked():
                     op_lock.release()
                 tasks = deepcopy(client.tasks)
@@ -501,6 +504,8 @@ def task_processor(client):
                 time.sleep(config["clients"][client.name]["run_interval"])
             except Exception:
                 print_t(f"[{client.name}] 出现异常，正在重新连接客户端…", logger=logger)
+                if op_lock.locked:
+                    halted = True
                 client.reconnect()
 
     return template
