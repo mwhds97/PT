@@ -7,9 +7,9 @@ snippets:
     size:
     - [0, 100]
     publish_within: 660
-    seeder: [0, 5]
-    leecher: [0, 5000]
-    snatch: [0, 5]
+    seeder: [-1, 5]
+    leecher: [-1, 5000]
+    snatch: [-1, 5]
     free_only: true
     free_time_min: 21000
     free_end_escape: true
@@ -28,18 +28,28 @@ snippets:
     - info: '做种时长达到要求'
       exp: 'seeding_time >= size / 1073741824 * 1.0 * 60'
       period: S
+  DEFAULT_CLT:
+    clients:
+      de1:
+        volume: disk1
+        path: '/mnt/pool'
+      qb1:
+        volume: disk2
+        path: 'C:\pool'
 clients:
   de1:
     type: deluge
     host: '127.0.0.1:58846'
     user: 'localclient'
     pass: 'deluge'
+    bandwidth: 1000
     task_count_max: 10
   qb1:
     type: qbittorrent
     host: 'http://127.0.0.1:8080'
     user: 'admin'
     pass: 'admin'
+    bandwidth: 200
     task_count_max: 10
 volumes:
   disk1: 4396
@@ -55,7 +65,8 @@ sites:
       c_secure_ssl: '...'
       c_secure_tracker_ssl: '...'
       c_secure_uid: '...'
-    priority: 4
+  HDChina:
+    rss: 'https://hdchina.org/torrentrss.php?rows=50&isize=1&linktype=dl&passkey='
   HDSky:
     rss: 'https://hdsky.me/torrentrss.php?rows=50&isize=1&linktype=dl&passkey='
     web:
@@ -66,7 +77,6 @@ sites:
       c_secure_ssl: '...'
       c_secure_tracker_ssl: '...'
       c_secure_uid: '...'
-    priority: 5
   MTeam:
     rss: 'https://kp.m-team.cc/torrentrss.php?rows=50&isize=1&https=1&linktype=dl&passkey='
     web:
@@ -75,7 +85,6 @@ sites:
     - 'https://kp.m-team.cc/music.php?sort=4&type=desc'
     cookies:
       tp: '...'
-    priority: 2
   OpenCD:
     rss: 'https://open.cd/torrentrss.php?rows=50&isize=1&linktype=dl&passkey='
     web:
@@ -88,65 +97,56 @@ sites:
       c_secure_uid: '...'
     fetch_interval: 60
     retry_interval: 10
-    priority: 8
   OurBits:
     rss: 'https://ourbits.club/torrentrss.php?rows=50&isize=1&https=1&linktype=dl&passkey='
     web:
     - 'https://ourbits.club/torrents.php?sort=4&type=desc'
     cookies:
       ourbits_jwt: '...'
-    priority: 7
   SSD:
     rss: 'https://springsunday.net/torrentrss.php?rows=50&isize=1&https=1&linktype=dl&passkey='
     web:
     - 'https://springsunday.net/torrents.php?sort=4&type=desc'
     cookies:
       SPRINGID: '...'
-    priority: 6
   TTG:
     rss: 'https://totheglory.im/putrss.php?ssl=yes&par='
-    web:
-    - 'https://totheglory.im/browse.php?c=M&sort=4&type=desc'
-    - 'https://totheglory.im/browse.php?c=G&sort=4&type=desc'
-    cookies:
-      laccess: '...'
-      pass: '...'
-      uid: '...'
-    priority: 3
   U2:
     rss: 'https://u2.dmhy.org/torrentrss.php?rows=50&isize=1&trackerssl=1&linktype=dl&passkey='
     web:
     - 'https://u2.dmhy.org/torrents.php?sort=4&type=desc'
     cookies:
       nexusphp_u2: '...'
-    priority: 1
 projects:
   U2_new:
     snippets:
     - PRJ_DEFAULT
     - RM_DEFAULT
-    client: de1
-    path: '/mnt/U2'
-    volume: disk1
+    clients:
+      de1:
+        volume: disk1
+        path: '/mnt/pool'
+        extra_options: {'max_upload_speed': 51200}
+      qb1:
+        volume: disk2
+        path: 'C:\pool'
+        extra_options: {'upLimit': 52428800}
     sites:
     - U2
-    extra_options: {'max_upload_speed': 52428800}
-  MT_new:
+  HDC_new:
     snippets:
     - PRJ_DEFAULT
     - RM_DEFAULT
-    client: de1
-    path: '/mnt/MT'
-    volume: disk1
+    - DEFAULT_CLT
     sites:
-    - MTeam
+    - HDChina
+    regexp:
+    - '(-|@)HDC'
   TTG_new:
     snippets:
     - PRJ_DEFAULT
     - RM_DEFAULT
-    client: qb1
-    path: 'C:\TTG'
-    volume: disk2
+    - DEFAULT_CLT
     sites:
     - TTG
     regexp:
@@ -156,9 +156,7 @@ projects:
     snippets:
     - PRJ_DEFAULT
     - RM_DEFAULT
-    client: de1
-    path: '/mnt/CHD'
-    volume: disk1
+    - DEFAULT_CLT
     sites:
     - CHDBits
     regexp:
@@ -170,9 +168,7 @@ projects:
     snippets:
     - PRJ_DEFAULT
     - RM_DEFAULT
-    client: de1
-    path: '/mnt/HDS'
-    volume: disk1
+    - DEFAULT_CLT
     sites:
     - HDSky
     regexp:
@@ -182,9 +178,7 @@ projects:
     snippets:
     - PRJ_DEFAULT
     - RM_DEFAULT
-    client: de1
-    path: '/mnt/SSD'
-    volume: disk1
+    - DEFAULT_CLT
     sites:
     - SSD
     regexp:
@@ -193,21 +187,25 @@ projects:
     snippets:
     - PRJ_DEFAULT
     - RM_DEFAULT
-    client: de1
-    path: '/mnt/OB'
-    volume: disk1
+    clients:
+      de1:
+        volume: disk1
+        path: '/mnt/pool'
+        extra_options: {'max_upload_speed': 51200}
+      qb1:
+        volume: disk2
+        path: 'C:\pool'
+        extra_options: {'upLimit': 52428800}
     sites:
     - OurBits
     regexp:
     - '(-|@)(Our|iLove|PbK|FLTTH)'
     hr_seed_ratio: 1.0
-    extra_options: {'max_upload_speed': 52428800}
-  OCD_new:
+  OTHERS_new:
     snippets:
     - PRJ_DEFAULT
     - RM_DEFAULT
-    client: de1
-    path: '/mnt/OCD'
-    volume: disk1
+    - DEFAULT_CLT
     sites:
+    - MTeam
     - OpenCD

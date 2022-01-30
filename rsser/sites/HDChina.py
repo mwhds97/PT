@@ -9,11 +9,11 @@ from bs4 import BeautifulSoup
 from utils import *
 
 
-def HDChina(config):
+def HDChina(config: dict) -> dict:
     response = requests.get(
-        config["HDChina"]["rss"],
-        proxies=config["HDChina"]["proxies"],
-        timeout=config["HDChina"]["rss_timeout"],
+        config["rss"],
+        proxies=config["proxies"],
+        timeout=config["rss_timeout"],
     )
     if response.status_code == 200:
         feed = feedparser.parse(response.text)
@@ -29,14 +29,31 @@ def HDChina(config):
         }
         for entry in feed["entries"]
     }
-    session = requests.session()
-    for web in config["HDChina"]["web"]:
+    if config["web"] == []:
+        return {
+            "[HDChina]"
+            + id: {
+                **torrent,
+                **{
+                    "free": False,
+                    "free_end": None,
+                    "hr": None,
+                    "downloaded": False,
+                    "seeder": -1,
+                    "leecher": -1,
+                    "snatch": -1,
+                },
+            }
+            for id, torrent in torrents.items()
+        }
+    """ session = requests.session()
+    for web in config["web"]:
         response = session.get(
             web,
-            headers={"user-agent": config["HDChina"]["user_agent"]},
-            cookies=config["HDChina"]["cookies"],
-            proxies=config["HDChina"]["proxies"],
-            timeout=config["HDChina"]["web_timeout"],
+            headers={"User-Agent": config["user_agent"]},
+            cookies=config["cookies"],
+            proxies=config["proxies"],
+            timeout=config["web_timeout"],
         )
         if response.status_code == 200:
             soup = BeautifulSoup(response.text, "lxml")
@@ -71,16 +88,16 @@ def HDChina(config):
         else:
             raise Exception
         time.sleep(1)
-        """ response = session.post(
+        response = session.post(
             url="https://hdchina.org/ajax_promotion.php",
             headers={
-                "User-Agent": config["HDChina"]["user_agent"],
+                "User-Agent": config["user_agent"],
                 "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
             },
             data=ids + [("csrf", csrf)],
-            cookies=config["HDChina"]["cookies"],
-            proxies=config["HDChina"]["proxies"],
-            timeout=config["HDChina"]["web_timeout"],
+            cookies=config["cookies"],
+            proxies=config["proxies"],
+            timeout=config["web_timeout"],
         )
         if response.status_code == 200:
             pro_info = json.loads(response.text)
@@ -112,12 +129,11 @@ def HDChina(config):
                             time.strptime(free_end.group(1), "%Y-%m-%d %H:%M:%S")
                         )
                         - time.timezone
-                        - config["HDChina"]["timezone"] * 3600
+                        - config["timezone"] * 3600
                     )
         else:
             raise Exception
-        time.sleep(1) """
-    session.close()
+    session.close() """
     return {
         "[HDChina]" + id: torrent
         for id, torrent in torrents.items()

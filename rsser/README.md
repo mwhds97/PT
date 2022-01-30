@@ -7,12 +7,13 @@
 目前支持的站点：
 
 - [x] CHDBits
+- [x] HDChina（仅支持 rss）
 - [x] HDSky
 - [x] M-Team（建议关闭 2FA）
 - [x] OpenCD
 - [x] OurBits（Cookies 有效期一个月）
 - [x] SSD
-- [x] TTG
+- [x] TTG（仅支持 rss）
 - [x] U2
 
 ---
@@ -50,8 +51,9 @@ pool: #种子池选项
     seeder: false #按做种人数升序排序
     leecher: true #按下载人数降序排序
     snatch: false #按完成人数升序排序
-    site: false #按站点的优先级（priority）升序排序
+    site: false #按站点的优先级升序排序
   #位置越前优先级越高
+  scan_interval: 30 #遍历种子信息并生成种子添加列表的时间间隔（单位：秒）
   save_interval: 3600 #保存种子信息的时间间隔（单位：秒）
 snippets: #可复用的配置片段，用法参见配置示例
   片段1:
@@ -72,6 +74,7 @@ clients: #客户端列表（字典）
     timeout: 15 #与客户端通信超时的阈值（单位：秒）
     reconnect_interval: 10 #重新连接客户端的时间间隔（单位：秒）
     run_interval: 30 #执行任务处理（包括添加、移除种子）流程的时间间隔（单位：秒）
+    bandwidth: 1000 #客户端的最大带宽（单位：Mbps）
     task_count_max: 10
     #同时进行的最大任务数量
     #所有状态的任务都会被计入
@@ -95,6 +98,7 @@ clients: #客户端列表（字典）
     timeout: 15 #与客户端通信超时的阈值（单位：秒）
     reconnect_interval: 10 #重新连接客户端的时间间隔（单位：秒）
     run_interval: 30 #执行任务处理（包括添加、移除种子）流程的时间间隔（单位：秒）
+    bandwidth: 1000 #客户端的最大带宽（单位：Mbps）
     task_count_max: 10
     #同时进行的最大任务数量
     #所有状态的任务都会被计入
@@ -103,7 +107,7 @@ clients: #客户端列表（字典）
 volumes: #存储列表（字典）
   存储1: 1024 #存储空间大小（单位：GB），分配到该存储的任务总体积不会超过该值
   ...
-sites: #站点列表（字典）
+sites: #站点列表（字典），位置越前优先级越高
   站点1: #必须和 sites 目录下的 py 文件名一致
     snippets: #引用的配置片段列表，位置越前优先级越高
     - 片段1
@@ -114,41 +118,54 @@ sites: #站点列表（字典）
     rss_timeout: 15 #获取站点 RSS 信息的超时阈值（单位：秒）
     web: #站点的种子页面地址列表
     - '...'
+    ...
     #建议每个页面都按发布时间降序排列种子
     #多数站点传入 sort=4&type=desc 即可
+    #若该设置未被指定，站点种子信息将仅通过 rss 获取（一般只能获得种子标题、体积、发布时间等，HR 时间会根据站点保守估计）
     web_timeout: 15 #获取站点种子页面信息的超时阈值（单位：秒）
     cookies: {'属性1': '值', ...}
     #用于访问站点的 cookies
-    user_agent: '...' #用于访问站点的 user-agent
+    user_agent: '...' #用于访问站点的 User-Agent
     proxies: {'属性1': '值', ...}
     #代理设置，例如 {'http': 'http://127.0.0.1:7890', 'https': 'http://127.0.0.1:7890'}
     fetch_interval: 300 #获取种子信息的时间间隔（单位：秒）
     retry_interval: 30 #获取种子信息失败时重试的时间间隔（单位：秒）
-    priority: 1
-    #用于种子信息排序的站点优先级
-    #该值越小，站点优先级越高
     timezone: +8 #站点的时区，一般设置为 +8 即可
+    task_count_max: 10
+    #同时进行的最大任务数量
+    #所有状态的任务都会被计入
+    total_size_max: 1024 #任务的总体积不会超过该值（单位：GB）
   ...
-projects: #任务计划列表（字典）
+projects: #任务计划列表（字典），位置越前优先级越高
   计划1:
     snippets: #引用的配置片段列表，位置越前优先级越高
     - 片段1
     ...
-    client: 客户端1 #执行任务的客户端
-    path: '...' #任务的下载路径，不需要转义
-    volume: 存储1 #任务所在的存储
+    clients: #执行任务的客户端列表（字典）：
+      客户端1:
+        volume: 存储1 #任务所在的存储
+        path: '...' #任务的下载路径，不需要转义
+        extra_options: {'属性1': '值', ...}
+        #任务的其他设置（例如限速、分类等），参见 Deluge 源代码和 qBittorrent API 文档
+        #若使用 qBittorrent，请用 'true' 'false' 替代布尔值
+      ...
+    #任务将被发送到当前上传速率最低且符合条件的客户端
+    #如果任务计划中尚有未移除的任务，删除现有客户端配置可能会导致找不到这些任务对应的存储，引入潜在炸盘风险
     sites: #用于种子筛选，不属于以下任一站点的种子不会被纳入计划
     - 站点1
+    ...
     regexp: #用于种子筛选，标题不匹配以下任一正则表达式的种子不会被纳入计划
     - '.*'
+    ...
     size: #用于种子筛选，体积不在以下任一范围（单位：GB）内的种子不会被纳入计划
     - [0, 100]
+    ...
     publish_within: 660
     #发布时间在该值（单位：秒）之前的种子不会被添加至客户端
     #考虑到程序延迟，建议略大于期望值
-    seeder: [0, 5] #做种人数不在该范围内的种子不会被添加至客户端
-    leecher: [0, 5000] #下载人数不在该范围内的种子不会被添加至客户端
-    snatch: [0, 5] #完成人数不在该范围内的种子不会被添加至客户端
+    seeder: [-1, 5] #做种人数不在该范围内的种子不会被添加至客户端
+    leecher: [-1, 5000] #下载人数不在该范围内的种子不会被添加至客户端
+    snatch: [-1, 5] #完成人数不在该范围内的种子不会被添加至客户端
     free_only: true #若该值为 true，非免费的种子不会被添加至客户端
     free_time_min: 21000
     #若 free_only 的值为 true，免费时长小于该值（单位：秒）的种子不会被添加至客户端
@@ -167,10 +184,8 @@ projects: #任务计划列表（字典）
     task_count_max: 10
     #同时进行的最大任务数量
     #所有状态的任务都会被计入
+    total_size_max: 1024 #任务的总体积不会超过该值（单位：GB）
     retry_count_max: 2 #添加任务失败时重试的最大次数
-    extra_options: {'属性1': '值', ...}
-    #任务的其他设置（例如限速、分类等），参见 Deluge 源代码和 qBittorrent API 文档
-    #若使用 qBittorrent，请用 'true' 'false' 替代布尔值
     remove_conditions: #满足以下任一条件的种子将被移除
     - info: '种子下载速度过慢'
       exp: 'active_time >= 86400 and progress < 10'
@@ -184,6 +199,7 @@ projects: #任务计划列表（字典）
     - info: '做种和下载人数未达要求'
       exp: 'seeder > 10 and leecher < 20'
       period: S
+    ...
     #可用字段：size active_time seeding_time seeder leecher progress ratio uploaded downloaded upload_speed download_speed eta
     #时间单位：秒，体积单位：B，速率单位：B/s，进度范围：0-100
     #period 为条件的适用阶段，L 表示下载阶段，S 表示做种阶段，B 表示所有阶段

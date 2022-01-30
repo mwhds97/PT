@@ -7,9 +7,11 @@ import threading
 import time
 from collections import deque
 from copy import deepcopy
+from typing import Union
 
-from clients import *
-from sites import *
+import sites
+from clients import deluge, qbittorrent
+from init import init
 from utils import *
 
 
@@ -32,251 +34,113 @@ logger = open(
     newline="\n",
 )
 try:
-    err_info = "配置文件无法读取或为空"
     config = yaml_read(os.path.join(script_dir, "config.yaml"))
     if config == {}:
-        raise Exception
-    default_settings = {
-        "pool": {"size": 5000, "sort_by": {}, "save_interval": 3600},
-        "snippets": {},
-        "clients": {
-            "snippets": [],
-            "headers": {},
-            "timeout": 15,
-            "reconnect_interval": 10,
-            "run_interval": 30,
-            "task_count_max": float("inf"),
-            "total_size_max": float("inf"),
-        },
-        "volumes": {},
-        "sites": {
-            "snippets": [],
-            "rss_timeout": 15,
-            "web_timeout": 15,
-            "cookies": {},
-            "user_agent": "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36",
-            "proxies": {},
-            "fetch_interval": 300,
-            "retry_interval": 30,
-            "priority": 0,
-            "timezone": +8,
-        },
-        "projects": {
-            "snippets": [],
-            "volume": "__FBCDBESTCD__",
-            "regexp": [r".*"],
-            "size": [[0, float("inf")]],
-            "publish_within": float("inf"),
-            "seeder": [0, float("inf")],
-            "leecher": [0, float("inf")],
-            "snatch": [0, float("inf")],
-            "free_only": False,
-            "free_time_min": 0,
-            "free_end_escape": False,
-            "escape_trigger_time": 60,
-            "hr_time_max": float("inf"),
-            "hr_seed_delay": 0,
-            "hr_seed_ratio": None,
-            "ignore_hr_seeding": False,
-            "ignore_hr_leeching": False,
-            "task_count_max": float("inf"),
-            "retry_count_max": 2,
-            "extra_options": {},
-            "remove_conditions": [],
-        },
-    }
-    err_info = "顶层键错误"
-    for setting in {"pool", "snippets", "volumes"} - set(config.keys()):
-        config[setting] = default_settings[setting]
-    config["volumes"]["__FBCDBESTCD__"] = float("inf")
-    if set(config.keys()) != {
-        "pool",
-        "snippets",
-        "clients",
-        "volumes",
-        "sites",
-        "projects",
-    }:
-        raise Exception
-    err_info = "种子池选项有误"
-    for setting in set(default_settings["pool"].keys()) - set(config["pool"].keys()):
-        config["pool"][setting] = default_settings["pool"][setting]
-    if set(config["pool"].keys()) != {"size", "sort_by", "save_interval"}:
-        raise Exception
-    err_info = "种子池排序选项有误"
-    if not set(config["pool"]["sort_by"].keys()) <= {
+        raise Exception("文件读取错误或为空")
+    active_sites, active_clients = init(config)
+except Exception as e:
+    print_t(f"配置文件加载失败，原因：{str(e)}", logger=logger)
+    logger.close()
+    sys.exit(0)
+
+
+def match_project(torrent: dict, allow_site_only: bool = False) -> Union[str, None]:
+    first_match_site_project = None
+    for name, project in config["projects"].items():
+        if torrent["site"] in project["sites"]:
+            if first_match_site_project is None:
+                first_match_site_project = name
+            match_regexp = False
+            for pattern in project["regexp"]:
+                if re.search(pattern, torrent["title"]) is not None:
+                    match_regexp = True
+                    break
+            match_size = False
+            for range in project["size"]:
+                if range[0] <= torrent["size"] <= range[1]:
+                    match_size = True
+                    break
+            if match_regexp and match_size:
+                return name
+    if allow_site_only:
+        return first_match_site_project
+    return None
+
+
+torrent_pool = yaml_read(os.path.join(script_dir, "torrent_pool.yaml"))
+invalid_torrents = []
+for name, torrent in torrent_pool.items():
+    if re.match(r"\[.+\]\d+$", name) is None:
+        invalid_torrents.append(name)
+    elif set(torrent.keys()) != {
+        "site",
+        "title",
         "size",
+        "link",
         "publish_time",
+        "free",
+        "free_end",
+        "hr",
+        "downloaded",
         "seeder",
         "leecher",
         "snatch",
-        "site",
+        "retry_count",
+        "project",
     }:
-        raise Exception
-    err_info = "客户端配置有误"
-    for name in config["clients"]:
-        if "snippets" in config["clients"][name]:
-            if not isinstance(config["clients"][name]["snippets"], list):
-                config["clients"][name]["snippets"] = [
-                    config["clients"][name]["snippets"]
-                ]
-            for snippet in config["clients"][name]["snippets"]:
-                config["clients"][name] = {
-                    **config["snippets"][snippet],
-                    **config["clients"][name],
-                }
-        for setting in set(default_settings["clients"].keys()) - set(
-            config["clients"][name].keys()
-        ):
-            config["clients"][name][setting] = default_settings["clients"][setting]
-        if (
-            set(config["clients"][name].keys())
-            != {
-                "snippets",
-                "type",
-                "host",
-                "user",
-                "pass",
-                "headers",
-                "timeout",
-                "reconnect_interval",
-                "run_interval",
-                "task_count_max",
-                "total_size_max",
-            }
-            or config["clients"][name]["type"] not in ["deluge", "qbittorrent"]
-        ):
-            raise Exception
-    err_info = "站点配置有误"
-    for name in config["sites"]:
-        if "snippets" in config["sites"][name]:
-            if not isinstance(config["sites"][name]["snippets"], list):
-                config["sites"][name]["snippets"] = [config["sites"][name]["snippets"]]
-            for snippet in config["sites"][name]["snippets"]:
-                config["sites"][name] = {
-                    **config["snippets"][snippet],
-                    **config["sites"][name],
-                }
-        for setting in set(default_settings["sites"].keys()) - set(
-            config["sites"][name].keys()
-        ):
-            config["sites"][name][setting] = default_settings["sites"][setting]
-        if not isinstance(config["sites"][name]["web"], list):
-            config["sites"][name]["web"] = [config["sites"][name]["web"]]
-        if set(config["sites"][name].keys()) != {
-            "snippets",
-            "rss",
-            "rss_timeout",
-            "web",
-            "web_timeout",
-            "cookies",
-            "user_agent",
-            "proxies",
-            "fetch_interval",
-            "retry_interval",
-            "priority",
-            "timezone",
-        }:
-            raise Exception
-    err_info = "任务计划配置有误"
-    for name in config["projects"]:
-        if "snippets" in config["projects"][name]:
-            if not isinstance(config["projects"][name]["snippets"], list):
-                config["projects"][name]["snippets"] = [
-                    config["projects"][name]["snippets"]
-                ]
-            for snippet in config["projects"][name]["snippets"]:
-                config["projects"][name] = {
-                    **config["snippets"][snippet],
-                    **config["projects"][name],
-                }
-        for setting in set(default_settings["projects"].keys()) - set(
-            config["projects"][name].keys()
-        ):
-            config["projects"][name][setting] = default_settings["projects"][setting]
-        if not isinstance(config["projects"][name]["sites"], list):
-            config["projects"][name]["sites"] = [config["projects"][name]["sites"]]
-        if not isinstance(config["projects"][name]["regexp"], list):
-            config["projects"][name]["regexp"] = [config["projects"][name]["regexp"]]
-        if not isinstance(config["projects"][name]["size"][0], list):
-            config["projects"][name]["size"] = [config["projects"][name]["size"]]
-        if not isinstance(config["projects"][name]["remove_conditions"], list):
-            config["projects"][name]["remove_conditions"] = [
-                config["projects"][name]["remove_conditions"]
-            ]
-        if set(config["projects"][name].keys()) != {
-            "snippets",
-            "client",
-            "path",
-            "volume",
-            "sites",
-            "regexp",
-            "size",
-            "publish_within",
-            "seeder",
-            "leecher",
-            "snatch",
-            "free_only",
-            "free_time_min",
-            "free_end_escape",
-            "escape_trigger_time",
-            "hr_time_max",
-            "hr_seed_delay",
-            "hr_seed_ratio",
-            "ignore_hr_seeding",
-            "ignore_hr_leeching",
-            "task_count_max",
-            "retry_count_max",
-            "extra_options",
-            "remove_conditions",
-        }:
-            raise Exception
-    err_info = "任务计划缺失对应站点配置"
-    active_sites = set()
-    for _, project in config["projects"].items():
-        for site in project["sites"]:
-            active_sites.add(site)
-    if not active_sites <= set(config["sites"].keys()):
-        raise Exception
-    err_info = "任务计划缺失对应客户端配置"
-    active_clients = set(
-        [project["client"] for _, project in config["projects"].items()]
-    )
-    if not active_clients <= set(config["clients"].keys()):
-        raise Exception
-except Exception:
-    print_t(f"配置文件加载失败，原因：{err_info}", logger=logger)
-    logger.close()
-    sys.exit(0)
-torrent_pool = yaml_read(os.path.join(script_dir, "torrent_pool.yaml"))
-invalid_torrents = [
-    name
-    for name, torrent in torrent_pool.items()
-    if "project" not in torrent
-    or torrent["project"] not in config["projects"]
-    or torrent["site"] not in config["projects"][torrent["project"]]["sites"]
-]
+        invalid_torrents.append(name)
+    elif torrent["project"] not in config["projects"]:
+        project = match_project(torrent, True)
+        if project is not None:
+            torrent["project"] = project
+        else:
+            invalid_torrents.append(name)
 name_list = yaml_read(os.path.join(script_dir, "name_queue.yaml"))
 name_list = [name for name in name_list if name not in invalid_torrents]
 name_queue = deque(maxlen=config["pool"]["size"])
 name_queue.extend(name_list)
-torrent_pool = {
-    name: torrent for name, torrent in torrent_pool.items() if name in name_queue
-}
+
+
+def renew_torrent_pool():
+    global torrent_pool
+    torrent_pool = {
+        name: torrent for name, torrent in torrent_pool.items() if name in name_queue
+    }
+    sort_keys = reversed(list(config["pool"]["sort_by"].keys()))
+    for sort_key in sort_keys:
+        torrent_pool = dict(
+            sorted(
+                torrent_pool.items(),
+                key=lambda torrent: torrent[1][sort_key]
+                if sort_key != "site"
+                else list(config["sites"].keys()).index(torrent[1]["site"]),
+                reverse=config["pool"]["sort_by"][sort_key],
+            )
+        )
+
+
+renew_torrent_pool()
 clients = []
 for client in active_clients:
     try:
-        clients.append(eval(config["clients"][client]["type"] + "(client, config)"))
+        clients.append(
+            eval(
+                f'{config["clients"][client]["type"]}(client, config["clients"][client])'
+            )
+        )
     except Exception:
         print_t(f"[{client}] 无法连接客户端，请重试", logger=logger)
         logger.close()
         sys.exit(0)
+
+
 tasks_overall = {}
+torrents_candidate = {client: {} for client in active_clients}
 pool_lock = threading.Lock()
-op_lock = threading.Lock()
+task_lock = threading.Lock()
 
 
-def generate_exp(exp):
+def generate_exp(exp: str) -> str:
     fields = [
         "size",
         "active_time",
@@ -296,11 +160,11 @@ def generate_exp(exp):
     return f"({exp})"
 
 
-def match_remove_conditions(torrent, stats):
+def match_remove_conditions(torrent: dict, stats: dict) -> Union[str, None]:
     project = config["projects"][torrent["project"]]
     if (
         re.search(
-            r"(?i)not.*reg|not.*auth|delete|remove|dupe|trump|rev|nuke|收|除|撤",
+            r"(?i)not.*reg|not.*auth|delete|remove|dupe|trump|rev|nuke|same|diff|loc|收|除|撤|同|重",
             stats["tracker_status"],
         )
         is not None
@@ -341,206 +205,292 @@ def match_remove_conditions(torrent, stats):
     return None
 
 
-def match_add_conditions(torrent, client, pool):
-    project = config["projects"][torrent["project"]]
-    if torrent["downloaded"]:
-        return False
-    if client.task_count >= config["clients"][client.name]["task_count_max"]:
-        return False
-    if set(tasks_overall.keys()) != active_clients:
-        return False
-    if (
-        len(
-            [
-                title
-                for title in client.tasks
-                if title in pool and pool[title]["project"] == torrent["project"]
-            ]
-        )
-        >= project["task_count_max"]
-    ):
-        return False
-    if (
-        client.total_size + torrent["size"]
-        > config["clients"][client.name]["total_size_max"]
-    ):
-        return False
-    if (
-        torrent["size"]
-        + sum(
-            [
-                sum(
-                    [
-                        task["size"]
-                        for title, task in task_dict.items()
-                        if title in pool
-                        and config["projects"][pool[title]["project"]]["volume"]
-                        == project["volume"]
-                    ]
-                )
-                for task_dict in tasks_overall.values()
-            ]
-        )
-        / 1073741824
-        > config["volumes"][project["volume"]]
-    ):
-        return False
-    if torrent["retry_count"] >= project["retry_count_max"]:
-        return False
-    if not (project["seeder"][0] <= torrent["seeder"] <= project["seeder"][1]):
-        return False
-    if not (project["leecher"][0] <= torrent["leecher"] <= project["leecher"][1]):
-        return False
-    if not (project["snatch"][0] <= torrent["snatch"] <= project["snatch"][1]):
-        return False
-    if (
-        time.mktime(time.localtime()) - torrent["publish_time"]
-        > project["publish_within"]
-    ):
-        return False
-    if project["free_only"]:
-        if not torrent["free"]:
+def unlock(lock: threading.Lock, locked: bool = True):
+    if lock.locked() and locked:
+        lock.release()
+
+
+def task_generator():
+    global torrents_candidate
+
+    def match_add_conditions(
+        torrent: dict, client: Union[deluge, qbittorrent], pool: dict, tasks: dict
+    ) -> bool:
+        project = config["projects"][torrent["project"]]
+        if torrent["downloaded"]:
             return False
-        elif torrent["free_end"] is not None:
-            if (
-                torrent["free_end"] - time.mktime(time.localtime())
-                < project["free_time_min"]
-            ):
+        if torrent["retry_count"] >= project["retry_count_max"]:
+            return False
+        if not (project["seeder"][0] <= torrent["seeder"] <= project["seeder"][1]):
+            return False
+        if not (project["leecher"][0] <= torrent["leecher"] <= project["leecher"][1]):
+            return False
+        if not (project["snatch"][0] <= torrent["snatch"] <= project["snatch"][1]):
+            return False
+        if (
+            time.mktime(time.localtime()) - torrent["publish_time"]
+            > project["publish_within"]
+        ):
+            return False
+        if project["free_only"]:
+            if not torrent["free"]:
                 return False
-    if torrent["hr"] is not None and torrent["hr"] > project["hr_time_max"]:
-        return False
-    return True
+            elif torrent["free_end"] is not None:
+                if (
+                    torrent["free_end"] - time.mktime(time.localtime())
+                    < project["free_time_min"]
+                ):
+                    return False
+        if torrent["hr"] is not None and torrent["hr"] > project["hr_time_max"]:
+            return False
+        if client.name not in project["clients"]:
+            return False
+        if len(tasks[client.name]) >= client.config["task_count_max"]:
+            return False
+        if (
+            sum(pool[name]["size"] for name in tasks[client.name] if name in pool)
+            + torrent["size"]
+            > client.config["total_size_max"]
+        ):
+            return False
+        if (
+            sum(
+                sum(
+                    1
+                    for name in task_group
+                    if name in pool and pool[name]["project"] == torrent["project"]
+                )
+                for _, task_group in tasks.items()
+            )
+            >= project["task_count_max"]
+        ):
+            return False
+        if (
+            torrent["size"]
+            + sum(
+                sum(
+                    pool[name]["size"]
+                    for name in task_group
+                    if name in pool and pool[name]["project"] == torrent["project"]
+                )
+                for _, task_group in tasks.items()
+            )
+            > project["total_size_max"]
+        ):
+            return False
+        if (
+            sum(
+                sum(
+                    1
+                    for name in task_group
+                    if name in pool and pool[name]["site"] == torrent["site"]
+                )
+                for _, task_group in tasks.items()
+            )
+            >= config["sites"][torrent["site"]]["task_count_max"]
+        ):
+            return False
+        if (
+            torrent["size"]
+            + sum(
+                sum(
+                    pool[name]["size"]
+                    for name in task_group
+                    if name in pool and pool[name]["site"] == torrent["site"]
+                )
+                for _, task_group in tasks.items()
+            )
+            > config["sites"][torrent["site"]]["total_size_max"]
+        ):
+            return False
+        volume = project["clients"][client.name]["volume"]
+        if volume is not None:
+            volume_total_size = 0
+            for group_client, task_group in tasks.items():
+                group_total_size = 0
+                for name in task_group:
+                    if name in pool:
+                        task_project = config["projects"][pool[name]["project"]]
+                        if group_client in task_project["clients"]:
+                            options = task_project["clients"][group_client]
+                            if options["volume"] == volume:
+                                group_total_size += pool[name]["size"]
+                volume_total_size += group_total_size
+            if torrent["size"] + volume_total_size > config["volumes"][volume]:
+                return False
+        return True
+
+    while True:
+        task_locked = task_lock.acquire(timeout=300)
+        start = set(tasks_overall.keys()) == active_clients
+        unlock(task_lock, task_locked)
+        if start:
+            break
+        time.sleep(5)
+
+    while True:
+        task_locked = task_lock.acquire(timeout=300)
+        tasks = deepcopy(tasks_overall)
+        pool_locked = pool_lock.acquire(timeout=30)
+        renew_torrent_pool()
+        pool = deepcopy(torrent_pool)
+        unlock(pool_lock, pool_locked)
+        pool = dict(
+            sorted(
+                pool.items(),
+                key=lambda torrent: list(config["projects"].keys()).index(
+                    torrent[1]["project"]
+                ),
+            )
+        )
+        torrents_candidate = {client: {} for client in active_clients}
+        for name, torrent in pool.items():
+            project = config["projects"][torrent["project"]]
+            clients_candidate = [
+                client for client in clients if client.name in project["clients"]
+            ]
+            for client in clients_candidate:
+                if client.config["bandwidth"] is None:
+                    sort_by_speed_prop = False
+                    break
+            else:
+                sort_by_speed_prop = True
+            clients_candidate = sorted(
+                clients_candidate,
+                key=lambda client: client.upload_speed / client.config["bandwidth"] * 8
+                if sort_by_speed_prop
+                else client.upload_speed,
+            )
+            for client in clients_candidate:
+                if name not in [
+                    task for _, task_group in tasks.items() for task in task_group
+                ] and match_add_conditions(torrent, client, pool, tasks):
+                    torrents_candidate[client.name][name] = torrent
+                    tasks[client.name][name] = {}
+                    break
+        unlock(task_lock, task_locked)
+        del pool
+        time.sleep(config["pool"]["scan_interval"])
 
 
-def task_processor(client):
+def task_processor(client: Union[deluge, qbittorrent]):
     def template():
         halted = False
+        reconnect_count = 0
         while True:
             try:
+                if reconnect_count > 10:
+                    unlock(task_lock, halted)
+                    halted = False
                 client.flush()
                 print_t(f"[{client.name}] 客户端连接正常，正在等候任务…", True)
+                reconnect_count = 0
                 if not halted:
-                    op_lock.acquire(timeout=120)
-                tasks_overall[client.name] = client.tasks
-                halted = False
-                if op_lock.locked():
-                    op_lock.release()
+                    task_locked = task_lock.acquire(timeout=300)
+                    tasks_overall[client.name] = deepcopy(client.tasks)
+                    unlock(task_lock, task_locked)
+                else:
+                    tasks_overall[client.name] = deepcopy(client.tasks)
+                    unlock(task_lock)
+                    halted = False
                 tasks = deepcopy(client.tasks)
-                pool_lock.acquire(timeout=30)
+                pool_locked = pool_lock.acquire(timeout=30)
                 pool = deepcopy(torrent_pool)
-                if pool_lock.locked():
-                    pool_lock.release()
+                unlock(pool_lock, pool_locked)
                 for name, stats in tasks.items():
-                    try:
-                        pool_lock.acquire(timeout=30)
-                        if name in torrent_pool:
-                            torrent_pool[name]["downloaded"] = True
-                        if pool_lock.locked():
-                            pool_lock.release()
-                        op_lock.acquire(timeout=120)
-                        if name in pool:
-                            torrent = pool[name]
-                            if (
-                                config["projects"][torrent["project"]]["client"]
-                                != client.name
-                            ):
-                                if op_lock.locked():
-                                    op_lock.release()
-                                continue
-                            info = match_remove_conditions(torrent, stats)
-                            if info is not None:
+                    pool_locked = pool_lock.acquire(timeout=30)
+                    if name in torrent_pool:
+                        torrent_pool[name]["downloaded"] = True
+                    unlock(pool_lock, pool_locked)
+                    if name in pool:
+                        torrent = pool[name]
+                        info = match_remove_conditions(torrent, stats)
+                        if info is not None:
+                            halted = task_lock.acquire(timeout=300)
+                            try:
                                 client.remove_torrent(torrent, name, info, logger)
-                                time.sleep(5)
-                                client.flush()
-                                tasks_overall[client.name] = client.tasks
-                        if op_lock.locked():
-                            op_lock.release()
-                    except Exception:
-                        print_t(
-                            f'[{client.name}] 删除种子 {name}（{torrent["size"]:.2f}GB）可能已失败，尝试删除其他种子…',
-                            logger=logger,
-                        )
-                        time.sleep(5)
-                        client.flush()
-                        tasks_overall[client.name] = client.tasks
-                        if op_lock.locked():
-                            op_lock.release()
-                pool_lock.acquire(timeout=30)
-                pool = deepcopy(torrent_pool)
-                if pool_lock.locked():
-                    pool_lock.release()
-                for name, torrent in pool.items():
-                    try:
-                        if (
-                            config["projects"][torrent["project"]]["client"]
-                            != client.name
-                        ):
-                            continue
-                        op_lock.acquire(timeout=120)
-                        if name not in client.tasks and match_add_conditions(
-                            torrent, client, pool
-                        ):
-                            pool_lock.acquire(timeout=30)
-                            if name in torrent_pool:
-                                torrent_pool[name]["retry_count"] += 1
-                            if pool_lock.locked():
-                                pool_lock.release()
-                            client.add_torrent(torrent, name, logger)
-                            time.sleep(10)
+                            except Exception:
+                                print_t(
+                                    f'[{client.name}] 删除种子 {name}（{torrent["size"]:.2f}GB）可能已失败，尝试删除其他种子…',
+                                    logger=logger,
+                                )
+                            time.sleep(5)
                             client.flush()
-                            tasks_overall[client.name] = client.tasks
-                        if op_lock.locked():
-                            op_lock.release()
-                    except Exception:
-                        print_t(
-                            f'[{client.name}] 添加种子 {name}（{torrent["size"]:.2f}GB）可能已失败，尝试添加其他种子…',
-                            logger=logger,
-                        )
+                            tasks_overall[client.name] = deepcopy(client.tasks)
+                            unlock(task_lock, halted)
+                            halted = False
+                del pool
+
+                pool_locked = pool_lock.acquire(timeout=30)
+                pool = deepcopy(torrent_pool)
+                unlock(pool_lock, pool_locked)
+                task_locked = task_lock.acquire(timeout=300)
+                torrents = deepcopy(torrents_candidate[client.name])
+                unlock(task_lock, task_locked)
+                for name, torrent in torrents.items():
+                    halted = task_lock.acquire(timeout=300)
+                    for _, task_group in tasks_overall.items():
+                        if name in task_group:
+                            break
+                    else:
+                        project = config["projects"][torrent["project"]]
+                        pool_locked = pool_lock.acquire(timeout=30)
+                        if name in torrent_pool:
+                            if (
+                                torrent_pool[name]["retry_count"]
+                                >= project["retry_count_max"]
+                            ):
+                                unlock(task_lock, halted)
+                                halted = False
+                                unlock(pool_lock, pool_locked)
+                                continue
+                            else:
+                                torrent_pool[name]["retry_count"] += 1
+                                unlock(pool_lock, pool_locked)
+                        try:
+                            client.add_torrent(
+                                torrent,
+                                name,
+                                project["clients"][client.name]["path"],
+                                project["clients"][client.name]["extra_options"],
+                                logger,
+                            )
+                        except Exception:
+                            print_t(
+                                f'[{client.name}] 添加种子 {name}（{torrent["size"]:.2f}GB）可能已失败，尝试添加其他种子…',
+                                logger=logger,
+                            )
                         time.sleep(10)
                         client.flush()
-                        tasks_overall[client.name] = client.tasks
-                        if op_lock.locked():
-                            op_lock.release()
-                time.sleep(config["clients"][client.name]["run_interval"])
+                        if name in client.tasks:
+                            pool_locked = pool_lock.acquire(timeout=30)
+                            if name in torrent_pool:
+                                torrent_pool[name]["downloaded"] = True
+                            unlock(pool_lock, pool_locked)
+                        tasks_overall[client.name] = deepcopy(client.tasks)
+                    unlock(task_lock, halted)
+                    halted = False
+                del pool
+                time.sleep(client.config["run_interval"])
             except Exception:
                 print_t(f"[{client.name}] 出现异常，正在重新连接客户端…", logger=logger)
-                if op_lock.locked:
-                    halted = True
+                reconnect_count += 1
                 client.reconnect()
 
     return template
 
 
-def match_project(torrent):
-    for name, project in config["projects"].items():
-        if torrent["site"] in project["sites"]:
-            match_regexp = False
-            for pattern in project["regexp"]:
-                if re.search(pattern, torrent["title"]) is not None:
-                    match_regexp = True
-                    break
-            match_size = False
-            for range in project["size"]:
-                if range[0] <= torrent["size"] <= range[1]:
-                    match_size = True
-                    break
-            if match_regexp and match_size:
-                return name
-    return None
-
-
-def torrent_fetcher(site):
+def torrent_fetcher(site: str, config: dict):
     def template():
-        global torrent_pool
         while True:
             try:
-                torrents = eval(site + '(config["sites"])')
+                torrents = eval(f"sites.{site}(config)")
             except Exception:
                 print_t(f"[{site}] 获取种子信息失败，正在重试…", logger=logger)
-                time.sleep(config["sites"][site]["retry_interval"])
+                time.sleep(config["retry_interval"])
                 continue
             if torrents != {}:
-                pool_lock.acquire(timeout=30)
+                pool_locked = pool_lock.acquire(timeout=30)
                 for name, torrent in torrents.items():
                     project = match_project(torrent)
                     if name in torrent_pool:
@@ -563,39 +513,26 @@ def torrent_fetcher(site):
                             "project": project,
                         }
                         name_queue.append(name)
-                torrent_pool = {
-                    name: torrent
-                    for name, torrent in torrent_pool.items()
-                    if name in name_queue
-                }
-                sort_keys = reversed(list(config["pool"]["sort_by"].keys()))
-                for sort_key in sort_keys:
-                    torrent_pool = dict(
-                        sorted(
-                            torrent_pool.items(),
-                            key=lambda torrent: torrent[1][sort_key]
-                            if sort_key != "site"
-                            else config["sites"][torrent[1]["site"]]["priority"],
-                            reverse=config["pool"]["sort_by"][sort_key],
-                        )
-                    )
-                if pool_lock.locked():
-                    pool_lock.release()
-            time.sleep(config["sites"][site]["fetch_interval"])
+                unlock(pool_lock, pool_locked)
+            time.sleep(config["fetch_interval"])
 
     return template
 
 
-def pool_saver(loop, interval, block=False):
+def pool_saver(loop: bool, interval: Union[int, float], block: bool = False):
     def template():
         while True:
             time.sleep(interval)
             print_t("正在保存种子数据…", logger=logger)
-            pool_lock.acquire(timeout=120)
-            yaml_dump(torrent_pool, os.path.join(script_dir, "torrent_pool.yaml"))
-            yaml_dump(list(name_queue), os.path.join(script_dir, "name_queue.yaml"))
-            if pool_lock.locked() and not block:
-                pool_lock.release()
+            pool_locked = pool_lock.acquire(timeout=300)
+            renew_torrent_pool()
+            try:
+                yaml_dump(torrent_pool, os.path.join(script_dir, "torrent_pool.yaml"))
+                yaml_dump(list(name_queue), os.path.join(script_dir, "name_queue.yaml"))
+            except Exception:
+                print_t("种子数据保存失败", logger=logger)
+            if not block:
+                unlock(pool_lock, pool_locked)
             if not loop:
                 break
 
@@ -624,12 +561,16 @@ threads = []
 for client in clients:
     threads.append(threading.Thread(target=task_processor(client)))
 for site in active_sites:
-    threads.append(threading.Thread(target=torrent_fetcher(site)))
+    threads.append(
+        threading.Thread(target=torrent_fetcher(site, config["sites"][site]))
+    )
 threads.append(
     threading.Thread(target=pool_saver(True, config["pool"]["save_interval"]))
 )
+threads.append(threading.Thread(target=task_generator))
 for thread in threads:
     thread.setDaemon(True)
     thread.start()
 while True:
     time.sleep(86400)
+    logger.flush()

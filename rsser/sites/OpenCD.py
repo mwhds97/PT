@@ -8,11 +8,11 @@ from bs4 import BeautifulSoup
 from utils import *
 
 
-def OpenCD(config):
+def OpenCD(config: dict) -> dict:
     response = requests.get(
-        config["OpenCD"]["rss"],
-        proxies=config["OpenCD"]["proxies"],
-        timeout=config["OpenCD"]["rss_timeout"],
+        config["rss"],
+        proxies=config["proxies"],
+        timeout=config["rss_timeout"],
     )
     if response.status_code == 200:
         feed = feedparser.parse(response.text)
@@ -28,13 +28,30 @@ def OpenCD(config):
         }
         for entry in feed["entries"]
     }
-    for web in config["OpenCD"]["web"]:
+    if config["web"] == []:
+        return {
+            "[OpenCD]"
+            + id: {
+                **torrent,
+                **{
+                    "free": False,
+                    "free_end": None,
+                    "hr": 129600,
+                    "downloaded": False,
+                    "seeder": -1,
+                    "leecher": -1,
+                    "snatch": -1,
+                },
+            }
+            for id, torrent in torrents.items()
+        }
+    for web in config["web"]:
         response = requests.get(
             web,
-            headers={"user-agent": config["OpenCD"]["user_agent"]},
-            cookies=config["OpenCD"]["cookies"],
-            proxies=config["OpenCD"]["proxies"],
-            timeout=config["OpenCD"]["web_timeout"],
+            headers={"User-Agent": config["user_agent"]},
+            cookies=config["cookies"],
+            proxies=config["proxies"],
+            timeout=config["web_timeout"],
         )
         if response.status_code == 200:
             soup = BeautifulSoup(response.text, "lxml")
@@ -67,7 +84,7 @@ def OpenCD(config):
                                     )
                                 )
                                 - time.timezone
-                                - config["OpenCD"]["timezone"] * 3600
+                                - config["timezone"] * 3600
                             )
                         if cols[2].find("div", class_="progress") is not None:
                             web_info["downloaded"] == True
@@ -77,7 +94,6 @@ def OpenCD(config):
                         torrents[id] = {**torrents[id], **web_info}
         else:
             raise Exception
-        time.sleep(1)
     return {
         "[OpenCD]" + id: torrent
         for id, torrent in torrents.items()

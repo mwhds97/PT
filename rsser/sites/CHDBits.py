@@ -8,11 +8,11 @@ from bs4 import BeautifulSoup
 from utils import *
 
 
-def CHDBits(config):
+def CHDBits(config: dict) -> dict:
     response = requests.get(
-        config["CHDBits"]["rss"],
-        proxies=config["CHDBits"]["proxies"],
-        timeout=config["CHDBits"]["rss_timeout"],
+        config["rss"],
+        proxies=config["proxies"],
+        timeout=config["rss_timeout"],
     )
     if response.status_code == 200:
         feed = feedparser.parse(response.text)
@@ -28,13 +28,30 @@ def CHDBits(config):
         }
         for entry in feed["entries"]
     }
-    for web in config["CHDBits"]["web"]:
+    if config["web"] == []:
+        return {
+            "[CHDBits]"
+            + id: {
+                **torrent,
+                **{
+                    "free": False,
+                    "free_end": None,
+                    "hr": 432000,
+                    "downloaded": False,
+                    "seeder": -1,
+                    "leecher": -1,
+                    "snatch": -1,
+                },
+            }
+            for id, torrent in torrents.items()
+        }
+    for web in config["web"]:
         response = requests.get(
             web,
-            headers={"user-agent": config["CHDBits"]["user_agent"]},
-            cookies=config["CHDBits"]["cookies"],
-            proxies=config["CHDBits"]["proxies"],
-            timeout=config["CHDBits"]["web_timeout"],
+            headers={"User-Agent": config["user_agent"]},
+            cookies=config["cookies"],
+            proxies=config["proxies"],
+            timeout=config["web_timeout"],
         )
         if response.status_code == 200:
             soup = BeautifulSoup(response.text, "lxml")
@@ -67,7 +84,7 @@ def CHDBits(config):
                                     )
                                 )
                                 - time.timezone
-                                - config["CHDBits"]["timezone"] * 3600
+                                - config["timezone"] * 3600
                             )
                         hr = cols[1].find("div", class_="circle-text")
                         if hr is not None:
@@ -80,7 +97,6 @@ def CHDBits(config):
                         torrents[id] = {**torrents[id], **web_info}
         else:
             raise Exception
-        time.sleep(1)
     return {
         "[CHDBits]" + id: torrent
         for id, torrent in torrents.items()

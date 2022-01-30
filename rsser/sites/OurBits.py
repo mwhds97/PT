@@ -8,11 +8,11 @@ from bs4 import BeautifulSoup
 from utils import *
 
 
-def OurBits(config):
+def OurBits(config: dict) -> dict:
     response = requests.get(
-        config["OurBits"]["rss"],
-        proxies=config["OurBits"]["proxies"],
-        timeout=config["OurBits"]["rss_timeout"],
+        config["rss"],
+        proxies=config["proxies"],
+        timeout=config["rss_timeout"],
     )
     if response.status_code == 200:
         feed = feedparser.parse(response.text)
@@ -28,13 +28,33 @@ def OurBits(config):
         }
         for entry in feed["entries"]
     }
-    for web in config["OurBits"]["web"]:
+    if config["web"] == []:
+        return {
+            "[OurBits]"
+            + id: {
+                **torrent,
+                **{
+                    "free": False,
+                    "free_end": None,
+                    "hr": 172800
+                    if time.mktime(time.localtime()) - torrent["publish_time"]
+                    <= 2592000
+                    else None,
+                    "downloaded": False,
+                    "seeder": -1,
+                    "leecher": -1,
+                    "snatch": -1,
+                },
+            }
+            for id, torrent in torrents.items()
+        }
+    for web in config["web"]:
         response = requests.get(
             web,
-            headers={"user-agent": config["OurBits"]["user_agent"]},
-            cookies=config["OurBits"]["cookies"],
-            proxies=config["OurBits"]["proxies"],
-            timeout=config["OurBits"]["web_timeout"],
+            headers={"User-Agent": config["user_agent"]},
+            cookies=config["cookies"],
+            proxies=config["proxies"],
+            timeout=config["web_timeout"],
         )
         if response.status_code == 200:
             soup = BeautifulSoup(response.text, "lxml")
@@ -67,7 +87,7 @@ def OurBits(config):
                                     )
                                 )
                                 - time.timezone
-                                - config["OurBits"]["timezone"] * 3600
+                                - config["timezone"] * 3600
                             )
                         if (
                             cols[1].find("img", class_="hitandrun") is not None
@@ -84,7 +104,6 @@ def OurBits(config):
                         torrents[id] = {**torrents[id], **web_info}
         else:
             raise Exception
-        time.sleep(1)
     return {
         "[OurBits]" + id: torrent
         for id, torrent in torrents.items()

@@ -4,6 +4,8 @@ import ssl
 import struct
 import time
 import zlib
+from io import TextIOWrapper
+from typing import Union
 
 import rencode
 import requests
@@ -12,7 +14,7 @@ from utils import *
 
 
 class deluge:
-    def __init__(self, name, config):
+    def __init__(self, name: str, config: dict):
         self.name = name
         self.config = config
         self.context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
@@ -32,15 +34,15 @@ class deluge:
         self.socket = self.context.wrap_socket(
             socket.socket(socket.AF_INET, socket.SOCK_STREAM),
         )
-        self.socket.settimeout(self.config["clients"][self.name]["timeout"])
+        self.socket.settimeout(self.config["timeout"])
         self.socket.connect(
             (
-                self.config["clients"][self.name]["host"].split(":")[0],
-                int(self.config["clients"][self.name]["host"].split(":")[1]),
+                self.config["host"].split(":")[0],
+                int(self.config["host"].split(":")[1]),
             )
         )
 
-    def get_response(self, version, data=b""):
+    def get_response(self, version: list, data: bytes = b""):
         flags = None
         null_count = 0
         while True:
@@ -83,7 +85,7 @@ class deluge:
         elif data[0] == 2:
             raise Exception
 
-    def send_request(self, version, method, *args, **kwargs):
+    def send_request(self, version: list, method: str, *args, **kwargs):
         self.request_id += 1
         request = zlib.compress(
             rencode.dumps(((self.request_id, method, args, kwargs),))
@@ -95,7 +97,7 @@ class deluge:
                 self.socket.send(b"D" + struct.pack("!i", len(request)))
         self.socket.send(request)
 
-    def call(self, method, *args, **kwargs):
+    def call(self, method: str, *args, **kwargs):
         self.send_request(self.version, method, *args, **kwargs)
         return self.get_response(self.version)
 
@@ -121,15 +123,15 @@ class deluge:
         if self.version[0] == 2:
             self.call(
                 "daemon.login",
-                self.config["clients"][self.name]["user"],
-                self.config["clients"][self.name]["pass"],
+                self.config["user"],
+                self.config["pass"],
                 client_version="deluge",
             )
         elif self.version[0] == 1:
             self.call(
                 "daemon.login",
-                self.config["clients"][self.name]["user"],
-                self.config["clients"][self.name]["pass"],
+                self.config["user"],
+                self.config["pass"],
             )
 
     def reconnect(self):
@@ -138,7 +140,7 @@ class deluge:
             del self.socket
         except Exception:
             pass
-        time.sleep(self.config["clients"][self.name]["reconnect_interval"])
+        time.sleep(self.config["reconnect_interval"])
         try:
             self.new_client()
         except Exception:
@@ -190,11 +192,24 @@ class deluge:
             for hash, stats in self.tasks.items()
         }
         self.total_size = (
-            sum([task["size"] for _, task in self.tasks.items()]) / 1073741824
+            sum(task["size"] for _, task in self.tasks.items()) / 1073741824
         )
         self.task_count = len(self.tasks)
+        self.upload_speed = (
+            sum(task["upload_speed"] for _, task in self.tasks.items()) / 1048576
+        )
+        self.download_speed = (
+            sum(task["download_speed"] for _, task in self.tasks.items()) / 1048576
+        )
 
-    def add_torrent(self, torrent, name, logger):
+    def add_torrent(
+        self,
+        torrent: dict,
+        name: str,
+        path: str,
+        extra_options: dict,
+        logger: Union[TextIOWrapper, None],
+    ):
         free_end = (
             "N/A"
             if torrent["free_end"] is None
@@ -212,17 +227,17 @@ class deluge:
             torrent["link"],
             {
                 "name": name,
-                "download_location": self.config["projects"][torrent["project"]][
-                    "path"
-                ],
+                "download_location": path,
                 "add_paused": False,
                 "auto_managed": False,
-                **self.config["projects"][torrent["project"]]["extra_options"],
+                **extra_options,
             },
         )
         print_t(text, logger=logger)
 
-    def remove_torrent(self, torrent, name, info, logger):
+    def remove_torrent(
+        self, torrent: dict, name: str, info: str, logger: Union[TextIOWrapper, None]
+    ):
         text = f'[{self.name}] 删除种子 {name}\
  原因：{info}\
  体积：{torrent["size"]:.2f}GB\
@@ -235,7 +250,7 @@ class deluge:
 
 
 class qbittorrent:
-    def __init__(self, name, config):
+    def __init__(self, name: str, config: dict):
         self.name = name
         self.config = config
         self.new_client()
@@ -244,17 +259,17 @@ class qbittorrent:
     def __del__(self):
         self.get_response("/api/v2/auth/logout", nobreak=True)
 
-    def get_response(self, api, data={}, nobreak=False):
+    def get_response(self, api: str, data: dict = {}, nobreak: bool = False):
         try:
             response = requests.post(
-                url=self.config["clients"][self.name]["host"] + api,
+                url=self.config["host"] + api,
                 headers={
                     "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
-                    **self.config["clients"][self.name]["headers"],
+                    **self.config["headers"],
                 },
                 data=data,
                 cookies=self.cookies,
-                timeout=self.config["clients"][self.name]["timeout"],
+                timeout=self.config["timeout"],
             )
             if response.status_code != 200:
                 raise Exception
@@ -269,8 +284,8 @@ class qbittorrent:
         response = self.get_response(
             "/api/v2/auth/login",
             {
-                "username": self.config["clients"][self.name]["user"],
-                "password": self.config["clients"][self.name]["pass"],
+                "username": self.config["user"],
+                "password": self.config["pass"],
             },
         )
         self.cookies = {
@@ -281,7 +296,7 @@ class qbittorrent:
 
     def reconnect(self):
         self.get_response("/api/v2/auth/logout", nobreak=True)
-        time.sleep(self.config["clients"][self.name]["reconnect_interval"])
+        time.sleep(self.config["reconnect_interval"])
         try:
             self.new_client()
         except Exception:
@@ -328,9 +343,8 @@ class qbittorrent:
             }
             for task in self.tasks
         }
-        for name in self.tasks:
-            self.tasks[name]["progress"] *= 100
-        for name, stats in self.tasks.items():
+        for _, stats in self.tasks.items():
+            stats["progress"] *= 100
             tracker_status = ""
             response = self.get_response(
                 "/api/v2/torrents/trackers", {"hash": stats["hash"]}, True
@@ -338,21 +352,32 @@ class qbittorrent:
             trackers = json.loads(response.text) if response.text != "" else []
             for tracker in trackers[3:]:
                 tracker_status += tracker["msg"]
-            self.tasks[name]["tracker_status"] = tracker_status
+            stats["tracker_status"] = tracker_status
         if not compare_version(self.ver, "2.8.1"):
-            for name, stats in self.tasks.items():
+            for _, stats in self.tasks.items():
                 response = self.get_response(
                     "/api/v2/torrents/properties", {"hash": stats["hash"]}
                 )
-                self.tasks[name]["seeding_time"] = json.loads(response.text)[
-                    "seeding_time"
-                ]
+                stats["seeding_time"] = json.loads(response.text)["seeding_time"]
         self.total_size = (
-            sum([task["size"] for _, task in self.tasks.items()]) / 1073741824
+            sum(task["size"] for _, task in self.tasks.items()) / 1073741824
         )
         self.task_count = len(self.tasks)
+        self.upload_speed = (
+            sum(task["upload_speed"] for _, task in self.tasks.items()) / 1048576
+        )
+        self.download_speed = (
+            sum(task["download_speed"] for _, task in self.tasks.items()) / 1048576
+        )
 
-    def add_torrent(self, torrent, name, logger):
+    def add_torrent(
+        self,
+        torrent: dict,
+        name: str,
+        path: str,
+        extra_options: dict,
+        logger: Union[TextIOWrapper, None],
+    ):
         free_end = (
             "N/A"
             if torrent["free_end"] is None
@@ -369,15 +394,17 @@ class qbittorrent:
             "/api/v2/torrents/add",
             {
                 "urls": torrent["link"],
-                "savepath": self.config["projects"][torrent["project"]]["path"],
+                "savepath": path,
                 "rename": name,
                 "paused": "false",
-                **self.config["projects"][torrent["project"]]["extra_options"],
+                **extra_options,
             },
         )
         print_t(text, logger=logger)
 
-    def remove_torrent(self, torrent, name, info, logger):
+    def remove_torrent(
+        self, torrent: dict, name: str, info: str, logger: Union[TextIOWrapper, None]
+    ):
         text = f'[{self.name}] 删除种子 {name}\
  原因：{info}\
  体积：{torrent["size"]:.2f}GB\
