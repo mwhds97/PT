@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         魔力计算器
-// @version      2.6
+// @version      2.7
 // @author       mwhds97
 // @include      /^https?:\/\/.*(u2.*dmhy|m-team|hdchina|chdbits|hdsky|ourbits|open.*cd|springsunday).*\/(mpseed|mybonus|torrents|rescue|adult|movie|music)\.php.*$/
 // @grant        GM_setValue
@@ -32,7 +32,7 @@
   }
   function calcA_HDC(S, T, N, official) {
     var params = GM_getValue("HDC");
-    if(S * 1024 < params.Smin) {
+    if(S < params.Smin) {
       return 0;
     }
     if(official) {
@@ -341,35 +341,35 @@
 
   var params = {};
   if(/u2.*mpseed\.php/.test(document.URL)) {
-    params = /S0=(\d+(?:\.\d+)?)G[\s\S]*b=(\d+(?:\.\d+)?)[\s\S]*d=(\d+(?:\.\d+)?)[\s\S]*E\D*(\d+(?:\.\d+)?)\D*L\D*(\d+(?:\.\d+)?)[\s\S]*SD0=(\d+(?:\.\d+)?)[\s\S]*e=(\d+(?:\.\d+)?)[\s\S]*Pmin\D*(\d+(?:\.\d+)?)\D*(\d+(?:\.\d+)?)/.exec(document.getElementsByClassName("embedded")[1].innerText);
-    GM_setValue("U2", {"S0": parseFloat(params[1]), "b": parseFloat(params[2]), "d": parseFloat(params[3]), "Lmin": parseFloat(params[4]), "Lmax": parseFloat(params[5]), "SD0": parseFloat(params[6]), "e": parseFloat(params[7]), "Pa": parseFloat(params[8]), "Pb": parseFloat(params[9])});
+    params = /(?<!U)S0=(\d+(?:\.\d+)?[KMGT]i?B?)[\s\S]+?b=(\d+(?:\.\d+)?)[\s\S]+?d=(\d+(?:\.\d+)?)[\s\S]+?(\d+(?:\.\d+)?).+?(\d+(?:\.\d+)?)[\s\S]+?SD0=(\d+(?:\.\d+)?)[\s\S]+?e=(\d+(?:\.\d+)?)[\s\S]+?Pmin.+?(\d+(?:\.\d+)?).+?(\d+(?:\.\d+)?)/.exec(document.getElementsByClassName("embedded")[1].innerText);
+    GM_setValue("U2", {"S0": size_G(params[1]), "b": parseFloat(params[2]), "d": parseFloat(params[3]), "Lmin": parseFloat(params[4]), "Lmax": parseFloat(params[5]), "SD0": parseFloat(params[6]), "e": parseFloat(params[7]), "Pa": parseFloat(params[8]), "Pb": parseFloat(params[9])});
   }
   if(/m-team.*mybonus\.php/.test(document.URL)) {
-    params = /(\d+(?:\.\d+)?)\D*(\d+(?:\.\d+)?)[\s\S]*T0 = (\d+(?:\.\d+)?)[\s\S]*N0 = (\d+(?:\.\d+)?)[\s\S]*B0 = (\d+(?:\.\d+)?)[\s\S]*L = (\d+(?:\.\d+)?)[\s\S]*-\s*(\d+(?:\.\d+)?).*(?:\d+(?:\.\d+)?)/.exec(document.getElementsByClassName("text")[2].innerText);
+    params = /(\d+(?:\.\d+)?).+?(\d+(?:\.\d+)?)[\s\S]+?T0 = (\d+(?:\.\d+)?)[\s\S]+?N0 = (\d+(?:\.\d+)?)[\s\S]+?B0 = (\d+(?:\.\d+)?)[\s\S]+?L = (\d+(?:\.\d+)?)[\s\S]+?-.+?(\d+(?:\.\d+)?)/.exec(document.getElementsByClassName("text")[2].innerText);
     GM_setValue("MT", {"d": parseFloat(params[1]), "Umax": parseFloat(params[2]), "T0": parseFloat(params[3]), "N0": parseFloat(params[4]), "B0": parseFloat(params[5]), "L": parseFloat(params[6]), "sum": parseFloat(params[7])});
   }
   if(/hdchina.*mybonus\.php/.test(document.URL)) {
-    params = /T0 = (\d+(?:\.\d+)?)[\s\S]*N0 = (\d+(?:\.\d+)?)[\s\S]*B0 = (\d+(?:\.\d+)?)[\s\S]*L = (\d+(?:\.\d+)?)[\s\S]*M = (\d+(?:\.\d+)?)[\s\S]*{\n(\d+(?:\.\d+)?),\n(\d+(?:\.\d+)?)[\s\S]*(?:A = (\d+(?:\.\d+)?).*A = (?=.*\[.*\[)|A = (\d+(?:\.\d+)?)(?!.*\[.*\[))[\s\S]*\D+(\d+(?:\.\d+)?)M/.exec(document.getElementsByClassName("normal_tab mybonus")[2].innerText);
-    GM_setValue("HDC", {"T0": parseFloat(params[1]), "N0": parseFloat(params[2]), "B0": parseFloat(params[3]), "L": parseFloat(params[4]), "M": parseFloat(params[5]), "Ra": parseFloat(params[6]), "Rb": parseFloat(params[7]), "A0": parseFloat(params[typeof params[9] === "undefined" ? 8 : 9]), "Smin": parseFloat(params[10])});
+    params = /T0 = (\d+(?:\.\d+)?)[\s\S]+?N0 = (\d+(?:\.\d+)?)[\s\S]+?B0 = (\d+(?:\.\d+)?)[\s\S]+?L = (\d+(?:\.\d+)?)[\s\S]+?M = (\d+(?:\.\d+)?)[\s\S]+?R=.+?(\d+(?:\.\d+)?).+?(\d+(?:\.\d+)?)[\s\S]+?A = (\d+(?:\.\d+)?).+?A = (\d+(?:\.\d+)?).+?(\[.+\[)?[\s\S]+?(\d+(?:\.\d+)?[KMGT]i?B?)/.exec(document.getElementsByClassName("normal_tab mybonus")[2].innerText);
+    GM_setValue("HDC", {"T0": parseFloat(params[1]), "N0": parseFloat(params[2]), "B0": parseFloat(params[3]), "L": parseFloat(params[4]), "M": parseFloat(params[5]), "Ra": parseFloat(params[6]), "Rb": parseFloat(params[7]), "A0": parseFloat(params[typeof params[10] === "undefined" ? 9 : 8]), "Smin": size_G(params[11])});
   }
   if(/chdbits.*mybonus\.php/.test(document.URL)) {
-    params = /T0 = (\d+(?:\.\d+)?)[\s\S]*N0 = (\d+(?:\.\d+)?)[\s\S]*B0 = (\d+(?:\.\d+)?)[\s\S]*L = (\d+(?:\.\d+)?)[\s\S]*A = (\d+(?:\.\d+)?)/.exec(document.getElementsByClassName("text")[2].innerText);
+    params = /T0 = (\d+(?:\.\d+)?)[\s\S]+?N0 = (\d+(?:\.\d+)?)[\s\S]+?B0 = (\d+(?:\.\d+)?)[\s\S]+?L = (\d+(?:\.\d+)?)[\s\S]+?A = (\d+(?:\.\d+)?)/.exec(document.getElementsByClassName("text")[2].innerText);
     GM_setValue("CHD", {"T0": parseFloat(params[1]), "N0": parseFloat(params[2]), "B0": parseFloat(params[3]), "L": parseFloat(params[4]), "A0": parseFloat(params[5])});
   }
   if(/hdsky.*mybonus\.php/.test(document.URL)) {
-    params = /T0 = (\d+(?:\.\d+)?)[\s\S]*N0 = (\d+(?:\.\d+)?)[\s\S]*B0 = (\d+(?:\.\d+)?)[\s\S]*L = (\d+(?:\.\d+)?)[\s\S]*M=(\d+(?:\.\d+)?)[\s\S]*K=(\d+(?:\.\d+)?).*K=(\d+(?:\.\d+)?)[\s\S]*A = (\d+(?:\.\d+)?).*A = /.exec(document.getElementsByClassName("text")[2].innerText);
+    params = /T0 = (\d+(?:\.\d+)?)[\s\S]+?N0 = (\d+(?:\.\d+)?)[\s\S]+?B0 = (\d+(?:\.\d+)?)[\s\S]+?L = (\d+(?:\.\d+)?)[\s\S]+?M=(\d+(?:\.\d+)?)[\s\S]+?K=(\d+(?:\.\d+)?).+?K=(\d+(?:\.\d+)?)[\s\S]+?A = (\d+(?:\.\d+)?)/.exec(document.getElementsByClassName("text")[2].innerText);
     GM_setValue("HDS", {"T0": parseFloat(params[1]), "N0": parseFloat(params[2]), "B0": parseFloat(params[3]), "L": parseFloat(params[4]), "M": parseFloat(params[5]), "Ka": parseFloat(params[6]), "Kb": parseFloat(params[7]), "A0": parseFloat(params[8])});
   }
   if(/ourbits.*mybonus\.php/.test(document.URL)) {
-    params = /T0 = (\d+(?:\.\d+)?)[\s\S]*N0 = (\d+(?:\.\d+)?)[\s\S]*B0 = (\d+(?:\.\d+)?)[\s\S]*L = (\d+(?:\.\d+)?)[\s\S]*A = (\d+(?:\.\d+)?)/.exec(document.getElementsByClassName("text")[2].innerText);
+    params = /T0 = (\d+(?:\.\d+)?)[\s\S]+?N0 = (\d+(?:\.\d+)?)[\s\S]+?B0 = (\d+(?:\.\d+)?)[\s\S]+?L = (\d+(?:\.\d+)?)[\s\S]+?A = (\d+(?:\.\d+)?)/.exec(document.getElementsByClassName("text")[2].innerText);
     GM_setValue("OB", {"T0": parseFloat(params[1]), "N0": parseFloat(params[2]), "B0": parseFloat(params[3]), "L": parseFloat(params[4]), "A0": parseFloat(params[5])});
   }
   if(/open.*cd.*mybonus\.php/.test(document.URL)) {
-    params = /T0 = (\d+(?:\.\d+)?)[\s\S]*N0 = (\d+(?:\.\d+)?)[\s\S]*B0 = (\d+(?:\.\d+)?)[\s\S]*L = (\d+(?:\.\d+)?)[\s\S]*A = (\d+(?:\.\d+)?).*A = /.exec(document.getElementsByClassName("text")[2].innerText);
+    params = /T0 = (\d+(?:\.\d+)?)[\s\S]+?N0 = (\d+(?:\.\d+)?)[\s\S]+?B0 = (\d+(?:\.\d+)?)[\s\S]+?L = (\d+(?:\.\d+)?)[\s\S]+?A = (\d+(?:\.\d+)?)/.exec(document.getElementsByClassName("text")[2].innerText);
     GM_setValue("OCD", {"T0": parseFloat(params[1]), "N0": parseFloat(params[2]), "B0": parseFloat(params[3]), "L": parseFloat(params[4]), "A0": parseFloat(params[5])});
   }
   if(/springsunday.*mybonus\.php/.test(document.URL)) {
-    params = /N0 = (\d+(?:\.\d+)?)[\s\S]*E = (\d+(?:\.\d+)?)[\s\S]*D = (\d+(?:\.\d+)?)[\s\S]*(?:[\d\,]+(?:\.\d+)?\s+){5}([\d\,]+(?:\.\d+)?)\s+(?:[\d\,]+(?:\.\d+)?\s+){2}([\d\,]+(?:\.\d+)?)\s+[\d\,]+(?:\.\d+)?/.exec(document.getElementsByClassName("text")[2].innerText);
+    params = /N0 = (\d+(?:\.\d+)?)[\s\S]+?E = (\d+(?:\.\d+)?)[\s\S]+?D = (\d+(?:\.\d+)?)[\s\S]+?(?:[\d\,]+(?:\.\d+)?\s+){5}([\d\,]+(?:\.\d+)?)\s+(?:[\d\,]+(?:\.\d+)?\s+){2}([\d\,]+(?:\.\d+)?)/.exec(document.getElementsByClassName("text")[2].innerText);
     GM_setValue("SSD", {"N0": parseFloat(params[1]), "E": parseFloat(params[2]), "D": parseFloat(params[3]), "A0": parseFloat(params[4].replace(/\,/g, "")), "ratio": parseFloat(params[5])});
   }
 
