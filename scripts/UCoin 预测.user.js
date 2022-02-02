@@ -1,6 +1,7 @@
 // ==UserScript==
 // @name         UCoin 预测
-// @version      1.2
+// @version      1.3
+// @description  预测当天的 UCoin 收益
 // @author       mwhds97
 // @include      /^https?:\/\/.*u2.*dmhy.*\/mpseed\.php.*$/
 // @grant        none

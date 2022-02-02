@@ -1,6 +1,7 @@
 // ==UserScript==
 // @name         魔力计算器
-// @version      2.7
+// @version      2.8
+// @description  计算部分站点各个种子的魔力参数
 // @author       mwhds97
 // @include      /^https?:\/\/.*(u2.*dmhy|m-team|hdchina|chdbits|hdsky|ourbits|open.*cd|springsunday).*\/(mpseed|mybonus|torrents|rescue|adult|movie|music)\.php.*$/
 // @grant        GM_setValue
@@ -59,7 +60,7 @@
     return params.E * Math.log(1 + A / params.D);
   }
   function size_G(size_str) {
-    var size = /(\d+(?:\.\d+)?)[\n\s]*([KMGT])?i?B/.exec(size_str);
+    var size = /(\d+(?:\.\d+)?)[\n\s]*([KMGT])?i?B?/.exec(size_str);
     if(typeof size[2] === "undefined") {
       return parseFloat(size[1]) / 1073741824;
     }

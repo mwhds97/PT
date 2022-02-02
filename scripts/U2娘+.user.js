@@ -1,6 +1,7 @@
 // ==UserScript==
 // @name         U2娘+
-// @version      2.1
+// @version      2.2
+// @description  U2娘调戏脚本（鼠标划过“U2娘的小秘密”）
 // @author       mwhds97
 // @include      /^https?:\/\/.*u2.*dmhy.*$/
 // @grant        none

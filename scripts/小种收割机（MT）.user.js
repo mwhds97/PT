@@ -1,6 +1,7 @@
 // ==UserScript==
 // @name         小种收割机（MT）
-// @version      1.2
+// @version      1.3
+// @description  批量下载小体积种子（MT）
 // @include      /^https?:\/\/.*m-team.*\/(torrents|adult|movie|music)\.php.*$/
 // @grant        GM_download
 // @noframes
