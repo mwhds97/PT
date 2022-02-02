@@ -192,14 +192,14 @@ class deluge:
             for hash, stats in self.tasks.items()
         }
         self.total_size = (
-            sum(task["size"] for _, task in self.tasks.items()) / 1073741824
+            sum(stats["size"] for _, stats in self.tasks.items()) / 1073741824
         )
         self.task_count = len(self.tasks)
         self.upload_speed = (
-            sum(task["upload_speed"] for _, task in self.tasks.items()) / 1048576
+            sum(stats["upload_speed"] for _, stats in self.tasks.items()) / 1048576
         )
         self.download_speed = (
-            sum(task["download_speed"] for _, task in self.tasks.items()) / 1048576
+            sum(stats["download_speed"] for _, stats in self.tasks.items()) / 1048576
         )
 
     def add_torrent(
@@ -360,14 +360,14 @@ class qbittorrent:
                 )
                 stats["seeding_time"] = json.loads(response.text)["seeding_time"]
         self.total_size = (
-            sum(task["size"] for _, task in self.tasks.items()) / 1073741824
+            sum(stats["size"] for _, stats in self.tasks.items()) / 1073741824
         )
         self.task_count = len(self.tasks)
         self.upload_speed = (
-            sum(task["upload_speed"] for _, task in self.tasks.items()) / 1048576
+            sum(stats["upload_speed"] for _, stats in self.tasks.items()) / 1048576
         )
         self.download_speed = (
-            sum(task["download_speed"] for _, task in self.tasks.items()) / 1048576
+            sum(stats["download_speed"] for _, stats in self.tasks.items()) / 1048576
         )
 
     def add_torrent(
