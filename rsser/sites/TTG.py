@@ -37,7 +37,7 @@ def TTG(config: dict) -> dict:
                     "free": False,
                     "free_end": None,
                     "hr": 86400
-                    if re.search(r"第\d+[集话話周週]|EP?\d+(?!-)", title_size[0]) is not None
+                    if re.search(r"第\d+[集话話周週]|EP?\d+(?!-)", torrent["title"]) is not None
                     else 216000,
                     "downloaded": False,
                     "seeder": -1,
