@@ -36,7 +36,7 @@ def size_G(size_str: str) -> float:
 def yaml_read(file_name: str) -> Union[dict, list]:
     try:
         with open(file_name, "r", encoding="utf-8") as file:
-            return yaml.load(file, yaml.FullLoader)
+            return yaml.load(file, yaml.CFullLoader)
     except Exception:
         return {}
 
@@ -46,6 +46,7 @@ def yaml_dump(data: Union[dict, list], file_name: str):
         yaml.dump(
             data,
             file,
+            yaml.CDumper,
             default_flow_style=False,
             allow_unicode=True,
             line_break="\n",
