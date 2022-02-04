@@ -10,13 +10,10 @@ snippets:
     seeder: [-1, 5]
     leecher: [-1, 5000]
     snatch: [-1, 5]
-    free_only: true
     free_time_min: 21000
-    free_end_escape: true
     hr_time_max: 432000
     hr_seed_delay: 1800
     ignore_hr_leeching: true
-    task_count_max: 10
   RM_DEFAULT:
     remove_conditions:
     - info: '种子下载速度过慢'
@@ -28,14 +25,6 @@ snippets:
     - info: '做种时长达到要求'
       exp: 'seeding_time >= size / 1073741824 * 1.0 * 60'
       period: S
-  DEFAULT_CLT:
-    clients:
-      de1:
-        volume: disk1
-        path: '/mnt/pool'
-      qb1:
-        volume: disk2
-        path: 'C:\pool'
 clients:
   de1:
     type: deluge
@@ -125,19 +114,26 @@ projects:
     clients:
       de1:
         volume: disk1
-        path: '/mnt/pool'
+        path: '/mnt/U2'
         extra_options: {'max_upload_speed': 51200}
       qb1:
         volume: disk2
-        path: 'C:\pool'
+        path: 'C:\U2'
         extra_options: {'upLimit': 52428800}
     sites:
     - U2
+    free_only: true
   HDC_new:
     snippets:
     - PRJ_DEFAULT
     - RM_DEFAULT
-    - DEFAULT_CLT
+    clients:
+      de1:
+        volume: disk1
+        path: '/mnt/HDC'
+      qb1:
+        volume: disk2
+        path: 'C:\HDC'
     sites:
     - HDChina
     regexp:
@@ -146,7 +142,13 @@ projects:
     snippets:
     - PRJ_DEFAULT
     - RM_DEFAULT
-    - DEFAULT_CLT
+    clients:
+      de1:
+        volume: disk1
+        path: '/mnt/TTG'
+      qb1:
+        volume: disk2
+        path: 'C:\TTG'
     sites:
     - TTG
     regexp:
@@ -156,33 +158,54 @@ projects:
     snippets:
     - PRJ_DEFAULT
     - RM_DEFAULT
-    - DEFAULT_CLT
+    clients:
+      de1:
+        volume: disk1
+        path: '/mnt/CHD'
+      qb1:
+        volume: disk2
+        path: 'C:\CHD'
     sites:
     - CHDBits
     regexp:
     - '-CHD(?!Bits)'
     - '@CHD'
     - '(-|@)OneHD'
+    free_only: true
     ignore_hr_leeching: false
   HDS_new:
     snippets:
     - PRJ_DEFAULT
     - RM_DEFAULT
-    - DEFAULT_CLT
+    clients:
+      de1:
+        volume: disk1
+        path: '/mnt/HDS'
+      qb1:
+        volume: disk2
+        path: 'C:\HDS'
     sites:
     - HDSky
     regexp:
     - '(-|@)HDS'
     - 'WOWOW|NHK|TVAsahi'
+    free_only: true
   SSD_new:
     snippets:
     - PRJ_DEFAULT
     - RM_DEFAULT
-    - DEFAULT_CLT
+    clients:
+      de1:
+        volume: disk1
+        path: '/mnt/SSD'
+      qb1:
+        volume: disk2
+        path: 'C:\SSD'
     sites:
     - SSD
     regexp:
     - '(-|@)CMCT'
+    free_only: true
   OB_new:
     snippets:
     - PRJ_DEFAULT
@@ -190,22 +213,30 @@ projects:
     clients:
       de1:
         volume: disk1
-        path: '/mnt/pool'
+        path: '/mnt/OB'
         extra_options: {'max_upload_speed': 51200}
       qb1:
         volume: disk2
-        path: 'C:\pool'
+        path: 'C:\OB'
         extra_options: {'upLimit': 52428800}
     sites:
     - OurBits
     regexp:
     - '(-|@)(Our|iLove|PbK|FLTTH)'
+    free_only: true
     hr_seed_ratio: 1.0
   OTHERS_new:
     snippets:
     - PRJ_DEFAULT
     - RM_DEFAULT
-    - DEFAULT_CLT
+    clients:
+      de1:
+        volume: disk1
+        path: '/mnt/OTHERS'
+      qb1:
+        volume: disk2
+        path: 'C:\OTHERS'
     sites:
     - MTeam
     - OpenCD
+    free_only: true
