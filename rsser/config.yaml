@@ -54,6 +54,7 @@ sites:
       c_secure_ssl: '...'
       c_secure_tracker_ssl: '...'
       c_secure_uid: '...'
+    hr_min_progress: 50
   HDChina:
     rss: 'https://hdchina.org/torrentrss.php?rows=50&isize=1&linktype=dl&passkey='
   HDSky:
@@ -92,6 +93,8 @@ sites:
     - 'https://ourbits.club/torrents.php?sort=4&type=desc'
     cookies:
       ourbits_jwt: '...'
+    hr_seed_ratio: 1.0
+    hr_min_progress: 10
   SSD:
     rss: 'https://springsunday.net/torrentrss.php?rows=50&isize=1&https=1&linktype=dl&passkey='
     web:
@@ -100,6 +103,8 @@ sites:
       SPRINGID: '...'
   TTG:
     rss: 'https://totheglory.im/putrss.php?ssl=yes&par='
+    hr_seed_ratio: 1.0
+    hr_min_progress: 10
   U2:
     rss: 'https://u2.dmhy.org/torrentrss.php?rows=50&isize=1&trackerssl=1&linktype=dl&passkey='
     web:
@@ -137,7 +142,7 @@ projects:
     sites:
     - HDChina
     regexp:
-    - '(-|@)HDC'
+    - '[-@]HDC'
   TTG_new:
     snippets:
     - PRJ_DEFAULT
@@ -152,8 +157,7 @@ projects:
     sites:
     - TTG
     regexp:
-    - '(-|@)(TTG|WiKi|NGB|DoA|ARiN)'
-    hr_seed_ratio: 1.0
+    - '[-@](TTG|WiKi|NGB|DoA|ARiN)'
   CHD_new:
     snippets:
     - PRJ_DEFAULT
@@ -170,7 +174,7 @@ projects:
     regexp:
     - '-CHD(?!Bits)'
     - '@CHD'
-    - '(-|@)OneHD'
+    - '[-@]OneHD'
     free_only: true
     ignore_hr_leeching: false
   HDS_new:
@@ -187,7 +191,7 @@ projects:
     sites:
     - HDSky
     regexp:
-    - '(-|@)HDS'
+    - '[-@]HDS'
     - 'WOWOW|NHK|TVAsahi'
     free_only: true
   SSD_new:
@@ -204,7 +208,7 @@ projects:
     sites:
     - SSD
     regexp:
-    - '(-|@)CMCT'
+    - '[-@]CMCT'
     free_only: true
   OB_new:
     snippets:
@@ -222,9 +226,8 @@ projects:
     sites:
     - OurBits
     regexp:
-    - '(-|@)(Our|iLove|PbK|FLTTH)'
+    - '[-@](Our|iLove|PbK|FLTTH)'
     free_only: true
-    hr_seed_ratio: 1.0
   OTHERS_new:
     snippets:
     - PRJ_DEFAULT

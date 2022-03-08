@@ -162,6 +162,7 @@ def generate_exp(exp: str) -> str:
 
 def match_remove_conditions(torrent: dict, stats: dict) -> Union[str, None]:
     project = config["projects"][torrent["project"]]
+    site = config["sites"][torrent["site"]]
     if (
         re.search(
             r"(?i)not.*reg|not.*auth|delete|remove|dupe|trump|rev|nuke|same|diff|loc|收|除|撤|同|重",
@@ -169,9 +170,13 @@ def match_remove_conditions(torrent: dict, stats: dict) -> Union[str, None]:
         )
         is not None
     ):
-        return "种子被撤除"
+        return "服务器信息异常"
     if stats["seeding_time"] == 0:
-        if project["ignore_hr_leeching"] or torrent["hr"] is None:
+        if (
+            project["ignore_hr_leeching"]
+            or torrent["hr"] is None
+            or stats["progress"] < site["hr_min_progress"]
+        ):
             if project["free_end_escape"]:
                 if not torrent["free"]:
                     return "免费失效"
@@ -190,8 +195,8 @@ def match_remove_conditions(torrent: dict, stats: dict) -> Union[str, None]:
         if project["ignore_hr_seeding"] or torrent["hr"] is None:
             hr_time = 0
         elif (
-            project["hr_seed_ratio"] is not None
-            and stats["ratio"] >= project["hr_seed_ratio"]
+            site["hr_seed_ratio"] is not None
+            and stats["ratio"] >= site["hr_seed_ratio"]
         ):
             hr_time = project["hr_seed_delay"]
         else:

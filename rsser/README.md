@@ -130,6 +130,8 @@ sites: #站点列表（字典），位置越前优先级越高
     #代理设置，例如 {'http': 'http://127.0.0.1:7890', 'https': 'http://127.0.0.1:7890'}
     fetch_interval: 300 #获取种子信息的时间间隔（单位：秒）
     retry_interval: 30 #获取种子信息失败时重试的时间间隔（单位：秒）
+    hr_seed_ratio: null #若站点的 H&R 规则允许达到一定分享率后停止做种，可将该值设定为对应分享率
+    hr_min_progress: 100 #站点启动 H&R 检测时的任务进度（范围：0-100）
     timezone: +8 #站点的时区，一般设置为 +8 即可
     task_count_max: 10
     #同时进行的最大任务数量
@@ -178,7 +180,6 @@ projects: #任务计划列表（字典），位置越前优先级越高
     #该值应不小于对应客户端 run_interval 的值
     hr_time_max: 432000 #H&R 要求做种时间超过该值（单位：秒）的种子不会被添加至客户端
     hr_seed_delay: 1800 #满足 H&R 要求后继续做种的时间（单位：秒），防止因未及时汇报等问题触发 H&R
-    hr_seed_ratio: null #若站点的 H&R 规则允许达到一定分享率后停止做种，可将该值设定为对应分享率
     ignore_hr_seeding: false #若该值为 true，做种中的种子的 H&R 要求将被忽略
     ignore_hr_leeching: true #若该值为 true，下载中的种子的 H&R 要求将被忽略
     task_count_max: 10

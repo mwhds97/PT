@@ -32,6 +32,8 @@ def init(config: dict) -> tuple:
             "fetch_interval": 300,
             "retry_interval": 30,
             "timezone": +8,
+            "hr_seed_ratio": None,
+            "hr_min_progress": 100,
             "task_count_max": float("inf"),
             "total_size_max": float("inf"),
         },
@@ -49,7 +51,6 @@ def init(config: dict) -> tuple:
             "escape_trigger_time": 60,
             "hr_time_max": float("inf"),
             "hr_seed_delay": 0,
-            "hr_seed_ratio": None,
             "ignore_hr_seeding": False,
             "ignore_hr_leeching": False,
             "task_count_max": float("inf"),
@@ -102,24 +103,20 @@ def init(config: dict) -> tuple:
             config["clients"][name].keys()
         ):
             config["clients"][name][setting] = default_settings["clients"][setting]
-        if (
-            set(config["clients"][name].keys())
-            != {
-                "snippets",
-                "type",
-                "host",
-                "user",
-                "pass",
-                "headers",
-                "timeout",
-                "reconnect_interval",
-                "run_interval",
-                "bandwidth",
-                "task_count_max",
-                "total_size_max",
-            }
-            or config["clients"][name]["type"] not in ["deluge", "qbittorrent"]
-        ):
+        if set(config["clients"][name].keys()) != {
+            "snippets",
+            "type",
+            "host",
+            "user",
+            "pass",
+            "headers",
+            "timeout",
+            "reconnect_interval",
+            "run_interval",
+            "bandwidth",
+            "task_count_max",
+            "total_size_max",
+        } or config["clients"][name]["type"] not in ["deluge", "qbittorrent"]:
             raise Exception("客户端配置有误")
         config["clients"][name]["user"] = str(config["clients"][name]["user"])
         config["clients"][name]["pass"] = str(config["clients"][name]["pass"])
@@ -149,6 +146,8 @@ def init(config: dict) -> tuple:
             "proxies",
             "fetch_interval",
             "retry_interval",
+            "hr_seed_ratio",
+            "hr_min_progress",
             "timezone",
             "task_count_max",
             "total_size_max",
@@ -195,7 +194,6 @@ def init(config: dict) -> tuple:
             "escape_trigger_time",
             "hr_time_max",
             "hr_seed_delay",
-            "hr_seed_ratio",
             "ignore_hr_seeding",
             "ignore_hr_leeching",
             "task_count_max",
