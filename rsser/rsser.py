@@ -149,6 +149,7 @@ def generate_exp(exp: str) -> str:
         "leecher",
         "progress",
         "ratio",
+        "up_div_down",
         "uploaded",
         "downloaded",
         "upload_speed",
@@ -196,7 +197,7 @@ def match_remove_conditions(torrent: dict, stats: dict) -> Union[str, None]:
             hr_time = 0
         elif (
             site["hr_seed_ratio"] is not None
-            and stats["ratio"] >= site["hr_seed_ratio"]
+            and stats["up_div_down"] >= site["hr_seed_ratio"]
         ):
             hr_time = project["hr_seed_delay"]
         else:

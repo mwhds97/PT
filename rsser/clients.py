@@ -191,16 +191,20 @@ class deluge:
             }
             for hash, stats in self.tasks.items()
         }
-        self.total_size = (
-            sum(stats["size"] for _, stats in self.tasks.items()) / 1073741824
-        )
-        self.task_count = len(self.tasks)
-        self.upload_speed = (
-            sum(stats["upload_speed"] for _, stats in self.tasks.items()) / 1048576
-        )
-        self.download_speed = (
-            sum(stats["download_speed"] for _, stats in self.tasks.items()) / 1048576
-        )
+        self.task_count = 0
+        self.total_size = 0
+        self.upload_speed = 0
+        self.download_speed = 0
+        for _, stats in self.tasks.items():
+            stats["up_div_down"] = (
+                stats["uploaded"] / (stats["size"] * stats["progress"] / 100)
+                if stats["progress"] > 0
+                else -1
+            )
+            self.task_count += 1
+            self.total_size += stats["size"] / 1073741824
+            self.upload_speed += stats["upload_speed"] / 1048576
+            self.download_speed += stats["download_speed"] / 1048576
 
     def add_torrent(
         self,
@@ -242,7 +246,7 @@ class deluge:
  原因：{info}\
  体积：{torrent["size"]:.2f}GB\
  上传量：{self.tasks[name]["uploaded"] / 1073741824:.2f}GB\
- 分享率：{self.tasks[name]["ratio"]:.2f}\
+ 分享率：{self.tasks[name]["up_div_down"]:.2f}\
  任务数：{self.task_count - 1}\
  总体积：{self.total_size - self.tasks[name]["size"] / 1073741824 + 0:.2f}GB'
         self.call("core.remove_torrent", self.tasks[name]["hash"], True)
@@ -343,8 +347,21 @@ class qbittorrent:
             }
             for task in self.tasks
         }
+        self.task_count = 0
+        self.total_size = 0
+        self.upload_speed = 0
+        self.download_speed = 0
         for _, stats in self.tasks.items():
             stats["progress"] *= 100
+            stats["up_div_down"] = (
+                stats["uploaded"] / (stats["size"] * stats["progress"] / 100)
+                if stats["progress"] > 0
+                else -1
+            )
+            self.task_count += 1
+            self.total_size += stats["size"] / 1073741824
+            self.upload_speed += stats["upload_speed"] / 1048576
+            self.download_speed += stats["download_speed"] / 1048576
             tracker_status = ""
             response = self.get_response(
                 "/api/v2/torrents/trackers", {"hash": stats["hash"]}, True
@@ -359,16 +376,6 @@ class qbittorrent:
                     "/api/v2/torrents/properties", {"hash": stats["hash"]}
                 )
                 stats["seeding_time"] = json.loads(response.text)["seeding_time"]
-        self.total_size = (
-            sum(stats["size"] for _, stats in self.tasks.items()) / 1073741824
-        )
-        self.task_count = len(self.tasks)
-        self.upload_speed = (
-            sum(stats["upload_speed"] for _, stats in self.tasks.items()) / 1048576
-        )
-        self.download_speed = (
-            sum(stats["download_speed"] for _, stats in self.tasks.items()) / 1048576
-        )
 
     def add_torrent(
         self,
@@ -409,7 +416,7 @@ class qbittorrent:
  原因：{info}\
  体积：{torrent["size"]:.2f}GB\
  上传量：{self.tasks[name]["uploaded"] / 1073741824:.2f}GB\
- 分享率：{self.tasks[name]["ratio"]:.2f}\
+ 分享率：{self.tasks[name]["up_div_down"]:.2f}\
  任务数：{self.task_count - 1}\
  总体积：{self.total_size - self.tasks[name]["size"] / 1073741824 + 0:.2f}GB'
         self.get_response(
