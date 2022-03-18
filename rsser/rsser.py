@@ -223,106 +223,67 @@ def task_generator():
         torrent: dict, client: Union[deluge, qbittorrent], pool: dict, tasks: dict
     ) -> bool:
         project = config["projects"][torrent["project"]]
-        if torrent["downloaded"]:
-            return False
-        if torrent["retry_count"] >= project["retry_count_max"]:
-            return False
-        if not (project["seeder"][0] <= torrent["seeder"] <= project["seeder"][1]):
-            return False
-        if not (project["leecher"][0] <= torrent["leecher"] <= project["leecher"][1]):
-            return False
-        if not (project["snatch"][0] <= torrent["snatch"] <= project["snatch"][1]):
-            return False
-        if (
-            time.mktime(time.localtime()) - torrent["publish_time"]
-            > project["publish_within"]
-        ):
-            return False
-        if project["free_only"]:
-            if not torrent["free"]:
-                return False
-            elif torrent["free_end"] is not None:
-                if (
-                    torrent["free_end"] - time.mktime(time.localtime())
-                    < project["free_time_min"]
-                ):
-                    return False
-        if torrent["hr"] is not None and torrent["hr"] > project["hr_time_max"]:
-            return False
-        if client.name not in project["clients"]:
-            return False
-        if len(tasks[client.name]) >= client.config["task_count_max"]:
-            return False
-        if (
-            sum(pool[name]["size"] for name in tasks[client.name] if name in pool)
-            + torrent["size"]
-            > client.config["total_size_max"]
-        ):
-            return False
-        if (
-            sum(
-                sum(
-                    1
-                    for name in task_group
-                    if name in pool and pool[name]["project"] == torrent["project"]
-                )
-                for _, task_group in tasks.items()
-            )
-            >= project["task_count_max"]
-        ):
-            return False
-        if (
-            torrent["size"]
-            + sum(
-                sum(
-                    pool[name]["size"]
-                    for name in task_group
-                    if name in pool and pool[name]["project"] == torrent["project"]
-                )
-                for _, task_group in tasks.items()
-            )
-            > project["total_size_max"]
-        ):
-            return False
-        if (
-            sum(
-                sum(
-                    1
-                    for name in task_group
-                    if name in pool and pool[name]["site"] == torrent["site"]
-                )
-                for _, task_group in tasks.items()
-            )
-            >= config["sites"][torrent["site"]]["task_count_max"]
-        ):
-            return False
-        if (
-            torrent["size"]
-            + sum(
-                sum(
-                    pool[name]["size"]
-                    for name in task_group
-                    if name in pool and pool[name]["site"] == torrent["site"]
-                )
-                for _, task_group in tasks.items()
-            )
-            > config["sites"][torrent["site"]]["total_size_max"]
-        ):
-            return False
         volume = project["clients"][client.name]["volume"]
-        if volume is not None:
-            volume_total_size = 0
-            for group_client, task_group in tasks.items():
-                group_total_size = 0
-                for name in task_group:
-                    if name in pool:
-                        task_project = config["projects"][pool[name]["project"]]
-                        if group_client in task_project["clients"]:
-                            options = task_project["clients"][group_client]
-                            if options["volume"] == volume:
-                                group_total_size += pool[name]["size"]
-                volume_total_size += group_total_size
-            if torrent["size"] + volume_total_size > config["volumes"][volume]:
+        client_task_count = 0
+        client_total_size = 0
+        project_task_count = 0
+        project_total_size = 0
+        site_task_count = 0
+        site_total_size = 0
+        volume_total_size = 0
+        for group_client, task_group in tasks.items():
+            group_total_size = 0
+            for name in task_group:
+                if name in pool:
+                    if group_client == client.name:
+                        client_task_count += 1
+                        client_total_size += pool[name]["size"]
+                    if pool[name]["project"] == torrent["project"]:
+                        project_task_count += 1
+                        project_total_size += pool[name]["size"]
+                    if pool[name]["site"] == torrent["site"]:
+                        site_task_count += 1
+                        site_total_size += pool[name]["size"]
+                    task_project = config["projects"][pool[name]["project"]]
+                    if group_client in task_project["clients"]:
+                        if task_project["clients"][group_client]["volume"] == volume:
+                            group_total_size += pool[name]["size"]
+            volume_total_size += group_total_size
+        matchers = [
+            lambda: not torrent["downloaded"],
+            lambda: torrent["retry_count"] < project["retry_count_max"],
+            lambda: project["seeder"][0] <= torrent["seeder"] <= project["seeder"][1],
+            lambda: project["leecher"][0]
+            <= torrent["leecher"]
+            <= project["leecher"][1],
+            lambda: project["snatch"][0] <= torrent["snatch"] <= project["snatch"][1],
+            lambda: time.mktime(time.localtime()) - torrent["publish_time"]
+            <= project["publish_within"],
+            lambda: not project["free_only"]
+            or (
+                torrent["free"]
+                and (
+                    torrent["free_end"] is None
+                    or torrent["free_end"] - time.mktime(time.localtime())
+                    >= project["free_time_min"]
+                )
+            ),
+            lambda: torrent["hr"] is None or torrent["hr"] <= project["hr_time_max"],
+            lambda: client.name in project["clients"],
+            lambda: client_task_count < client.config["task_count_max"],
+            lambda: client_total_size + torrent["size"]
+            <= client.config["total_size_max"],
+            lambda: project_task_count < project["task_count_max"],
+            lambda: project_total_size + torrent["size"] <= project["total_size_max"],
+            lambda: site_task_count
+            < config["sites"][torrent["site"]]["task_count_max"],
+            lambda: site_total_size + torrent["size"]
+            <= config["sites"][torrent["site"]]["total_size_max"],
+            lambda: volume is None
+            or volume_total_size + torrent["size"] <= config["volumes"][volume],
+        ]
+        for matcher in matchers:
+            if not matcher():
                 return False
         return True
 
