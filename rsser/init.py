@@ -57,6 +57,7 @@ def init(config: dict) -> tuple:
             "total_size_max": float("inf"),
             "retry_count_max": 2,
             "remove_conditions": [],
+            "load_balance_key": "0",
         },
     }
     for setting in {"pool", "snippets", "volumes"} - set(config.keys()):
@@ -200,6 +201,7 @@ def init(config: dict) -> tuple:
             "total_size_max",
             "retry_count_max",
             "remove_conditions",
+            "load_balance_key",
         }:
             raise Exception("任务计划配置有误")
     active_sites = set()

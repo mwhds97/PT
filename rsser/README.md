@@ -204,6 +204,11 @@ projects: #任务计划列表（字典），位置越前优先级越高
     #可用字段：size active_time seeding_time seeder leecher progress ratio up_div_down uploaded downloaded upload_speed download_speed eta
     #时间单位：秒，体积单位：B，速率单位：B/s，进度范围：0-100
     #period 为条件的适用阶段，L 表示下载阶段，S 表示做种阶段，B 表示所有阶段
+    load_balance_key: 'upload_speed * 8 / bandwidth'
+    #用于客户端负载均衡，表达式计算结果越小的客户端优先级越高
+    #可用字段：task_count total_size upload_speed download_speed bandwidth volume_size
+    #若要使用 bandwidth 字段，请确保任务计划指定的所有客户端的 bandwidth 设置都有值
+    #若要使用 volume_size 字段，请确保任务计划的 volume 设置有值
   ...
 ```
 

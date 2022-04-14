@@ -140,28 +140,27 @@ pool_lock = threading.Lock()
 task_lock = threading.Lock()
 
 
-def generate_exp(exp: str) -> str:
-    fields = [
-        "size",
-        "active_time",
-        "seeding_time",
-        "seeder",
-        "leecher",
-        "progress",
-        "ratio",
-        "up_div_down",
-        "uploaded",
-        "downloaded",
-        "upload_speed",
-        "download_speed",
-        "eta",
-    ]
-    for field in fields:
-        exp = re.sub(field, f'stats["{field}"]', exp)
-    return f"({exp})"
-
-
 def match_remove_conditions(torrent: dict, stats: dict) -> Union[str, None]:
+    def generate_exp(exp: str) -> str:
+        fields = [
+            "size",
+            "active_time",
+            "seeding_time",
+            "seeder",
+            "leecher",
+            "progress",
+            "ratio",
+            "up_div_down",
+            "uploaded",
+            "downloaded",
+            "upload_speed",
+            "download_speed",
+            "eta",
+        ]
+        for field in fields:
+            exp = re.sub(field, f'stats["{field}"]', exp)
+        return f"({exp})"
+
     project = config["projects"][torrent["project"]]
     site = config["sites"][torrent["site"]]
     if (
@@ -295,6 +294,23 @@ def task_generator():
             break
         time.sleep(5)
 
+    def generate_exp(exp: str) -> str:
+        fields = [
+            "task_count",
+            "total_size",
+            "upload_speed",
+            "download_speed",
+        ]
+        for field in fields:
+            exp = re.sub(field, f"client.{field}", exp)
+        exp = re.sub(r"bandwidth", 'client.config["bandwidth"]', exp)
+        exp = re.sub(
+            r"volume_size",
+            'config["volumes"][project["clients"][client.name]["volume"]]',
+            exp,
+        )
+        return f"({exp})"
+
     while True:
         task_locked = task_lock.acquire(timeout=300)
         tasks = deepcopy(tasks_overall)
@@ -316,17 +332,9 @@ def task_generator():
             clients_candidate = [
                 client for client in clients if client.name in project["clients"]
             ]
-            for client in clients_candidate:
-                if client.config["bandwidth"] is None:
-                    sort_by_speed_prop = False
-                    break
-            else:
-                sort_by_speed_prop = True
             clients_candidate = sorted(
                 clients_candidate,
-                key=lambda client: client.upload_speed / client.config["bandwidth"] * 8
-                if sort_by_speed_prop
-                else client.upload_speed,
+                key=lambda client: eval(generate_exp(project["load_balance_key"])),
             )
             for client in clients_candidate:
                 if name not in [

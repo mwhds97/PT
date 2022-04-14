@@ -14,6 +14,7 @@ snippets:
     hr_time_max: 432000
     hr_seed_delay: 1800
     ignore_hr_leeching: true
+    load_balance_key: 'upload_speed * 8 / bandwidth'
   RM_DEFAULT:
     remove_conditions:
     - info: '种子下载速度过慢'
