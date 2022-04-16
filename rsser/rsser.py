@@ -295,20 +295,25 @@ def task_generator():
         time.sleep(5)
 
     def generate_exp(exp: str) -> str:
-        fields = [
+        client_fields = [
             "task_count",
             "total_size",
             "upload_speed",
             "download_speed",
         ]
-        for field in fields:
+        torrent_fields = ["seeder", "leecher", "snatch"]
+        for field in client_fields:
             exp = re.sub(field, f"client.{field}", exp)
+        for field in torrent_fields:
+            exp = re.sub(field, f'torrent["{field}"]', exp)
         exp = re.sub(r"bandwidth", 'client.config["bandwidth"]', exp)
         exp = re.sub(
             r"volume_size",
             'config["volumes"][project["clients"][client.name]["volume"]]',
             exp,
         )
+        exp = re.sub(r"torrent_size", 'torrent["size"]', exp)
+        exp = re.sub(r"hr_time", 'torrent["hr"]', exp)
         return f"({exp})"
 
     while True:
