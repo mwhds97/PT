@@ -272,6 +272,7 @@ def task_generator():
             lambda: client_task_count < client.config["task_count_max"],
             lambda: client_total_size + torrent["size"]
             <= client.config["total_size_max"],
+            lambda: client.download_speed < client.config["download_speed_max"],
             lambda: project_task_count < project["task_count_max"],
             lambda: project_total_size + torrent["size"] <= project["total_size_max"],
             lambda: site_task_count

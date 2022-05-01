@@ -34,6 +34,7 @@ clients:
     pass: 'deluge'
     bandwidth: 1000
     task_count_max: 10
+    download_speed_max: 90
   qb1:
     type: qbittorrent
     host: 'http://127.0.0.1:8080'
@@ -41,6 +42,7 @@ clients:
     pass: 'admin'
     bandwidth: 200
     task_count_max: 10
+    download_speed_max: 90
 volumes:
   disk1: 4396
   disk2: 2215

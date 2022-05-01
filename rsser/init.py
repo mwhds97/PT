@@ -19,6 +19,7 @@ def init(config: dict) -> tuple:
             "bandwidth": None,
             "task_count_max": float("inf"),
             "total_size_max": float("inf"),
+            "download_speed_max": float("inf"),
         },
         "volumes": {},
         "sites": {
@@ -117,6 +118,7 @@ def init(config: dict) -> tuple:
             "bandwidth",
             "task_count_max",
             "total_size_max",
+            "download_speed_max",
         } or config["clients"][name]["type"] not in ["deluge", "qbittorrent"]:
             raise Exception("客户端配置有误")
         config["clients"][name]["user"] = str(config["clients"][name]["user"])
