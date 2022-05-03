@@ -249,6 +249,8 @@ class deluge:
  分享率：{self.tasks[name]["up_div_down"]:.2f}\
  任务数：{self.task_count - 1}\
  总体积：{self.total_size - self.tasks[name]["size"] / 1073741824 + 0:.2f}GB'
+        self.call("core.force_reannounce", [self.tasks[name]["hash"]])
+        time.sleep(5)
         self.call("core.remove_torrent", self.tasks[name]["hash"], True)
         print_t(text, logger=logger)
 
@@ -419,6 +421,10 @@ class qbittorrent:
  分享率：{self.tasks[name]["up_div_down"]:.2f}\
  任务数：{self.task_count - 1}\
  总体积：{self.total_size - self.tasks[name]["size"] / 1073741824 + 0:.2f}GB'
+        self.get_response(
+            "/api/v2/torrents/reannounce", {"hashes": self.tasks[name]["hash"]}
+        )
+        time.sleep(5)
         self.get_response(
             "/api/v2/torrents/delete",
             {"hashes": self.tasks[name]["hash"], "deleteFiles": "true"},
