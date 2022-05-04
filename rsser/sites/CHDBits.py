@@ -36,7 +36,7 @@ def CHDBits(config: dict) -> dict:
                 **{
                     "free": False,
                     "free_end": None,
-                    "hr": 432000,
+                    "hr": None,
                     "downloaded": False,
                     "seeder": -1,
                     "leecher": -1,
@@ -45,6 +45,7 @@ def CHDBits(config: dict) -> dict:
             }
             for id, torrent in torrents.items()
         }
+    web_info_all = {}
     for web in config["web"]:
         response = requests.get(
             web,
@@ -62,41 +63,42 @@ def CHDBits(config: dict) -> dict:
                 cols = row.find_all("td", recursive=False)
                 if len(cols) >= 10:
                     id = re.search(r"id=(\d+)", str(cols[1])).group(1)
-                    if id in torrents:
-                        web_info = {
-                            "free": False,
-                            "free_end": None,
-                            "hr": None,
-                            "downloaded": False,
-                            "seeder": -1,
-                            "leecher": -1,
-                            "snatch": -1,
-                        }
-                        if re.search(r'class="pro_\S*free', str(cols[1])) is not None:
-                            web_info["free"] = True
-                            free_end = re.search(r'<span title="(.+?)"', str(cols[1]))
-                            web_info["free_end"] = (
-                                None
-                                if free_end is None
-                                else time.mktime(
-                                    time.strptime(
-                                        free_end.group(1), "%Y-%m-%d %H:%M:%S"
-                                    )
-                                )
-                                - time.timezone
-                                - config["timezone"] * 3600
+                    web_info = {
+                        "free": False,
+                        "free_end": None,
+                        "hr": None,
+                        "downloaded": False,
+                        "seeder": -1,
+                        "leecher": -1,
+                        "snatch": -1,
+                    }
+                    if re.search(r'class="pro_\S*free', str(cols[1])) is not None:
+                        web_info["free"] = True
+                        free_end = re.search(r'<span title="(.+?)"', str(cols[1]))
+                        web_info["free_end"] = (
+                            None
+                            if free_end is None
+                            else time.mktime(
+                                time.strptime(free_end.group(1), "%Y-%m-%d %H:%M:%S")
                             )
-                        hr = cols[1].find("div", class_="circle-text")
-                        if hr is not None:
-                            web_info["hr"] = int(re.sub("\D", "", hr.text)) * 86400
-                        web_info["seeder"] = int(re.sub("\D", "", cols[5].text))
-                        web_info["leecher"] = int(re.sub("\D", "", cols[6].text))
-                        web_info["snatch"] = int(re.sub("\D", "", cols[7].text))
-                        if re.search(r"\d", cols[9].text) is not None:
-                            web_info["downloaded"] = True
-                        torrents[id] = {**torrents[id], **web_info}
+                            - time.timezone
+                            - config["timezone"] * 3600
+                        )
+                    hr = cols[1].find("div", class_="circle-text")
+                    if hr is not None:
+                        web_info["hr"] = int(re.sub("\D", "", hr.text)) * 86400
+                    web_info["seeder"] = int(re.sub("\D", "", cols[5].text))
+                    web_info["leecher"] = int(re.sub("\D", "", cols[6].text))
+                    web_info["snatch"] = int(re.sub("\D", "", cols[7].text))
+                    if re.search(r"\d", cols[9].text) is not None:
+                        web_info["downloaded"] = True
+                    web_info_all[id] = web_info
         else:
             raise Exception
+    for id in web_info_all:
+        torrents[id] = (
+            {**torrents[id], **web_info_all[id]} if id in torrents else web_info_all[id]
+        )
     return {
         "[CHDBits]" + id: torrent
         for id, torrent in torrents.items()

@@ -473,7 +473,7 @@ def torrent_fetcher(site: str, config: dict):
             if torrents != {}:
                 pool_locked = pool_lock.acquire(timeout=30)
                 for name, torrent in torrents.items():
-                    project = match_project(torrent)
+                    project = match_project(torrent) if "link" in torrent else None
                     if name in torrent_pool:
                         torrent_pool[name] = {
                             **torrent_pool[name],

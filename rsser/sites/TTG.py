@@ -36,9 +36,7 @@ def TTG(config: dict) -> dict:
                 **{
                     "free": False,
                     "free_end": None,
-                    "hr": 86400
-                    if re.search(r"第\d+[集话話周週]|EP?\d+(?!-)", torrent["title"]) is not None
-                    else 216000,
+                    "hr": None,
                     "downloaded": False,
                     "seeder": -1,
                     "leecher": -1,
@@ -47,7 +45,8 @@ def TTG(config: dict) -> dict:
             }
             for id, torrent in torrents.items()
         }
-    """ for web in config["web"]:
+    """ web_info_all = {}
+    for web in config["web"]:
         response = requests.get(
             web,
             headers={"User-Agent": config["user_agent"]},
@@ -66,47 +65,50 @@ def TTG(config: dict) -> dict:
                 cols = row.find_all("td", recursive=False)
                 if len(cols) >= 10:
                     id = re.search(r'tid="(\d+)"', str(cols[1])).group(1)
-                    if id in torrents:
-                        web_info = {
-                            "free": False,
-                            "free_end": None,
-                            "hr": None,
-                            "downloaded": False,
-                            "seeder": -1,
-                            "leecher": -1,
-                            "snatch": -1,
-                        }
-                        if cols[1].find("img", alt="free") is not None:
-                            web_info["free"] = True
-                            free_end = re.search(
-                                r"javascript:alert.+(\d{4}年\d{2}月\d{2}日\d{2}点\d{2}分)",
-                                str(cols[1]),
+                    web_info = {
+                        "free": False,
+                        "free_end": None,
+                        "hr": None,
+                        "downloaded": False,
+                        "seeder": -1,
+                        "leecher": -1,
+                        "snatch": -1,
+                    }
+                    if cols[1].find("img", alt="free") is not None:
+                        web_info["free"] = True
+                        free_end = re.search(
+                            r"javascript:alert.+(\d{4}年\d{2}月\d{2}日\d{2}点\d{2}分)",
+                            str(cols[1]),
+                        )
+                        web_info["free_end"] = (
+                            None
+                            if free_end is None
+                            else time.mktime(
+                                time.strptime(free_end.group(1), "%Y年%m月%d日%H点%M分")
                             )
-                            web_info["free_end"] = (
-                                None
-                                if free_end is None
-                                else time.mktime(
-                                    time.strptime(free_end.group(1), "%Y年%m月%d日%H点%M分")
-                                )
-                                - time.timezone
-                                - config["timezone"] * 3600
-                            )
-                        if cols[1].find("img", title="Hit and Run") is not None:
-                            web_info["hr"] = (
-                                86400
-                                if re.search(r"第\d+[集话話周週]|EP?\d+(?!-)", str(cols[1]))
-                                is not None
-                                else 216000
-                            )
-                        if cols[1].find("div", class_="process") is not None:
-                            web_info["downloaded"] = True
-                        web_info["snatch"] = int(re.sub("\D", "", cols[7].text))
-                        seeder_leecher = re.sub("[^\d/]", "", cols[8].text).split("/")
-                        web_info["seeder"] = int(seeder_leecher[0])
-                        web_info["leecher"] = int(seeder_leecher[1])
-                        torrents[id] = {**torrents[id], **web_info}
+                            - time.timezone
+                            - config["timezone"] * 3600
+                        )
+                    if cols[1].find("img", title="Hit and Run") is not None:
+                        web_info["hr"] = (
+                            86400
+                            if re.search(r"第\d+[集话話周週]|EP?\d+(?!-)", str(cols[1]))
+                            is not None
+                            else 216000
+                        )
+                    if cols[1].find("div", class_="process") is not None:
+                        web_info["downloaded"] = True
+                    web_info["snatch"] = int(re.sub("\D", "", cols[7].text))
+                    seeder_leecher = re.sub("[^\d/]", "", cols[8].text).split("/")
+                    web_info["seeder"] = int(seeder_leecher[0])
+                    web_info["leecher"] = int(seeder_leecher[1])
+                    web_info_all[id] = web_info
         else:
-            raise Exception """
+            raise Exception
+    for id in web_info_all:
+        torrents[id] = (
+            {**torrents[id], **web_info_all[id]} if id in torrents else web_info_all[id]
+        ) """
     return {
         "[TTG]" + id: torrent
         for id, torrent in torrents.items()

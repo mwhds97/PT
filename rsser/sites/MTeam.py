@@ -51,6 +51,7 @@ def MTeam(config: dict) -> dict:
             }
             for id, torrent in torrents.items()
         }
+    web_info_all = {}
     for web in config["web"]:
         response = requests.get(
             web,
@@ -68,33 +69,36 @@ def MTeam(config: dict) -> dict:
                 cols = row.find_all("td", recursive=False)
                 if len(cols) >= 10:
                     id = re.search(r"id=(\d+)", str(cols[1])).group(1)
-                    if id in torrents:
-                        web_info = {
-                            "free": False,
-                            "free_end": None,
-                            "hr": None,
-                            "downloaded": False,
-                            "seeder": -1,
-                            "leecher": -1,
-                            "snatch": -1,
-                        }
-                        if re.search(r'class="pro_\S*free', str(cols[1])) is not None:
-                            free_duration = re.search(
-                                r"<span.+(?:限時：|will end in)(.+?)</span>", str(cols[1])
-                            )
-                            if free_duration is None:
-                                web_info["free"] = True
-                            elif "<" not in free_duration.group(1):
-                                web_info["free"] = True
-                                web_info["free_end"] = epoch(free_duration.group(1))
-                        web_info["seeder"] = int(re.sub("\D", "", cols[5].text))
-                        web_info["leecher"] = int(re.sub("\D", "", cols[6].text))
-                        web_info["snatch"] = int(re.sub("\D", "", cols[7].text))
-                        if re.search(r"\d", cols[8].text) is not None:
-                            web_info["downloaded"] = True
-                        torrents[id] = {**torrents[id], **web_info}
+                    web_info = {
+                        "free": False,
+                        "free_end": None,
+                        "hr": None,
+                        "downloaded": False,
+                        "seeder": -1,
+                        "leecher": -1,
+                        "snatch": -1,
+                    }
+                    if re.search(r'class="pro_\S*free', str(cols[1])) is not None:
+                        free_duration = re.search(
+                            r"<span.+(?:限時：|will end in)(.+?)</span>", str(cols[1])
+                        )
+                        if free_duration is None:
+                            web_info["free"] = True
+                        elif "<" not in free_duration.group(1):
+                            web_info["free"] = True
+                            web_info["free_end"] = epoch(free_duration.group(1))
+                    web_info["seeder"] = int(re.sub("\D", "", cols[5].text))
+                    web_info["leecher"] = int(re.sub("\D", "", cols[6].text))
+                    web_info["snatch"] = int(re.sub("\D", "", cols[7].text))
+                    if re.search(r"\d", cols[8].text) is not None:
+                        web_info["downloaded"] = True
+                    web_info_all[id] = web_info
         else:
             raise Exception
+    for id in web_info_all:
+        torrents[id] = (
+            {**torrents[id], **web_info_all[id]} if id in torrents else web_info_all[id]
+        )
     return {
         "[MTeam]" + id: torrent
         for id, torrent in torrents.items()

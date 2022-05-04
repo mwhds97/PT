@@ -46,7 +46,8 @@ def HDChina(config: dict) -> dict:
             }
             for id, torrent in torrents.items()
         }
-    """ session = requests.session()
+    """ web_info_all = {}
+    session = requests.session()
     for web in config["web"]:
         response = session.get(
             web,
@@ -69,22 +70,21 @@ def HDChina(config: dict) -> dict:
                 if len(cols) >= 9:
                     id = re.search(r"id=(\d+)", str(cols[1])).group(1)
                     ids.append(("ids[]", id))
-                    if id in torrents:
-                        web_info = {
-                            "free": False,
-                            "free_end": None,
-                            "hr": None,
-                            "downloaded": False,
-                            "seeder": -1,
-                            "leecher": -1,
-                            "snatch": -1,
-                        }
-                        if cols[1].find("div", class_="progress") is not None:
-                            web_info["downloaded"] == True
-                        web_info["seeder"] = int(re.sub("\D", "", cols[5].text))
-                        web_info["leecher"] = int(re.sub("\D", "", cols[6].text))
-                        web_info["snatch"] = int(re.sub("\D", "", cols[7].text))
-                        torrents[id] = {**torrents[id], **web_info}
+                    web_info = {
+                        "free": False,
+                        "free_end": None,
+                        "hr": None,
+                        "downloaded": False,
+                        "seeder": -1,
+                        "leecher": -1,
+                        "snatch": -1,
+                    }
+                    if cols[1].find("div", class_="progress") is not None:
+                        web_info["downloaded"] == True
+                    web_info["seeder"] = int(re.sub("\D", "", cols[5].text))
+                    web_info["leecher"] = int(re.sub("\D", "", cols[6].text))
+                    web_info["snatch"] = int(re.sub("\D", "", cols[7].text))
+                    web_info_all[id] = web_info
         else:
             raise Exception
         time.sleep(1)
@@ -117,12 +117,12 @@ def HDChina(config: dict) -> dict:
                     raise Exception
             for id, state in pro_info["message"].items():
                 if (
-                    id in torrents
+                    id in web_info_all
                     and re.search(r'class="pro_\S*free', state["sp_state"]) is not None
                 ):
-                    torrents[id]["free"] = True
+                    web_info_all[id]["free"] = True
                     free_end = re.search(r'<span title="(.+?)"', state["timeout"])
-                    torrents[id]["free_end"] = (
+                    web_info_all[id]["free_end"] = (
                         None
                         if free_end is None
                         else time.mktime(
@@ -133,7 +133,11 @@ def HDChina(config: dict) -> dict:
                     )
         else:
             raise Exception
-    session.close() """
+    session.close()
+    for id in web_info_all:
+        torrents[id] = (
+            {**torrents[id], **web_info_all[id]} if id in torrents else web_info_all[id]
+        ) """
     return {
         "[HDChina]" + id: torrent
         for id, torrent in torrents.items()
