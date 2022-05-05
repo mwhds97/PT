@@ -212,7 +212,7 @@ class deluge:
         name: str,
         path: str,
         extra_options: dict,
-        logger: Union[TextIOWrapper, None],
+        logger: Union[TextIOWrapper, None] = None,
     ):
         free_end = (
             "N/A"
@@ -240,7 +240,12 @@ class deluge:
         print_t(text, logger=logger)
 
     def remove_torrent(
-        self, torrent: dict, name: str, info: str, logger: Union[TextIOWrapper, None]
+        self,
+        torrent: dict,
+        name: str,
+        info: str,
+        reannounce: bool,
+        logger: Union[TextIOWrapper, None] = None,
     ):
         text = f'[{self.name}] 删除种子 {name}\
  原因：{info}\
@@ -249,8 +254,9 @@ class deluge:
  分享率：{self.tasks[name]["up_div_down"]:.2f}\
  任务数：{self.task_count - 1}\
  总体积：{self.total_size - self.tasks[name]["size"] / 1073741824 + 0:.2f}GB'
-        self.call("core.force_reannounce", [self.tasks[name]["hash"]])
-        time.sleep(5)
+        if reannounce:
+            self.call("core.force_reannounce", [self.tasks[name]["hash"]])
+            time.sleep(5)
         self.call("core.remove_torrent", self.tasks[name]["hash"], True)
         print_t(text, logger=logger)
 
@@ -385,7 +391,7 @@ class qbittorrent:
         name: str,
         path: str,
         extra_options: dict,
-        logger: Union[TextIOWrapper, None],
+        logger: Union[TextIOWrapper, None] = None,
     ):
         free_end = (
             "N/A"
@@ -412,7 +418,12 @@ class qbittorrent:
         print_t(text, logger=logger)
 
     def remove_torrent(
-        self, torrent: dict, name: str, info: str, logger: Union[TextIOWrapper, None]
+        self,
+        torrent: dict,
+        name: str,
+        info: str,
+        reannounce: bool,
+        logger: Union[TextIOWrapper, None] = None,
     ):
         text = f'[{self.name}] 删除种子 {name}\
  原因：{info}\
@@ -421,10 +432,11 @@ class qbittorrent:
  分享率：{self.tasks[name]["up_div_down"]:.2f}\
  任务数：{self.task_count - 1}\
  总体积：{self.total_size - self.tasks[name]["size"] / 1073741824 + 0:.2f}GB'
-        self.get_response(
-            "/api/v2/torrents/reannounce", {"hashes": self.tasks[name]["hash"]}
-        )
-        time.sleep(5)
+        if reannounce:
+            self.get_response(
+                "/api/v2/torrents/reannounce", {"hashes": self.tasks[name]["hash"]}
+            )
+            time.sleep(5)
         self.get_response(
             "/api/v2/torrents/delete",
             {"hashes": self.tasks[name]["hash"], "deleteFiles": "true"},

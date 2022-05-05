@@ -140,7 +140,7 @@ pool_lock = threading.Lock()
 task_lock = threading.Lock()
 
 
-def match_remove_conditions(torrent: dict, stats: dict) -> Union[str, None]:
+def match_remove_conditions(torrent: dict, stats: dict) -> Union[tuple, None]:
     def generate_exp(exp: str) -> str:
         fields = [
             "size",
@@ -170,7 +170,7 @@ def match_remove_conditions(torrent: dict, stats: dict) -> Union[str, None]:
         )
         is not None
     ):
-        return "服务器信息异常"
+        return ("服务器信息异常", False)
     if stats["seeding_time"] == 0:
         if (
             project["ignore_hr_leeching"]
@@ -179,18 +179,18 @@ def match_remove_conditions(torrent: dict, stats: dict) -> Union[str, None]:
         ):
             if project["free_end_escape"]:
                 if not torrent["free"]:
-                    return "免费失效"
+                    return ("免费已失效", False)
                 elif torrent["free_end"] is not None:
                     if (
                         torrent["free_end"] - time.mktime(time.localtime())
                         < project["escape_trigger_time"]
                     ):
-                        return "免费失效"
+                        return ("免费即将失效", True)
             for condition in project["remove_conditions"]:
                 if condition["period"] in ["L", "B"] and eval(
                     generate_exp(condition["exp"])
                 ):
-                    return condition["info"]
+                    return (condition["info"], True)
     elif stats["seeding_time"] > 0:
         if project["ignore_hr_seeding"] or torrent["hr"] is None:
             hr_time = 0
@@ -206,7 +206,7 @@ def match_remove_conditions(torrent: dict, stats: dict) -> Union[str, None]:
                 if condition["period"] in ["S", "B"] and eval(
                     generate_exp(condition["exp"])
                 ):
-                    return condition["info"]
+                    return (condition["info"], True)
     return None
 
 
@@ -389,7 +389,9 @@ def task_processor(client: Union[deluge, qbittorrent]):
                         if info is not None:
                             halted = task_lock.acquire(timeout=300)
                             try:
-                                client.remove_torrent(torrent, name, info, logger)
+                                client.remove_torrent(
+                                    torrent, name, info[0], info[1], logger
+                                )
                             except Exception:
                                 print_t(
                                     f'[{client.name}] 删除种子 {name}（{torrent["size"]:.2f}GB）可能已失败，尝试删除其他种子…',
