@@ -465,12 +465,19 @@ def task_processor(client: Union[deluge, qbittorrent]):
 
 def torrent_fetcher(site: str, config: dict):
     def template():
+        retry_count = 0
         while True:
             try:
                 torrents = eval(f"sites.{site}(config)")
+                retry_count = 0
             except Exception:
                 print_t(f"[{site}] 获取种子信息失败，正在重试…", logger=logger)
-                time.sleep(config["retry_interval"])
+                retry_count += 1
+                if retry_count <= 5 or config["retry_pause_time"] is None:
+                    time.sleep(config["retry_interval"])
+                else:
+                    time.sleep(config["retry_pause_time"])
+                    retry_count = 0
                 continue
             if torrents != {}:
                 pool_locked = pool_lock.acquire(timeout=30)

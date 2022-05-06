@@ -70,6 +70,7 @@ sites:
       c_secure_ssl: '...'
       c_secure_tracker_ssl: '...'
       c_secure_uid: '...'
+    retry_pause_time: 600
   MTeam:
     rss: 'https://kp.m-team.cc/torrentrss.php?rows=50&isize=1&https=1&linktype=dl&passkey='
     web:
@@ -78,6 +79,7 @@ sites:
     - 'https://kp.m-team.cc/music.php?sort=4&type=desc'
     cookies:
       tp: '...'
+    retry_pause_time: 600
   OpenCD:
     rss: 'https://open.cd/torrentrss.php?rows=50&isize=1&linktype=dl&passkey='
     web:
