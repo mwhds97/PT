@@ -404,56 +404,57 @@ def task_processor(client: Union[deluge, qbittorrent]):
                             halted = False
                 del pool
 
-                pool_locked = pool_lock.acquire(timeout=30)
-                pool = deepcopy(torrent_pool)
-                unlock(pool_lock, pool_locked)
-                task_locked = task_lock.acquire(timeout=300)
-                torrents = deepcopy(torrents_candidate[client.name])
-                unlock(task_lock, task_locked)
-                for name, torrent in torrents.items():
-                    halted = task_lock.acquire(timeout=300)
-                    for _, task_group in tasks_overall.items():
-                        if name in task_group:
-                            break
-                    else:
-                        project = config["projects"][torrent["project"]]
-                        pool_locked = pool_lock.acquire(timeout=30)
-                        if name in torrent_pool:
-                            if (
-                                torrent_pool[name]["retry_count"]
-                                >= project["retry_count_max"]
-                            ):
-                                unlock(task_lock, halted)
-                                halted = False
-                                unlock(pool_lock, pool_locked)
-                                continue
-                            else:
-                                torrent_pool[name]["retry_count"] += 1
-                                unlock(pool_lock, pool_locked)
-                        try:
-                            client.add_torrent(
-                                torrent,
-                                name,
-                                project["clients"][client.name]["path"],
-                                project["clients"][client.name]["extra_options"],
-                                logger,
-                            )
-                        except Exception:
-                            print_t(
-                                f'[{client.name}] 添加种子 {name}（{torrent["size"]:.2f}GB）可能已失败，尝试添加其他种子…',
-                                logger=logger,
-                            )
-                        time.sleep(10)
-                        client.flush()
-                        if name in client.tasks:
+                if client.download_speed < client.config["download_speed_max"]:
+                    pool_locked = pool_lock.acquire(timeout=30)
+                    pool = deepcopy(torrent_pool)
+                    unlock(pool_lock, pool_locked)
+                    task_locked = task_lock.acquire(timeout=300)
+                    torrents = deepcopy(torrents_candidate[client.name])
+                    unlock(task_lock, task_locked)
+                    for name, torrent in torrents.items():
+                        halted = task_lock.acquire(timeout=300)
+                        for _, task_group in tasks_overall.items():
+                            if name in task_group:
+                                break
+                        else:
+                            project = config["projects"][torrent["project"]]
                             pool_locked = pool_lock.acquire(timeout=30)
                             if name in torrent_pool:
-                                torrent_pool[name]["downloaded"] = True
-                            unlock(pool_lock, pool_locked)
-                        tasks_overall[client.name] = deepcopy(client.tasks)
-                    unlock(task_lock, halted)
-                    halted = False
-                del pool
+                                if (
+                                    torrent_pool[name]["retry_count"]
+                                    >= project["retry_count_max"]
+                                ):
+                                    unlock(task_lock, halted)
+                                    halted = False
+                                    unlock(pool_lock, pool_locked)
+                                    continue
+                                else:
+                                    torrent_pool[name]["retry_count"] += 1
+                                    unlock(pool_lock, pool_locked)
+                            try:
+                                client.add_torrent(
+                                    torrent,
+                                    name,
+                                    project["clients"][client.name]["path"],
+                                    project["clients"][client.name]["extra_options"],
+                                    logger,
+                                )
+                            except Exception:
+                                print_t(
+                                    f'[{client.name}] 添加种子 {name}（{torrent["size"]:.2f}GB）可能已失败，尝试添加其他种子…',
+                                    logger=logger,
+                                )
+                            time.sleep(10)
+                            client.flush()
+                            if name in client.tasks:
+                                pool_locked = pool_lock.acquire(timeout=30)
+                                if name in torrent_pool:
+                                    torrent_pool[name]["downloaded"] = True
+                                unlock(pool_lock, pool_locked)
+                            tasks_overall[client.name] = deepcopy(client.tasks)
+                        unlock(task_lock, halted)
+                        halted = False
+                    del pool
                 time.sleep(client.config["run_interval"])
             except Exception:
                 print_t(f"[{client.name}] 出现异常，正在重新连接客户端…", logger=logger)
