@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+import random
 import signal
 import sys
 import threading
@@ -338,6 +339,7 @@ def task_generator():
             clients_candidate = [
                 client for client in clients if client.name in project["clients"]
             ]
+            random.shuffle(clients_candidate)
             clients_candidate = sorted(
                 clients_candidate,
                 key=lambda client: eval(generate_exp(project["load_balance_key"])),
