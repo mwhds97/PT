@@ -2,6 +2,7 @@
 
 import os
 import random
+import re
 import signal
 import sys
 import threading
@@ -141,76 +142,6 @@ pool_lock = threading.Lock()
 task_lock = threading.Lock()
 
 
-def match_remove_conditions(torrent: dict, stats: dict) -> Union[tuple, None]:
-    def generate_exp(exp: str) -> str:
-        fields = [
-            "size",
-            "active_time",
-            "seeding_time",
-            "seeder",
-            "leecher",
-            "progress",
-            "ratio",
-            "up_div_down",
-            "uploaded",
-            "downloaded",
-            "upload_speed",
-            "download_speed",
-            "eta",
-        ]
-        for field in fields:
-            exp = re.sub(field, f'stats["{field}"]', exp)
-        return f"({exp})"
-
-    project = config["projects"][torrent["project"]]
-    site = config["sites"][torrent["site"]]
-    if (
-        re.search(
-            r"(?i)not.*reg|not.*auth|delete|remove|dupe|trump|rev|nuke|same|diff|loc|收|除|撤|同|重",
-            stats["tracker_status"],
-        )
-        is not None
-    ):
-        return ("服务器信息异常", False)
-    if stats["seeding_time"] == 0:
-        if (
-            project["ignore_hr_leeching"]
-            or torrent["hr"] is None
-            or stats["progress"] < site["hr_min_progress"]
-        ):
-            if project["free_end_escape"]:
-                if not torrent["free"]:
-                    return ("免费已失效", False)
-                elif torrent["free_end"] is not None:
-                    if (
-                        torrent["free_end"] - time.mktime(time.localtime())
-                        < project["escape_trigger_time"]
-                    ):
-                        return ("免费即将失效", True)
-            for condition in project["remove_conditions"]:
-                if condition["period"] in ["L", "B"] and eval(
-                    generate_exp(condition["exp"])
-                ):
-                    return (condition["info"], True)
-    elif stats["seeding_time"] > 0:
-        if project["ignore_hr_seeding"] or torrent["hr"] is None:
-            hr_time = 0
-        elif (
-            site["hr_seed_ratio"] is not None
-            and stats["up_div_down"] >= site["hr_seed_ratio"]
-        ):
-            hr_time = project["hr_seed_delay"]
-        else:
-            hr_time = torrent["hr"] + project["hr_seed_delay"]
-        if stats["seeding_time"] >= hr_time:
-            for condition in project["remove_conditions"]:
-                if condition["period"] in ["S", "B"] and eval(
-                    generate_exp(condition["exp"])
-                ):
-                    return (condition["info"], True)
-    return None
-
-
 def unlock(lock: threading.Lock, locked: bool = True):
     if lock.locked() and locked:
         lock.release()
@@ -232,7 +163,6 @@ def task_generator():
         site_total_size = 0
         volume_total_size = 0
         for group_client, task_group in tasks.items():
-            group_total_size = 0
             for name in task_group:
                 if name in pool:
                     if group_client == client.name:
@@ -247,8 +177,7 @@ def task_generator():
                     task_project = config["projects"][pool[name]["project"]]
                     if group_client in task_project["clients"]:
                         if task_project["clients"][group_client]["volume"] == volume:
-                            group_total_size += pool[name]["size"]
-            volume_total_size += group_total_size
+                            volume_total_size += pool[name]["size"]
         matchers = [
             lambda: not torrent["downloaded"],
             lambda: torrent["retry_count"] < project["retry_count_max"],
@@ -358,6 +287,76 @@ def task_generator():
 
 def task_processor(client: Union[deluge, qbittorrent]):
     def template():
+        def match_remove_conditions(torrent: dict, stats: dict) -> Union[tuple, None]:
+            def generate_exp(exp: str) -> str:
+                fields = [
+                    "size",
+                    "active_time",
+                    "seeding_time",
+                    "seeder",
+                    "leecher",
+                    "progress",
+                    "ratio",
+                    "up_div_down",
+                    "uploaded",
+                    "downloaded",
+                    "upload_speed",
+                    "download_speed",
+                    "eta",
+                ]
+                for field in fields:
+                    exp = re.sub(field, f'stats["{field}"]', exp)
+                exp = re.sub(r"client_name", f'"{client.name}"', exp)
+                return f"({exp})"
+
+            project = config["projects"][torrent["project"]]
+            site = config["sites"][torrent["site"]]
+            if (
+                project["tracker_message_remove"] is not None
+                and re.search(
+                    project["tracker_message_remove"], stats["tracker_status"]
+                )
+                is not None
+            ):
+                return ("服务器信息异常", False)
+            if stats["seeding_time"] == 0:
+                if (
+                    project["ignore_hr_leeching"]
+                    or torrent["hr"] is None
+                    or stats["progress"] < site["hr_min_progress"]
+                ):
+                    if project["free_end_escape"]:
+                        if not torrent["free"]:
+                            return ("免费已失效", False)
+                        elif torrent["free_end"] is not None:
+                            if (
+                                torrent["free_end"] - time.mktime(time.localtime())
+                                < project["escape_trigger_time"]
+                            ):
+                                return ("免费即将失效", True)
+                    for condition in project["remove_conditions"]:
+                        if condition["period"] in ["L", "B"] and eval(
+                            generate_exp(condition["exp"])
+                        ):
+                            return (condition["info"], True)
+            elif stats["seeding_time"] > 0:
+                if project["ignore_hr_seeding"] or torrent["hr"] is None:
+                    hr_time = 0
+                elif (
+                    site["hr_seed_ratio"] is not None
+                    and stats["up_div_down"] >= site["hr_seed_ratio"]
+                ):
+                    hr_time = project["hr_seed_delay"]
+                else:
+                    hr_time = torrent["hr"] + project["hr_seed_delay"]
+                if stats["seeding_time"] >= hr_time:
+                    for condition in project["remove_conditions"]:
+                        if condition["period"] in ["S", "B"] and eval(
+                            generate_exp(condition["exp"])
+                        ):
+                            return (condition["info"], True)
+            return None
+
         halted = False
         reconnect_count = 0
         while True:

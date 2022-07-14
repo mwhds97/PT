@@ -59,6 +59,7 @@ def init(config: dict) -> tuple:
             "total_size_max": float("inf"),
             "retry_count_max": 2,
             "remove_conditions": [],
+            "tracker_message_remove": None,
             "load_balance_key": "0",
         },
     }
@@ -205,6 +206,7 @@ def init(config: dict) -> tuple:
             "total_size_max",
             "retry_count_max",
             "remove_conditions",
+            "tracker_message_remove",
             "load_balance_key",
         }:
             raise Exception("任务计划配置有误")
