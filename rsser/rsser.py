@@ -475,7 +475,7 @@ def torrent_fetcher(site: str, config: dict):
             except Exception:
                 print_t(f"[{site}] 获取种子信息失败，正在重试…", logger=logger)
                 retry_count += 1
-                if retry_count <= 5 or config["retry_pause_time"] is None:
+                if retry_count <= config["retry_pause_count"]:
                     time.sleep(config["retry_interval"])
                 else:
                     time.sleep(config["retry_pause_time"])
