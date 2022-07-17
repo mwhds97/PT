@@ -53,8 +53,8 @@ pool: #种子池选项
     snatch: false #按完成人数升序排序
     site: false #按站点的优先级升序排序
   #位置越前优先级越高
-  scan_interval: 30 #遍历种子信息并生成种子添加列表的时间间隔（单位：秒）
-  save_interval: 3600 #保存种子信息的时间间隔（单位：秒）
+  scan_interval: 30 #遍历种子信息并生成种子添加列表的时间间隔表达式（单位：秒）
+  save_interval: 3600 #保存种子信息的时间间隔表达式（单位：秒）
 snippets: #可复用的配置片段，用法参见配置示例
   片段1:
     参数1: 值
@@ -72,8 +72,8 @@ clients: #客户端列表（字典）
     user: '...' #Deluge daemon 用户名
     pass: '...' #Deluge daemon 密码
     timeout: 15 #与客户端通信超时的阈值（单位：秒）
-    reconnect_interval: 10 #重新连接客户端的时间间隔（单位：秒）
-    run_interval: 30 #执行任务处理（包括添加、移除种子）流程的时间间隔（单位：秒）
+    reconnect_interval: 10 #重新连接客户端的时间间隔表达式（单位：秒）
+    run_interval: 30 #执行任务处理（包括添加、移除种子）流程的时间间隔表达式（单位：秒）
     bandwidth: 1000 #客户端的最大带宽（单位：Mbps）
     task_count_max: 10
     #同时进行的最大任务数量
@@ -97,8 +97,8 @@ clients: #客户端列表（字典）
     #如果 Web UI 设置中的“启用 Host header 属性验证”被勾选，且 Web UI 的本地监听端口和远程访问端口不一致（常见于 NAT 环境）
     #，该值必须包含 'Host': '设定域名（若为 * 可取任意值）:本地监听端口（Web UI）'
     timeout: 15 #与客户端通信超时的阈值（单位：秒）
-    reconnect_interval: 10 #重新连接客户端的时间间隔（单位：秒）
-    run_interval: 30 #执行任务处理（包括添加、移除种子）流程的时间间隔（单位：秒）
+    reconnect_interval: 10 #重新连接客户端的时间间隔表达式（单位：秒）
+    run_interval: 30 #执行任务处理（包括添加、移除种子）流程的时间间隔表达式（单位：秒）
     bandwidth: 1000 #客户端的最大带宽（单位：Mbps）
     task_count_max: 10
     #同时进行的最大任务数量
@@ -130,10 +130,10 @@ sites: #站点列表（字典），位置越前优先级越高
     user_agent: '...' #用于访问站点的 User-Agent
     proxies: {'属性1': '值', ...}
     #代理设置，例如 {'http': 'http://127.0.0.1:7890', 'https': 'http://127.0.0.1:7890'}
-    fetch_interval: 300 #获取种子信息的时间间隔（单位：秒）
-    retry_interval: 30 #获取种子信息失败时重试的时间间隔（单位：秒）
+    fetch_interval: 300 #获取种子信息的时间间隔表达式（单位：秒）
+    retry_interval: 30 #获取种子信息失败时重试的时间间隔表达式（单位：秒）
     retry_pause_count: 4 #获取种子信息连续失败次数达到该值后，暂停种子信息获取
-    retry_pause_time: 600 #种子信息获取暂停持续的时间间隔（单位：秒）
+    retry_pause_time: 600 #种子信息获取暂停持续的时间间隔表达式（单位：秒）
     hr_seed_ratio: null #若站点的 H&R 规则允许达到一定分享率后停止做种，可将该值设定为对应分享率
     hr_min_progress: 100 #站点启动 H&R 检测时的任务进度（范围：0-100）
     timezone: +8 #站点的时区，一般设置为 +8 即可

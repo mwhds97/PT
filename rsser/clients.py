@@ -1,4 +1,7 @@
 import json
+import math
+import random
+import re
 import socket
 import ssl
 import struct
@@ -140,7 +143,7 @@ class deluge:
             del self.socket
         except Exception:
             pass
-        time.sleep(self.config["reconnect_interval"])
+        time.sleep(eval(str(self.config["reconnect_interval"])))
         try:
             self.new_client()
         except Exception:
@@ -308,7 +311,7 @@ class qbittorrent:
 
     def reconnect(self):
         self.get_response("/api/v2/auth/logout", nobreak=True)
-        time.sleep(self.config["reconnect_interval"])
+        time.sleep(eval(str(self.config["reconnect_interval"])))
         try:
             self.new_client()
         except Exception:

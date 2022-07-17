@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+import math
 import random
 import re
 import signal
@@ -282,7 +283,7 @@ def task_generator():
                     break
         unlock(task_lock, task_locked)
         del pool
-        time.sleep(config["pool"]["scan_interval"])
+        time.sleep(eval(str(config["pool"]["scan_interval"])))
 
 
 def task_processor(client: Union[deluge, qbittorrent]):
@@ -456,7 +457,7 @@ def task_processor(client: Union[deluge, qbittorrent]):
                         unlock(task_lock, halted)
                         halted = False
                     del pool
-                time.sleep(client.config["run_interval"])
+                time.sleep(eval(str(client.config["run_interval"])))
             except Exception:
                 print_t(f"[{client.name}] 出现异常，正在重新连接客户端…", logger=logger)
                 reconnect_count += 1
@@ -476,9 +477,9 @@ def torrent_fetcher(site: str, config: dict):
                 print_t(f"[{site}] 获取种子信息失败，正在重试…", logger=logger)
                 retry_count += 1
                 if retry_count <= config["retry_pause_count"]:
-                    time.sleep(config["retry_interval"])
+                    time.sleep(eval(str(config["retry_interval"])))
                 else:
-                    time.sleep(config["retry_pause_time"])
+                    time.sleep(eval(str(config["retry_pause_time"])))
                     retry_count = 0
                 continue
             if torrents != {}:
@@ -506,7 +507,7 @@ def torrent_fetcher(site: str, config: dict):
                         }
                         name_queue.append(name)
                 unlock(pool_lock, pool_locked)
-            time.sleep(config["fetch_interval"])
+            time.sleep(eval(str(config["fetch_interval"])))
 
     return template
 
@@ -557,7 +558,9 @@ for site in active_sites:
         threading.Thread(target=torrent_fetcher(site, config["sites"][site]))
     )
 threads.append(
-    threading.Thread(target=pool_saver(True, config["pool"]["save_interval"]))
+    threading.Thread(
+        target=pool_saver(True, eval(str(config["pool"]["save_interval"])))
+    )
 )
 threads.append(threading.Thread(target=task_generator))
 for thread in threads:
