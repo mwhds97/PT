@@ -1,4 +1,6 @@
 import json
+import math
+import random
 import re
 import time
 
@@ -48,9 +50,9 @@ def HDChina(config: dict) -> dict:
         }
     """ web_info_all = {}
     session = requests.session()
-    for web in config["web"]:
+    for index, url in enumerate(config["web"]):
         response = session.get(
-            web,
+            url,
             headers={"User-Agent": config["user_agent"]},
             cookies=config["cookies"],
             proxies=config["proxies"],
@@ -133,6 +135,8 @@ def HDChina(config: dict) -> dict:
                     )
         else:
             raise Exception
+        if index < len(config["web"]) - 1:
+            time.sleep(eval(str(config["web_interval"])))
     session.close()
     for id in web_info_all:
         torrents[id] = (

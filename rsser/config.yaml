@@ -59,6 +59,7 @@ sites:
       c_secure_tracker_ssl: '...'
       c_secure_uid: '...'
     hr_min_progress: 50
+    web_interval: 10
   HDChina:
     rss: 'https://hdchina.org/torrentrss.php?rows=50&isize=1&linktype=dl&passkey='
   HDSky:

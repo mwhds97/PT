@@ -1,3 +1,5 @@
+import math
+import random
 import re
 import time
 
@@ -46,9 +48,9 @@ def U2(config: dict) -> dict:
             for id, torrent in torrents.items()
         }
     web_info_all = {}
-    for web in config["web"]:
+    for index, url in enumerate(config["web"]):
         response = requests.get(
-            web,
+            url,
             headers={"User-Agent": config["user_agent"]},
             cookies=config["cookies"],
             proxies=config["proxies"],
@@ -113,6 +115,8 @@ def U2(config: dict) -> dict:
                     web_info_all[id] = web_info
         else:
             raise Exception
+        if index < len(config["web"]) - 1:
+            time.sleep(eval(str(config["web_interval"])))
     for id in web_info_all:
         torrents[id] = (
             {**torrents[id], **web_info_all[id]} if id in torrents else web_info_all[id]
