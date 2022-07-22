@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         U2娘+
-// @version      2.3
+// @version      2.4
 // @description  U2娘调戏脚本（鼠标划过“U2娘的小秘密”）
 // @author       mwhds97
 // @include      /^https?:\/\/.*u2.*dmhy.*$/
@@ -122,7 +122,9 @@
   {"name": "sleepy", "value": "你不困么", "word": "你不困么"},
   {"name": "witch", "value": "屑魔女", "word": "屑魔女"},
   {"name": "ricenoodle", "value": "辣炒米粉", "word": "辣炒米粉"},
-  {"name": "time", "value": "现在几点", "word": "现在几点"}];
+  {"name": "time", "value": "现在几点", "word": "现在几点"},
+  {"name": "victoryroad", "value": "胜利大马路", "word": "胜利大马路"},
+  {"name": "crazythursday", "value": "疯狂星期四", "word": "疯狂星期四"}];
 
   var shbox = document.getElementsByName("shbox")[0];
   for(var i in shbox.childNodes) {
