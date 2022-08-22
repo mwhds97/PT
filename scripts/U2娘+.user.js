@@ -1,11 +1,13 @@
 // ==UserScript==
 // @name         U2娘+
-// @version      2.4
+// @version      2.5
 // @description  U2娘调戏脚本（鼠标划过“U2娘的小秘密”）
 // @author       mwhds97
 // @include      /^https?:\/\/.*u2.*dmhy.*$/
 // @grant        none
 // @noframes
+// @downloadURL  https://cdn.jsdelivr.net/gh/mwhds97/PT@master/scripts/U2%E5%A8%98%2B.user.js
+// @updateURL    https://cdn.jsdelivr.net/gh/mwhds97/PT@master/scripts/U2%E5%A8%98%2B.user.js
 // ==/UserScript==
 
 (function() {
@@ -116,7 +118,7 @@
   {"name": "r21", "value": "雨妹", "word": "雨妹"},
   {"name": "uspt", "value": "专利局", "word": "USPT"},
   {"name": "eternal", "value": "+1秒", "word": "+1s"},
-  {"name": "rickroll", "value": "rick&roll", "word": "rick and roll"},
+  {"name": "rickroll", "value": "rick&roll！", "word": "rick and roll"},
   {"name": "occupation", "value": "我的职业", "word": "我的职业"},
   {"name": "yuri", "value": "女同", "word": "女同"},
   {"name": "sleepy", "value": "你不困么", "word": "你不困么"},

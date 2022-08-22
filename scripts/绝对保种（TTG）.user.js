@@ -1,10 +1,12 @@
 // ==UserScript==
 // @name         绝对保种（TTG）
-// @version      1.3
+// @version      1.4
 // @description  批量下载绝对保种积分高的种子（TTG）
 // @include      /^https?:\/\/.*totheglory.*\/browse\.php.*$/
 // @grant        GM_download
 // @noframes
+// @downloadURL  https://cdn.jsdelivr.net/gh/mwhds97/PT@master/scripts/%E7%BB%9D%E5%AF%B9%E4%BF%9D%E7%A7%8D%EF%BC%88TTG%EF%BC%89.user.js
+// @updateURL    https://cdn.jsdelivr.net/gh/mwhds97/PT@master/scripts/%E7%BB%9D%E5%AF%B9%E4%BF%9D%E7%A7%8D%EF%BC%88TTG%EF%BC%89.user.js
 // ==/UserScript==
 
 (function() {

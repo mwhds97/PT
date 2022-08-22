@@ -1,10 +1,12 @@
 // ==UserScript==
 // @name         小种收割机（MT）
-// @version      1.3
+// @version      1.4
 // @description  批量下载小体积种子（MT）
 // @include      /^https?:\/\/.*m-team.*\/(torrents|adult|movie|music)\.php.*$/
 // @grant        GM_download
 // @noframes
+// @downloadURL  https://cdn.jsdelivr.net/gh/mwhds97/PT@master/scripts/%E5%B0%8F%E7%A7%8D%E6%94%B6%E5%89%B2%E6%9C%BA%EF%BC%88MT%EF%BC%89.user.js
+// @updateURL    https://cdn.jsdelivr.net/gh/mwhds97/PT@master/scripts/%E5%B0%8F%E7%A7%8D%E6%94%B6%E5%89%B2%E6%9C%BA%EF%BC%88MT%EF%BC%89.user.js
 // ==/UserScript==
 
 (function() {

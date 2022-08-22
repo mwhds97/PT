@@ -1,11 +1,13 @@
 // ==UserScript==
 // @name         魔力计算器
-// @version      2.8
+// @version      2.9
 // @description  计算部分站点各个种子的魔力参数
 // @author       mwhds97
 // @include      /^https?:\/\/.*(u2.*dmhy|m-team|hdchina|chdbits|hdsky|ourbits|open.*cd|springsunday).*\/(mpseed|mybonus|torrents|rescue|adult|movie|music)\.php.*$/
 // @grant        GM_setValue
 // @grant        GM_getValue
+// @downloadURL  https://cdn.jsdelivr.net/gh/mwhds97/PT@master/scripts/%E9%AD%94%E5%8A%9B%E8%AE%A1%E7%AE%97%E5%99%A8.user.js
+// @updateURL    https://cdn.jsdelivr.net/gh/mwhds97/PT@master/scripts/%E9%AD%94%E5%8A%9B%E8%AE%A1%E7%AE%97%E5%99%A8.user.js
 // ==/UserScript==
 
 (function() {
