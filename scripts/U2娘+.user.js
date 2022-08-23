@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         U2娘+
-// @version      2.5
+// @version      2.6
 // @description  U2娘调戏脚本（鼠标划过“U2娘的小秘密”）
 // @author       mwhds97
 // @include      /^https?:\/\/.*u2.*dmhy.*$/
@@ -56,6 +56,7 @@
   {"name": "ll", "value": "LoveLive！", "word": "lovelive"},
   {"name": "les", "value": "百合", "word": "百合"},
   {"name": "makeinu", "value": "败犬", "word": "败犬"},
+  {"name": "otaku", "value": "死宅", "word": "死宅"},
   {"name": "lollipop", "value": "棒棒糖", "word": "棒棒糖"},
   {"name": "excuse", "value": "抱妹借口", "word": "抱妹最佳借口"},
   {"name": "transform", "value": "变身", "word": "变身"},
@@ -126,7 +127,13 @@
   {"name": "ricenoodle", "value": "辣炒米粉", "word": "辣炒米粉"},
   {"name": "time", "value": "现在几点", "word": "现在几点"},
   {"name": "victoryroad", "value": "胜利大马路", "word": "胜利大马路"},
-  {"name": "crazythursday", "value": "疯狂星期四", "word": "疯狂星期四"}];
+  {"name": "crazythursday", "value": "疯狂星期四", "word": "疯狂星期四"},
+  {"name": "moment", "value": "刹那未来", "word": "刹那抓住了未来"},
+  {"name": "giveme", "value": "给我", "word": "能不能给我"},
+  {"name": "baby", "value": "小宝贝", "word": "小宝贝"},
+  {"name": "liar", "value": "骗子", "word": "骗子"},
+  {"name": "olympic", "value": "冬奥会", "word": "冬奥会"},
+  {"name": "mana", "value": "补魔", "word": "补魔"}];
 
   var shbox = document.getElementsByName("shbox")[0];
   for(var i in shbox.childNodes) {
