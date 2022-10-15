@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         魔力计算器
-// @version      2.9
+// @version      2.10
 // @description  计算部分站点各个种子的魔力参数
 // @author       mwhds97
 // @include      /^https?:\/\/.*(u2.*dmhy|m-team|hdchina|chdbits|hdsky|ourbits|open.*cd|springsunday).*\/(mpseed|mybonus|torrents|rescue|adult|movie|music)\.php.*$/
@@ -51,7 +51,7 @@
   }
   function calcA_SSD(S, T, N) {
     var params = GM_getValue("SSD");
-    return Math.sqrt(S) * (0.25 + 0.32 * Math.log(1 + T)) * (0.5 + 2.5 * Math.pow(10, -(N - 1) / (params.N0 - 1)));
+    return Math.pow(S, S < 1 ? 2 : 0.5) * (0.25 + 0.32 * Math.log(1 + T)) * (0.5 + 2.5 * Math.pow(10, -(N - 1) / (params.N0 - 1)));
   }
   function calcB(A, site) {
     var params = GM_getValue(site);
