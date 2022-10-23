@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         U2娘+
-// @version      2.6
+// @version      2.7
 // @description  U2娘调戏脚本（鼠标划过“U2娘的小秘密”）
 // @author       mwhds97
 // @include      /^https?:\/\/.*u2.*dmhy.*$/
@@ -34,6 +34,7 @@
   {"name": "skill", "value": "技能", "word": "我的技能"},
   {"name": "photo", "value": "头像", "word": "看看我的头像"},
   {"name": "so", "value": "取向", "word": "我的取向"},
+  {"name": "occupation", "value": "职业", "word": "我的职业"},
   {"name": "harem", "value": "后宫", "word": "我的后宫"},
   {"name": "power", "value": "战斗力", "word": "我的战斗力"},
   {"name": "uid", "value": "用户ID", "word": "我的UID"},
@@ -120,7 +121,6 @@
   {"name": "uspt", "value": "专利局", "word": "USPT"},
   {"name": "eternal", "value": "+1秒", "word": "+1s"},
   {"name": "rickroll", "value": "rick&roll！", "word": "rick and roll"},
-  {"name": "occupation", "value": "我的职业", "word": "我的职业"},
   {"name": "yuri", "value": "女同", "word": "女同"},
   {"name": "sleepy", "value": "你不困么", "word": "你不困么"},
   {"name": "witch", "value": "屑魔女", "word": "屑魔女"},
