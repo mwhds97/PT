@@ -63,7 +63,7 @@ def SSD(config: dict) -> dict:
                 raise Exception
             for row in rows[1:]:
                 cols = row.find_all("td", recursive=False)
-                if len(cols) >= 10:
+                if len(cols) >= 9:
                     id = re.search(r"id=(\d+)", str(cols[1])).group(1)
                     web_info = {
                         "free": False,
@@ -88,9 +88,9 @@ def SSD(config: dict) -> dict:
                         )
                     if cols[1].find("div", class_="progress_bar") is not None:
                         web_info["downloaded"] = True
-                    web_info["seeder"] = int(re.sub("\D", "", cols[6].text))
-                    web_info["leecher"] = int(re.sub("\D", "", cols[7].text))
-                    web_info["snatch"] = int(re.sub("\D", "", cols[8].text))
+                    web_info["seeder"] = int(re.sub("\D", "", cols[5].text))
+                    web_info["leecher"] = int(re.sub("\D", "", cols[6].text))
+                    web_info["snatch"] = int(re.sub("\D", "", cols[7].text))
                     web_info_all[id] = web_info
         else:
             raise Exception

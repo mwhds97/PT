@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         魔力计算器
-// @version      2.10
+// @version      2.11
 // @description  计算部分站点各个种子的魔力参数
 // @author       mwhds97
 // @include      /^https?:\/\/.*(u2.*dmhy|m-team|hdchina|chdbits|hdsky|ourbits|open.*cd|springsunday).*\/(mpseed|mybonus|torrents|rescue|adult|movie|music)\.php.*$/
@@ -407,6 +407,6 @@
   }
   if(/springsunday.*(torrents|rescue)\.php/.test(document.URL)) {
     table = document.getElementsByClassName("torrents")[0];
-    MakeMagic("SSD", table, 4, 5, 6, 9, 10);
+    MakeMagic("SSD", table, 3, 4, 5, 8, 9);
   }
 })();
