@@ -123,7 +123,10 @@ def HDChina(config: dict) -> dict:
                     and re.search(r'class="pro_\S*free', state["sp_state"]) is not None
                 ):
                     web_info_all[id]["free"] = True
-                    free_end = re.search(r'<span title="(.+?)"', state["timeout"])
+                    free_end = re.search(
+                        r'<span title="\s*(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\s*"',
+                        state["timeout"],
+                    )
                     web_info_all[id]["free_end"] = (
                         None
                         if free_end is None

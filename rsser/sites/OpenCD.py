@@ -76,7 +76,10 @@ def OpenCD(config: dict) -> dict:
                     }
                     if re.search(r'class="pro_\S*free', str(cols[2])) is not None:
                         web_info["free"] = True
-                        free_end = re.search(r'<span title="(.+?)"', str(cols[2]))
+                        free_end = re.search(
+                            r'<span title="\s*(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\s*"',
+                            str(cols[2]),
+                        )
                         web_info["free_end"] = (
                             None
                             if free_end is None

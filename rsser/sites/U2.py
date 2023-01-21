@@ -84,7 +84,10 @@ def U2(config: dict) -> dict:
                         is not None
                     ):
                         web_info["free"] = True
-                        free_end = re.search(r'<time title="(.+?)"', str(cols[1]))
+                        free_end = re.search(
+                            r'<time title="\s*(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\s*"',
+                            str(cols[1]),
+                        )
                         web_info["free_end"] = (
                             None
                             if free_end is None

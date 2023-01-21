@@ -80,7 +80,10 @@ def HDSky(config: dict) -> dict:
                         if re.search(r"\[.+<b>.+\]", str(cols[1])) is None:
                             web_info["free"] = True
                         else:
-                            free_end = re.search(r'<span title="(.+?)"', str(cols[1]))
+                            free_end = re.search(
+                                r'<span title="\s*(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\s*"',
+                                str(cols[1]),
+                            )
                             if free_end is not None:
                                 web_info["free"] = True
                                 web_info["free_end"] = (
