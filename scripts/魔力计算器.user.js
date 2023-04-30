@@ -352,7 +352,7 @@
     GM_setValue("MT", {"d": parseFloat(params[1]), "Umax": parseFloat(params[2]), "T0": parseFloat(params[3]), "N0": parseFloat(params[4]), "B0": parseFloat(params[5]), "L": parseFloat(params[6]), "sum": parseFloat(params[7])});
   }
   if(/hdchina.*mybonus\.php/.test(document.URL)) {
-    params = /T0 = (\d+(?:\.\d+)?)[\s\S]+?N0 = (\d+(?:\.\d+)?)[\s\S]+?B0 = (\d+(?:\.\d+)?)[\s\S]+?L = (\d+(?:\.\d+)?)[\s\S]+?M = (\d+(?:\.\d+)?)[\s\S]+?R=.+?(\d+(?:\.\d+)?).+?(\d+(?:\.\d+)?)[\s\S]+?A = (\d+(?:\.\d+)?).+?A = (\d+(?:\.\d+)?).+?(\[.+\[)?[\s\S]+?(\d+(?:\.\d+)?[KMGT]i?B?)/.exec(document.getElementsByClassName("normal_tab mybonus")[2].innerText);
+    params = /T0 = (\d+(?:\.\d+)?)[\s\S]+?N0 = (\d+(?:\.\d+)?)[\s\S]+?B0 = (\d+(?:\.\d+)?)[\s\S]+?L = (\d+(?:\.\d+)?)[\s\S]+?M = (\d+(?:\.\d+)?)[\s\S]+?R=[\s\S]+?(\d+(?:\.\d+)?)[\s\S]+?(\d+(?:\.\d+)?)[\s\S]+?A = (\d+(?:\.\d+)?).+?A = (\d+(?:\.\d+)?).+?(\[.+\[)?[\s\S]+?(\d+(?:\.\d+)?[KMGT]i?B?)/.exec(document.getElementsByClassName("normal_tab mybonus")[2].innerText);
     GM_setValue("HDC", {"T0": parseFloat(params[1]), "N0": parseFloat(params[2]), "B0": parseFloat(params[3]), "L": parseFloat(params[4]), "M": parseFloat(params[5]), "Ra": parseFloat(params[6]), "Rb": parseFloat(params[7]), "A0": parseFloat(params[typeof params[10] === "undefined" ? 9 : 8]), "Smin": size_G(params[11])});
   }
   if(/chdbits.*mybonus\.php/.test(document.URL)) {
