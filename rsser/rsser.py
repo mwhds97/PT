@@ -10,7 +10,7 @@ import threading
 import time
 from collections import deque
 from copy import deepcopy
-from typing import Union
+from typing import Optional, Union
 
 import sites
 from clients import deluge, qbittorrent
@@ -47,7 +47,7 @@ except Exception as e:
     sys.exit(0)
 
 
-def match_project(torrent: dict, allow_site_only: bool = False) -> Union[str, None]:
+def match_project(torrent: dict, allow_site_only: bool = False) -> Optional[str]:
     first_match_site_project = None
     for name, project in config["projects"].items():
         if torrent["site"] in project["sites"]:
@@ -288,7 +288,7 @@ def task_generator():
 
 def task_processor(client: Union[deluge, qbittorrent]):
     def template():
-        def match_remove_conditions(torrent: dict, stats: dict) -> Union[tuple, None]:
+        def match_remove_conditions(torrent: dict, stats: dict) -> Optional[tuple]:
             def generate_exp(exp: str) -> str:
                 fields = [
                     "size",
@@ -319,7 +319,7 @@ def task_processor(client: Union[deluge, qbittorrent]):
                 )
                 is not None
             ):
-                return ("服务器信息异常", False)
+                return ("服务器信息异常", False, None)
             if stats["seeding_time"] == 0:
                 if (
                     project["ignore_hr_leeching"]
@@ -328,18 +328,18 @@ def task_processor(client: Union[deluge, qbittorrent]):
                 ):
                     if project["free_end_escape"]:
                         if not torrent["free"]:
-                            return ("免费已失效", False)
+                            return ("免费已失效", False, site["escape_trackers"])
                         elif torrent["free_end"] is not None:
                             if (
                                 torrent["free_end"] - time.mktime(time.localtime())
                                 < project["escape_trigger_time"]
                             ):
-                                return ("免费即将失效", True)
+                                return ("免费即将失效", True, None)
                     for condition in project["remove_conditions"]:
                         if condition["period"] in ["L", "B"] and eval(
                             generate_exp(condition["exp"])
                         ):
-                            return (condition["info"], True)
+                            return (condition["info"], True, None)
             elif stats["seeding_time"] > 0:
                 if project["ignore_hr_seeding"] or torrent["hr"] is None:
                     hr_time = 0
@@ -355,7 +355,7 @@ def task_processor(client: Union[deluge, qbittorrent]):
                         if condition["period"] in ["S", "B"] and eval(
                             generate_exp(condition["exp"])
                         ):
-                            return (condition["info"], True)
+                            return (condition["info"], True, None)
             return None
 
         halted = False
@@ -392,7 +392,7 @@ def task_processor(client: Union[deluge, qbittorrent]):
                             halted = task_lock.acquire(timeout=300)
                             try:
                                 client.remove_torrent(
-                                    torrent, name, info[0], info[1], logger
+                                    torrent, name, info[0], info[1], info[2], logger
                                 )
                             except Exception:
                                 print_t(

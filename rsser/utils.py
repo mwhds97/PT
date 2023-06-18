@@ -1,12 +1,12 @@
 import re
 import time
 from io import TextIOWrapper
-from typing import Union
+from typing import Optional, Union
 
 import yaml
 
 
-def print_t(text: str, nowrap: bool = False, logger: Union[TextIOWrapper, None] = None):
+def print_t(text: str, nowrap: bool = False, logger: Optional[TextIOWrapper] = None):
     full_text = "\r" + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + " " + text
     print(
         f"{full_text: <75}",

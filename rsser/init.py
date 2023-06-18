@@ -40,6 +40,7 @@ def init(config: dict) -> tuple:
             "hr_min_progress": 100,
             "task_count_max": float("inf"),
             "total_size_max": float("inf"),
+            "escape_trackers": ["http://localhost/noannounce"],
         },
         "projects": {
             "snippets": [],
@@ -142,6 +143,10 @@ def init(config: dict) -> tuple:
             config["sites"][name][setting] = default_settings["sites"][setting]
         if not isinstance(config["sites"][name]["web"], list):
             config["sites"][name]["web"] = [config["sites"][name]["web"]]
+        if not isinstance(config["sites"][name]["escape_trackers"], list):
+            config["sites"][name]["escape_trackers"] = [
+                config["sites"][name]["escape_trackers"]
+            ]
         if set(config["sites"][name].keys()) != {
             "snippets",
             "rss",
@@ -161,6 +166,7 @@ def init(config: dict) -> tuple:
             "timezone",
             "task_count_max",
             "total_size_max",
+            "escape_trackers",
         }:
             raise Exception("站点配置有误")
     for name in config["projects"]:

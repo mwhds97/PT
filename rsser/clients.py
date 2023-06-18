@@ -8,7 +8,7 @@ import struct
 import time
 import zlib
 from io import TextIOWrapper
-from typing import Union
+from typing import Optional
 
 import rencode
 import requests
@@ -215,7 +215,7 @@ class deluge:
         name: str,
         path: str,
         extra_options: dict,
-        logger: Union[TextIOWrapper, None] = None,
+        logger: Optional[TextIOWrapper] = None,
     ):
         free_end = (
             "N/A"
@@ -247,8 +247,9 @@ class deluge:
         torrent: dict,
         name: str,
         info: str,
-        reannounce: bool,
-        logger: Union[TextIOWrapper, None] = None,
+        force_reannounce: bool = False,
+        new_trackers: Optional[list] = None,
+        logger: Optional[TextIOWrapper] = None,
     ):
         text = f'[{self.name}] 删除种子 {name}\
  原因：{info}\
@@ -257,7 +258,17 @@ class deluge:
  分享率：{self.tasks[name]["up_div_down"]:.2f}\
  任务数：{self.task_count - 1}\
  总体积：{self.total_size - self.tasks[name]["size"] / 1073741824 + 0:.2f}GB'
-        if reannounce:
+        if new_trackers is not None:
+            self.call(
+                "core.set_torrent_trackers",
+                self.tasks[name]["hash"],
+                [
+                    {"url": tracker, "tier": tier}
+                    for tier, tracker in enumerate(new_trackers)
+                ],
+            )
+            time.sleep(5)
+        if force_reannounce:
             self.call("core.force_reannounce", [self.tasks[name]["hash"]])
             time.sleep(5)
         self.call("core.remove_torrent", self.tasks[name]["hash"], True)
@@ -373,12 +384,14 @@ class qbittorrent:
             self.total_size += stats["size"] / 1073741824
             self.upload_speed += stats["upload_speed"] / 1048576
             self.download_speed += stats["download_speed"] / 1048576
+            stats["trackers"] = []
             tracker_status = ""
             response = self.get_response(
                 "/api/v2/torrents/trackers", {"hash": stats["hash"]}, True
             )
             trackers = json.loads(response.text) if response.text != "" else []
             for tracker in trackers[3:]:
+                stats["trackers"].append(tracker["url"])
                 tracker_status += tracker["msg"]
             stats["tracker_status"] = tracker_status
         if not compare_version(self.ver, "2.8.1"):
@@ -394,7 +407,7 @@ class qbittorrent:
         name: str,
         path: str,
         extra_options: dict,
-        logger: Union[TextIOWrapper, None] = None,
+        logger: Optional[TextIOWrapper] = None,
     ):
         free_end = (
             "N/A"
@@ -425,8 +438,9 @@ class qbittorrent:
         torrent: dict,
         name: str,
         info: str,
-        reannounce: bool,
-        logger: Union[TextIOWrapper, None] = None,
+        force_reannounce: bool = False,
+        new_trackers: Optional[list] = None,
+        logger: Optional[TextIOWrapper] = None,
     ):
         text = f'[{self.name}] 删除种子 {name}\
  原因：{info}\
@@ -435,7 +449,20 @@ class qbittorrent:
  分享率：{self.tasks[name]["up_div_down"]:.2f}\
  任务数：{self.task_count - 1}\
  总体积：{self.total_size - self.tasks[name]["size"] / 1073741824 + 0:.2f}GB'
-        if reannounce:
+        if new_trackers is not None:
+            self.get_response(
+                "/api/v2/torrents/removeTrackers",
+                {
+                    "hash": self.tasks[name]["hash"],
+                    "urls": "|".join(self.tasks[name]["trackers"]),
+                },
+            )
+            self.get_response(
+                "/api/v2/torrents/addTrackers",
+                {"hash": self.tasks[name]["hash"], "urls": "%0A".join(new_trackers)},
+            )
+            time.sleep(5)
+        if force_reannounce:
             self.get_response(
                 "/api/v2/torrents/reannounce", {"hashes": self.tasks[name]["hash"]}
             )
