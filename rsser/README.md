@@ -6,7 +6,7 @@
 
 目前支持的站点：
 
-- [x] CHDBits
+- [x] CHDBits（仅支持 rss）
 - [x] HDChina（仅支持 rss）
 - [x] HDSky
 - [x] M-Team（建议关闭 2FA）

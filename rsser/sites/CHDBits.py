@@ -47,7 +47,7 @@ def CHDBits(config: dict) -> dict:
             }
             for id, torrent in torrents.items()
         }
-    web_info_all = {}
+    """ web_info_all = {}
     for index, url in enumerate(config["web"]):
         response = requests.get(
             url,
@@ -105,7 +105,7 @@ def CHDBits(config: dict) -> dict:
     for id in web_info_all:
         torrents[id] = (
             {**torrents[id], **web_info_all[id]} if id in torrents else web_info_all[id]
-        )
+        ) """
     return {
         "[CHDBits]" + id: torrent
         for id, torrent in torrents.items()

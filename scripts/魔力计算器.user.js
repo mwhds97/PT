@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name         魔力计算器
-// @version      2.11
+// @version      2.12
 // @description  计算部分站点各个种子的魔力参数
 // @author       mwhds97
-// @include      /^https?:\/\/.*(u2.*dmhy|m-team|hdchina|chdbits|hdsky|ourbits|open.*cd|springsunday).*\/(mpseed|mybonus|torrents|rescue|adult|movie|music)\.php.*$/
+// @include      /^https?:\/\/.*(u2.*dmhy|m-team|hdchina|ptchdbits|hdsky|ourbits|open.*cd|springsunday).*\/(mpseed|mybonus|torrents|rescue|adult|movie|music)\.php.*$/
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @downloadURL  https://cdn.jsdelivr.net/gh/mwhds97/PT@master/scripts/%E9%AD%94%E5%8A%9B%E8%AE%A1%E7%AE%97%E5%99%A8.user.js
@@ -355,7 +355,7 @@
     params = /T0 = (\d+(?:\.\d+)?)[\s\S]+?N0 = (\d+(?:\.\d+)?)[\s\S]+?B0 = (\d+(?:\.\d+)?)[\s\S]+?L = (\d+(?:\.\d+)?)[\s\S]+?M = (\d+(?:\.\d+)?)[\s\S]+?R=[\s\S]+?(\d+(?:\.\d+)?)[\s\S]+?(\d+(?:\.\d+)?)[\s\S]+?A = (\d+(?:\.\d+)?).+?A = (\d+(?:\.\d+)?).+?(\[.+\[)?[\s\S]+?(\d+(?:\.\d+)?[KMGT]i?B?)/.exec(document.getElementsByClassName("normal_tab mybonus")[2].innerText);
     GM_setValue("HDC", {"T0": parseFloat(params[1]), "N0": parseFloat(params[2]), "B0": parseFloat(params[3]), "L": parseFloat(params[4]), "M": parseFloat(params[5]), "Ra": parseFloat(params[6]), "Rb": parseFloat(params[7]), "A0": parseFloat(params[typeof params[10] === "undefined" ? 9 : 8]), "Smin": size_G(params[11])});
   }
-  if(/chdbits.*mybonus\.php/.test(document.URL)) {
+  if(/ptchdbits.*mybonus\.php/.test(document.URL)) {
     params = /T0 = (\d+(?:\.\d+)?)[\s\S]+?N0 = (\d+(?:\.\d+)?)[\s\S]+?B0 = (\d+(?:\.\d+)?)[\s\S]+?L = (\d+(?:\.\d+)?)[\s\S]+?A = (\d+(?:\.\d+)?)/.exec(document.getElementsByClassName("text")[2].innerText);
     GM_setValue("CHD", {"T0": parseFloat(params[1]), "N0": parseFloat(params[2]), "B0": parseFloat(params[3]), "L": parseFloat(params[4]), "A0": parseFloat(params[5])});
   }
@@ -389,7 +389,7 @@
     table = document.getElementsByClassName("torrent_list")[0];
     MakeMagic("HDC", table, 3, 4, 5, 8, 9, 10, 11);
   }
-  if(/chdbits.*torrents\.php/.test(document.URL)) {
+  if(/ptchdbits.*torrents\.php/.test(document.URL)) {
     table = document.getElementsByClassName("torrents")[0];
     MakeMagic("CHD", table, 3, 4, 5, 8, 9, 10);
   }

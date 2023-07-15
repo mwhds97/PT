@@ -49,17 +49,8 @@ volumes:
   disk2: 2215
 sites:
   CHDBits:
-    rss: 'https://chdbits.co/torrentrss.php?rows=50&isize=1&linktype=dl&passkey='
-    web:
-    - 'https://chdbits.co/torrents.php?sort=4&type=desc'
-    cookies:
-      c_secure_login: '...'
-      c_secure_pass: '...'
-      c_secure_ssl: '...'
-      c_secure_tracker_ssl: '...'
-      c_secure_uid: '...'
+    rss: 'https://ptchdbits.co/torrentrss.php?rows=50&isize=1&linktype=dl&passkey='
     hr_min_progress: 50
-    web_interval: 10
   HDChina:
     rss: 'https://hdchina.org/torrentrss.php?rows=50&isize=1&linktype=dl&passkey='
   HDSky:
