@@ -1,12 +1,12 @@
 // ==UserScript==
 // @name         UCoin 预测
-// @version      1.4
+// @version      1.5
 // @description  预测当天的 UCoin 收益
 // @author       mwhds97
 // @include      /^https?:\/\/.*u2.*dmhy.*\/mpseed\.php.*$/
 // @grant        none
-// @downloadURL  https://cdn.jsdelivr.net/gh/mwhds97/PT@master/scripts/UCoin%20%E9%A2%84%E6%B5%8B.user.js
-// @updateURL    https://cdn.jsdelivr.net/gh/mwhds97/PT@master/scripts/UCoin%20%E9%A2%84%E6%B5%8B.user.js
+// @downloadURL  https://raw.githubusercontent.com/mwhds97/PT/master/scripts/UCoin%20%E9%A2%84%E6%B5%8B.user.js
+// @updateURL    https://raw.githubusercontent.com/mwhds97/PT/master/scripts/UCoin%20%E9%A2%84%E6%B5%8B.user.js
 // ==/UserScript==
 
 (function() {

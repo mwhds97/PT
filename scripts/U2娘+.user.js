@@ -1,13 +1,13 @@
 // ==UserScript==
 // @name         U2娘+
-// @version      2.7
+// @version      2.8
 // @description  U2娘调戏脚本（鼠标划过“U2娘的小秘密”）
 // @author       mwhds97
 // @include      /^https?:\/\/.*u2.*dmhy.*$/
 // @grant        none
 // @noframes
-// @downloadURL  https://cdn.jsdelivr.net/gh/mwhds97/PT@master/scripts/U2%E5%A8%98%2B.user.js
-// @updateURL    https://cdn.jsdelivr.net/gh/mwhds97/PT@master/scripts/U2%E5%A8%98%2B.user.js
+// @downloadURL  https://raw.githubusercontent.com/mwhds97/PT/master/scripts/U2%E5%A8%98%2B.user.js
+// @updateURL    https://raw.githubusercontent.com/mwhds97/PT/master/scripts/U2%E5%A8%98%2B.user.js
 // ==/UserScript==
 
 (function() {
