@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name         U2娘+
-// @version      2.8
+// @version      2.9
 // @description  U2娘调戏脚本（鼠标划过“U2娘的小秘密”）
 // @author       mwhds97
-// @include      /^https?:\/\/.*u2.*dmhy.*$/
+// @match        http*://*.u2.dmhy.org/*
 // @grant        none
 // @noframes
 // @downloadURL  https://raw.githubusercontent.com/mwhds97/PT/master/scripts/U2%E5%A8%98%2B.user.js
@@ -14,16 +14,20 @@
   'use strict';
 
   function CreateButton(form, index, name, value, word) {
-    var btn_new = document.createElement("input");
-    form.insertBefore(btn_new, form.childNodes[index]);
-    btn_new.outerHTML = '<input type="button" id="btn_' + name + '" class="btn" name="btn_' + name + '" value="' + value + '">';
-    document.getElementById("btn_" + name).addEventListener("click", function() {
+    let btn_new = document.createElement("input");
+    btn_new.type = "button";
+    btn_new.className = "btn";
+    btn_new.id = "btn_" + name;
+    btn_new.name = "btn_" + name;
+    btn_new.value = value;
+    btn_new.addEventListener("click", () => {
       document.getElementsByName("shbox_text")[0].value = "U2娘 " + word;
       document.getElementById("hbsubmit").click();
     }, false);
+    form.insertBefore(btn_new, form.childNodes[index]);
   }
 
-  var buttons = [{"name": "income", "value": "赚分速度", "word": "我的赚分速度"},
+  const buttons = [{"name": "income", "value": "赚分速度", "word": "我的赚分速度"},
   {"name": "myuc", "value": "我的UC", "word": "我的UCoin"},
   {"name": "alluc", "value": "全站UC", "word": "全站UC存量"},
   {"name": "rich", "value": "比我壕", "word": "U2有多少人比我壕"},
@@ -135,18 +139,20 @@
   {"name": "olympic", "value": "冬奥会", "word": "冬奥会"},
   {"name": "mana", "value": "补魔", "word": "补魔"}];
 
-  var shbox = document.getElementsByName("shbox")[0];
-  for(var i in shbox.childNodes) {
-    if(shbox.childNodes[i].type === "reset") {
-      i = parseInt(i);
+  let shbox = document.getElementsByName("shbox")[0];
+  let lastpos = 0;
+  for(let [index, node] of shbox.childNodes.entries()) {
+    if(node.type === "reset") {
+      lastpos = index;
       break;
     }
   }
-  shbox.childNodes[i + 1].outerHTML = '<a href="javascript:void(0)" id="expand">U2娘的小秘密</a>';
-  document.getElementById("expand").addEventListener("mouseover", function() {
-    for(var j = 0; j < buttons.length; j++) {
-      CreateButton(shbox, i + j + 1, buttons[j].name, buttons[j].value, buttons[j].word);
+  let secret = shbox.childNodes[lastpos + 1];
+  secret.onmouseover = "";
+  secret.addEventListener("mouseover", () => {
+    for(let [index, button] of buttons.entries()) {
+      CreateButton(shbox, lastpos + index + 1, button.name, button.value, button.word);
     }
-    shbox.removeChild(document.getElementById("expand"));
+    shbox.removeChild(secret);
   }, false);
 })();
