@@ -65,11 +65,11 @@ sites:
       c_secure_uid: '...'
     retry_pause_count: 4
   MTeam:
-    rss: 'https://kp.m-team.cc/torrentrss.php?rows=50&isize=1&https=1&linktype=dl&passkey='
+    rss: 'https://xp.m-team.io/torrentrss.php?rows=50&isize=1&https=1&linktype=dl&passkey='
     web:
-    - 'https://kp.m-team.cc/torrents.php?sort=4&type=desc'
-    - 'https://kp.m-team.cc/adult.php?sort=4&type=desc'
-    - 'https://kp.m-team.cc/music.php?sort=4&type=desc'
+    - 'https://xp.m-team.io/torrents.php?sort=4&type=desc'
+    - 'https://xp.m-team.io/adult.php?sort=4&type=desc'
+    - 'https://xp.m-team.io/music.php?sort=4&type=desc'
     cookies:
       tp: '...'
     retry_pause_count: 4

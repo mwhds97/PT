@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         魔力计算器
-// @version      2.15
+// @version      2.16
 // @description  计算部分站点各个种子的魔力参数
 // @author       mwhds97
 // @match        http*://*.u2.dmhy.org/mpseed.php*
@@ -10,6 +10,11 @@
 // @match        http*://*.m-team.cc/adult.php*
 // @match        http*://*.m-team.cc/movie.php*
 // @match        http*://*.m-team.cc/music.php*
+// @match        http*://*.m-team.io/mybonus.php*
+// @match        http*://*.m-team.io/torrents.php*
+// @match        http*://*.m-team.io/adult.php*
+// @match        http*://*.m-team.io/movie.php*
+// @match        http*://*.m-team.io/music.php*
 // @match        http*://*.hdchina.org/mybonus.php*
 // @match        http*://*.hdchina.org/torrents.php*
 // @match        http*://*.ptchdbits.co/mybonus.php*
