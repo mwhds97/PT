@@ -74,7 +74,12 @@ def SSD(config: dict) -> dict:
                         "leecher": -1,
                         "snatch": -1,
                     }
-                    if re.search(r'class="pro_\S*free', str(cols[1])) is not None:
+                    if (
+                        re.search(
+                            r'class="torrent-pro-icon torrent-pro-\S*free', str(cols[1])
+                        )
+                        is not None
+                    ):
                         web_info["free"] = True
                         free_end = re.search(
                             r'<span title="\s*(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\s*"',
