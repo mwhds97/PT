@@ -154,8 +154,10 @@ class deluge:
             "total_wanted": "size",
             "active_time": "active_time",
             "seeding_time": "seeding_time",
-            "total_seeds": "seeder",
-            "total_peers": "leecher",
+            "total_seeds": "total_seeds",
+            "total_peers": "total_peers",
+            "num_seeds": "num_seeds",
+            "num_peers": "num_peers",
             "progress": "progress",
             "ratio": "ratio",
             "total_uploaded": "uploaded",
@@ -175,6 +177,8 @@ class deluge:
                 "seeding_time",
                 "total_seeds",
                 "total_peers",
+                "num_seeds",
+                "num_peers",
                 "progress",
                 "ratio",
                 "total_uploaded",
@@ -208,6 +212,8 @@ class deluge:
             self.total_size += stats["size"] / 1073741824
             self.upload_speed += stats["upload_speed"] / 1048576
             self.download_speed += stats["download_speed"] / 1048576
+            stats["seeder"] = max(stats["total_seeds"], stats["num_seeds"])
+            stats["leecher"] = max(stats["total_peers"], stats["num_peers"])
 
     def add_torrent(
         self,
@@ -334,8 +340,10 @@ class qbittorrent:
             "size": "size",
             "time_active": "active_time",
             "seeding_time": "seeding_time",
-            "num_complete": "seeder",
-            "num_incomplete": "leecher",
+            "num_complete": "num_complete",
+            "num_incomplete": "num_incomplete",
+            "num_seeds": "num_seeds",
+            "num_leechs": "num_leechs",
             "progress": "progress",
             "ratio": "ratio",
             "uploaded": "uploaded",
@@ -358,6 +366,8 @@ class qbittorrent:
                     "seeding_time",
                     "num_complete",
                     "num_incomplete",
+                    "num_seeds",
+                    "num_leechs",
                     "progress",
                     "ratio",
                     "uploaded",
@@ -384,6 +394,8 @@ class qbittorrent:
             self.total_size += stats["size"] / 1073741824
             self.upload_speed += stats["upload_speed"] / 1048576
             self.download_speed += stats["download_speed"] / 1048576
+            stats["seeder"] = max(stats["num_complete"], stats["num_seeds"])
+            stats["leecher"] = max(stats["num_incomplete"], stats["num_leechs"])
             stats["trackers"] = []
             tracker_status = ""
             response = self.get_response(
