@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         U2娘+
-// @version      2.10
+// @version      2.11
 // @description  U2娘调戏脚本（鼠标划过“U2娘的小秘密”）
 // @author       mwhds97
 // @match        http*://*.u2.dmhy.org/*
@@ -137,7 +137,8 @@
     {"name": "baby", "value": "小宝贝", "word": "小宝贝"},
     {"name": "liar", "value": "骗子", "word": "骗子"},
     {"name": "olympic", "value": "冬奥会", "word": "冬奥会"},
-    {"name": "mana", "value": "补魔", "word": "补魔"}];
+    {"name": "mana", "value": "补魔", "word": "补魔"},
+    {"name": "mygo", "value": "MyGO", "word": "MyGO!!!!!"}];
 
     let shbox = document.getElementsByName("shbox")[0];
     let lastpos = 0;
