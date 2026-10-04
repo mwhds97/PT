@@ -91,7 +91,7 @@ def HDChina(config: dict) -> dict:
             raise Exception
         time.sleep(1)
         response = session.post(
-            url="https://hdchina.org/ajax_promotion.php",
+            url="https://hdwing.org/ajax_promotion.php",
             headers={
                 "User-Agent": config["user_agent"],
                 "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",

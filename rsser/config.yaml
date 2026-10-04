@@ -52,7 +52,7 @@ sites:
     rss: 'https://ptchdbits.co/torrentrss.php?rows=50&isize=1&linktype=dl&passkey='
     hr_min_progress: 50
   HDChina:
-    rss: 'https://hdchina.org/torrentrss.php?rows=50&isize=1&linktype=dl&passkey='
+    rss: 'https://hdwing.org/torrentrss.php?rows=50&isize=1&linktype=dl&passkey='
   HDSky:
     rss: 'https://hdsky.me/torrentrss.php?rows=50&isize=1&linktype=dl&passkey='
     web:

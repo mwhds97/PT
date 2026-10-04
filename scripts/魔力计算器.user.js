@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         魔力计算器
-// @version      2.16
+// @version      2.17
 // @description  计算部分站点各个种子的魔力参数
 // @author       mwhds97
 // @match        http*://*.u2.dmhy.org/mpseed.php*
@@ -17,6 +17,8 @@
 // @match        http*://*.m-team.io/music.php*
 // @match        http*://*.hdchina.org/mybonus.php*
 // @match        http*://*.hdchina.org/torrents.php*
+// @match        http*://*.hdwing.org/mybonus.php*
+// @match        http*://*.hdwing.org/torrents.php*
 // @match        http*://*.ptchdbits.co/mybonus.php*
 // @match        http*://*.ptchdbits.co/torrents.php*
 // @match        http*://*.hdsky.me/mybonus.php*
@@ -391,7 +393,7 @@
         let params = /(\d+(?:\.\d+)?).+?(\d+(?:\.\d+)?)[\s\S]+?T0 = (\d+(?:\.\d+)?)[\s\S]+?N0 = (\d+(?:\.\d+)?)[\s\S]+?B0 = (\d+(?:\.\d+)?)[\s\S]+?L = (\d+(?:\.\d+)?)[\s\S]+?-.+?(\d+(?:\.\d+)?)/.exec(document.getElementsByClassName("text")[2].innerText);
         GM_setValue("MT", {"d": parseFloat(params[1]), "Umax": parseFloat(params[2]), "T0": parseFloat(params[3]), "N0": parseFloat(params[4]), "B0": parseFloat(params[5]), "L": parseFloat(params[6]), "sum": parseFloat(params[7])});
     }
-    if(/hdchina.*mybonus\.php/.test(document.URL)) {
+    if(/(hdchina|hdwing).*mybonus\.php/.test(document.URL)) {
         let params = /T0 = (\d+(?:\.\d+)?)[\s\S]+?N0 = (\d+(?:\.\d+)?)[\s\S]+?B0 = (\d+(?:\.\d+)?)[\s\S]+?L = (\d+(?:\.\d+)?)[\s\S]+?M = (\d+(?:\.\d+)?)[\s\S]+?R=[\s\S]+?(\d+(?:\.\d+)?)[\s\S]+?(\d+(?:\.\d+)?)[\s\S]+?A = (\d+(?:\.\d+)?).+?A = (\d+(?:\.\d+)?).+?(\[.+\[)?[\s\S]+?(\d+(?:\.\d+)?[KMGT]i?B?)/.exec(document.getElementsByClassName("normal_tab mybonus")[2].innerText);
         GM_setValue("HDC", {"T0": parseFloat(params[1]), "N0": parseFloat(params[2]), "B0": parseFloat(params[3]), "L": parseFloat(params[4]), "M": parseFloat(params[5]), "Ra": parseFloat(params[6]), "Rb": parseFloat(params[7]), "A0": parseFloat(params[typeof params[10] === "undefined" ? 9 : 8]), "Smin": size_G(params[11])});
     }
@@ -422,7 +424,7 @@
     if(/m-team.*(torrents|adult|movie|music)\.php/.test(document.URL)) {
         MakeMagic("MT", document.getElementsByClassName("torrents")[0], 3, 4, 5, 8, 9, 10);
     }
-    if(/hdchina.*torrents\.php/.test(document.URL)) {
+    if(/(hdchina|hdwing).*torrents\.php/.test(document.URL)) {
         MakeMagic("HDC", document.getElementsByClassName("torrent_list")[0], 3, 4, 5, 8, 9, 10, 11);
     }
     if(/ptchdbits.*torrents\.php/.test(document.URL)) {
